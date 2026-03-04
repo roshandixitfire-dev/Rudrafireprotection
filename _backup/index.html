@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rudra Web - Supabase Demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }
+        .card { border: 1px solid #ccc; padding: 1.5rem; border-radius: 8px; margin-top: 1rem; }
+        button { background: #3ecf8e; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-size: 1rem; }
+        button:hover { opacity: 0.9; }
+        pre { background: #f4f4f4; padding: 1rem; overflow-x: auto; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>Supabase Access Token Demo</h1>
+    <p>Project: <strong>roshandixitfire-dev's Project</strong></p>
+    
+    <div class="card">
+        <h2>1. Access Token Status</h2>
+        <p>Click below to check if there is an active session access token.</p>
+        <button onclick="checkSession()">Check Session</button>
+        <div id="status" style="margin-top: 1rem; color: #666;">Not checked yet...</div>
+        <pre id="output"></pre>
+    </div>
+
+    <script>
+        // Initialize Supabase Client
+        const supabaseUrl = 'https://pcuszzwmdqaiwyytawfc.supabase.co'
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjdXN6endtZHFhaXd5eXRhd2ZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4MDI5NjMsImV4cCI6MjA4NjM3ODk2M30.5FOkaephYnd63x6oZY6VjDGIUEaDzJq3-Z_VyNl1Kmg'
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey)
+
+        async function checkSession() {
+            const statusEl = document.getElementById('status');
+            const outputEl = document.getElementById('output');
+            
+            statusEl.innerText = "Checking...";
+            outputEl.innerText = "";
+
+            const { data, error } = await supabase.auth.getSession();
+
+            if (error) {
+                statusEl.innerText = "Error fetching session.";
+                outputEl.innerText = JSON.stringify(error, null, 2);
+                return;
+            }
+
+            if (data.session) {
+                statusEl.innerText = "Active Session Found!";
+                outputEl.innerText = "Access Token:\n" + data.session.access_token;
+            } else {
+                statusEl.innerText = "No active session (User is not logged in).";
+                outputEl.innerText = "To get an access token, the user must sign in first.\n(e.g., supabase.auth.signInWithPassword)";
+            }
+        }
+    </script>
+</body>
+</html>

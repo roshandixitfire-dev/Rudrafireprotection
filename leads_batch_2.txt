@@ -1,0 +1,50 @@
+﻿51	AS013/26	29/3/2013	WOM	incoming	Hot	Kandivali	solatire pairsed	mahaveer construction	gr+21	12th+13 rcc	pinakin shah	mayuri madam  28624341	ajit singh	sumeya associates	
+52	AS027	12/1/2012	WOM	Qualified	HOT	Borivali	Shree sai taj Dev	shree sai taj developer	gr+7th flr	completed	prajesh navikar	bharat bhai 9821981172	bharat bhai	sanjay neve	
+53		26/3/2013	WOM	incoming	HOT	Goregaon	ARS assocates	jain group of companies	gr+7	2nd slab		bhimsen 8898907951		rasik p hinduja	
+54	AS028	12/1/2012	WOM	incoming	HOT	Borivali	Shiv shakti Co-OP	siddhivinayak developers	gr+7flr	4floor	prakash chandya	nilesh sir 9870288770	salimji	hiral somaya	
+55		29/4/2013	WOM	incoming	cold	vile parle	kiran	Ginfera	bas +st+12flr	3 flr	PRAGNESH	hemant shah	HEMANAT SIR/9022392877	bhavesh shroff	
+56	AS029	12/4/2012	WOM	Lost	HOT	Andheri	Rehabet	hub town developers	gr+14floor	completed		prafull shinde 9870986120	prashant		
+57		29/3/2013	WOM	incoming	WARM	Kandivali	swastick house	swastik construstion	bas+16 flr	bas+6 flr	sundarlal jain	sundarlal jain 9820081941	abhishek singh		
+58		4/4/2013	WOM	incoming	warm	Andheri	fortuna	fortuna developers	bas+7 flr	3slab		vijendra sha	jitendra shah	h.b.mahtre	
+59	AS030	12/4/2012	WOM	1 year	Cool	Goregaon	J.B.hotel	j.b.hotel	gr+11th flor	5th floor		musafir 9892327812	abbas bhai	j.b	
+60	AS031	12/4/2012	WOM	incoming	Hot	Andheri	satal Arcade	satal sanjana builders	gr+9th flr	6th+7th flo		jivan bhai 9820423300	raju bhai	jadhav kalbang	
+61		5/4/2013	WOM	incoming	hot	Borivali	manvi hoiding	manvi developers	bas+8th floor	bas+5 slab	manish jain		rajesh pandey	vivek bhole	
+62	AS032	12/5/2012	WOM	incoming	HOT		K.manyar								
+63	AS033	12/5/2012	WOM	lost	Hot	Santakruz	Santa city	shivalek venchas pvt ltd	gr+15 flr+floor	12 flr		vijay chavan 9987759019	pawar		
+64		5/4/2013	WOM	incoming	HOT	Borivali	shiv prasad	kamala home and builders	gd+7	gd+6	kalesh bhai	dwarkesh sir 28983854	atamaram		
+65	AS034	12/5/2012	WOM	lost	hot		spring field								
+66		5-0-2013	WOM	incoming	hot	Malad	pushkaraj	niminath construction	gr+9 flr	gr+4			bappu bhai	somayya	
+67	AS035	12/6/2012	WOM	incoming	HOT	Santakruz	olive tower	indo borese infre strschar pvt	gr+12 flo	4 flr		umesh 9172593969		jain patel	
+68		5/4/2013	wom	incoming	hOT	Kandivali	sai krupa housing soc	shanti developers	gr+7	gr+4		PATEL SIR 29670644	kailash	shah 	
+69	AS036	12/6/2012	WOM	incoming	HOT	Santakruz	emporers count	M/r builders and devel	gr+7th flr	4th slab rcc		sukant 9920807578		redkar	
+70		6/4/2013	WOM	incoming	cold	Goregaon	matru bhoomi	kamal group 	st+pod+12	st+pod+1st	KAMALA		hiren chouan	deepak mehta	
+71	AS037	12/7/2012	WOM	quated	hot	Kandivali	pakiza	kriatire construction	gr+18flr	gr+7flr		sahdev 9833200511	sahdev	aakar &somaya 	
+72		6/4/2013	WOM	incoming	HOT	Goregaon	shantinikatan	madhav enterprises	gr+13 floor	gr+13	sanjay his 9769288779	mukund	rasik p hinduja	
+73	AS038	12/7/2012	WOM	Lost	HOT		shiv shakti nagar	kiran hamani	gr+21 flr	gr+21 flr			guru sami	gread arked	
+74		8/4/2013	wom	incoming	hoT	Kandivali	kishkant building	land marg developers	gr+5floor	gr+5floor	jainhai meha	kaushik chanawala 9867329534	pandyji 	nikhil patel	
+75		8/4/2013	WOM	incoming	HOT	Andheri	basera	laxmi building builders	gr+15 flr+floor	gr+3floor		amit bhai 26304005		ellora	
+76	AS040	12/8/2012	WOM	incoming	HoT	Borivali	Sai dham CHS.LTD	divne Developers	gr+12 flr	gr+9 slab 		verma 9869713006	jayesh bhai	vilas g.bagul	
+77		8/4/2013	WOM	incoming	HOT	Jogeshwari	S.M.G.K	SMGK associates	gr+pod2+19flr	gr+pod+6 fr		2266929686	asad		
+78		6/4/2013	referral	Quated	HOT	thane	lik nagari phase3	lok nagari developers	gr+7 with 3 wing	completed		ravindra ravi 8108141398			
+79	AS041	12/8/2012	WOM	incoming	HOT	Borivali	Sai shanti	kamala homes and life tiles	gr+12flr	gr+11 com		mr.jain 9833980613	tatoba	tee arch	
+80		6/4/2013	refrral	Quated	HOT	Mira Road	white lotus	arcade group	gr+2	completed		amit jain			
+81	AS042	12/8/2012	WOM	Qualified	hot	Kandivali	Hansa Heritage	rahavansinsh const	gr+15fl+bak sit 2pd	14 slab comp		pinakji rughani 28018462	tambe	sanjay shah	
+82		18/3/2013	referral	Quated	hot	Malad	mahalaxmi residency	mahalaxmi associate	gr+14 upper flr	completed		ravilal patel			
+83	AS043	12/10/2012	WOM	Lost	Hot	Kandivali	Gagan Girinclve	mahaveer construction	gr+3pod+20flr	16 flr		raju rai 9819750495	gajanand	vivek bhole	
+84	AS044	12/10/2012	WOM	Qualified	HOT	Kandivali	Santananeshwar(S.R.A)	shreeji developers	gr+12+14	gr+12 ready		mahendra jain 2267193333	prakash gawada	vishwas sathdya	
+85		17/4/2013	refrral	Quated	Hot	thane	Acro polis-AB wing	arcade group	gr+15 flr+floor	completed					
+86		17/4/2013	referral	Quated	Hot	thane	Acro polis-MNO wing	arcade group	gr+15 flr+floor	completed					
+87	AS045	12/10/2012	WOM	Lost	HOT	Goregaon	Wallya realtors pvt.ltd	wallya realotors	2bas+gr+2pod+15	5 flor com		sanju wallya 29275978	dilip date	atul setut	
+88		16/4/2013	referral	Quated	Hot	Borivali	adita institute of magmt								
+89	AS046	12/11/2012	WOM	Lost	Cool	Santakruz	Karam jyoti private limited	K.L Group	gr+8th floor	5th floor		ritesh sir 9920153130	dinesh bhai	navin sha	
+90	AS047	12/11/2012	WOM	incoming	HOT	Malad	matru darshan soc.	royal builders&derel	gr+15floor	gr+11flr comp	mahesh bhai	amit bhai 9870717272	manoj pandy	shah and asso	
+91		27/4/2013	WOM	incoming	Hot	Mira Road	salanpur nirman	salanpur nirman	gd+13	gd+12		bharat bhai 932000011	anil yadav/9768769595		
+92	AS048	12/12/2012	WOM	Quated	Hot	Malad	cosmic heritage	musabhai	gr+pod+15flr	gr+pod+11flo	musabhai	musabhai	zakhir sir		
+93		27/4/2013	WOM	Quated	warm	Bhayander	kasturi height	anapurna realtors	still+pod+10 flr	still+pod+3 flr	rajesh patel	rajesh patel 9867377802	tanaji kavle/7208438794	rishikesh h	
+94	AS049	12/12/2012	WOM	Qualified	HOT	Malad	royal cristal	royal laetars	gr+pd2+bas+22 floor	14 floor		mahendra jain 9920040033	sushant kherdekar	vishwas setoro	
+95		27/4/2013	WOM	incoming	cool	Mira Road	star premier	premier dev	gr+10 (AB wing)	A/2      B/4		ayu khatri 9322828735	nadeem khatri/9594114811	kamalesh	
+96	AS050	12/12/2012	WOM	incoming	Hot	malad	pandya ghanwal developer(s.r.a)	pandya ghanwal 	gr+15 slab	12 slab	neelkant				
+97		26/4/2013	wom	incoming	hot	Borivali	subhash sadhan	nirmala enterprises	2 bas+9 flr	completed			lalubhai/9324673959		
+98	AS051	13/12/2012	WOM	incoming	HOT	Jogeshwari	M.K.Enterprises	hussain chanawala	gr+12th flr	gr+8th flr	hussain	hussain bhai	ketan	j.n hussain	
+99		25/4/2013	WOM	incoming	warm	Khar	rezvi school	rizvi builders	bas+10flr	bas+4 flr	rizvi		rizwan sir	rizvi	
+100	AS052	13/12/2012	WOM	Qualified	Hot	Jogeshwari	hemu meadow	m.mcorporation	gr+pod12+19flr	17 flr completed	khalil	sachin sakpal 9619399776	jyosef faiz	reza kabul	

@@ -1,0 +1,49 @@
+﻿101	AS053	13/12/2012	WOM	Qualified	hot	Andheri	Atul pride	Atul developers	gr+13floor	6 floor slab		Anant pathak 9820067980	Anant pathak 9820067980	s.s.v asso	
+102	AS054	13/12/2012	WOM	incoming	HOT	Andheri	Shreem CHS	Right channel construction	gr+7th flr	completed	Devendra pandey	Sudhir bhai 9820153130	irfan	D.O.T	
+103	AS013/28	2/5/2013	repeted	Quoted	Hot	Jogeshwari	Hemu Meadow-Awing	M.M.Corporation	gr+12 flr+floor	18 flr completed		Khalil 9820153130	Sachin Sakpal/9619399776	reza kabul	
+104	AS013/29	3/5/2013	repeted	Quoted	Hot	Malad	Cosmic Heritage	Elite construction	gr+14 upper flr	completed		8879851903	Mo. Ali	dilip godambe	
+105	AS055	14/12/2012	WOM	Quote	Hot	Bandra	Blue Haven	Devine Developers	gr+12 flr	12th floor comp	Verma	Prakash gawada 9869713006	Santhosh	D.O.T	
+106	AS013/30	7/5/2013	referral	Quoted	warm	Vashi	Wallya realtors pvt.ltd	Wallya realotors	gr+14	completed		Dilip Date 9167380922	Dilip Date	deepak	
+107	AS056	14/12/2012	WOM	incoming	hot	Bandra	shanti niwas	Atul developers	gr+11th flr	completed		Anant pathak 9820061980	Anant pathak 9820061980	s.s.v asso	
+108	AS057	18/12/2012	WOM	Lost	HOT	Santa Cruz	R.G.developers(S.R.A)	R.G.developers	gr+15 floor	completed		(022)26140502	Deepak shah	Vivek bhole	
+110	AS013/31	7/5/2013	WOM	Quote	hot	Byculla	mota builders	mota builders	gr+15-A&B wing	completed		Haren bhai 9820128911	Haren bhai	Sanjeev h j	
+111	AS059	18/12/2012	WOM	lost	HOT	Vashi	Concrete Builders	Concrete builders	bas+pod+25 floor	15 flr		Suresh jain 9223164433	Vishal tapase	metia	
+112	AS060	18/12/2012	WOM	incoming	HOT	Kandivali	Veer Tower	Divne Developers	gr+21 floor	completed		Nimesh Shah-9324246348	Alpesh Dhrod 9869713006	Redkar	
+113	AS061	19/12/2012	WOM	Quoted	Hot	santacruz	M.H.Developers	M.H.Developers	bas+7 flr	completed		Munaf bhai 9821111628	Munaf bhai	y.m pagnis	
+114	AS013/32	16/5/2013	repeted	quoted	warm	Goregaon	pakiza-Kandivali	Kriatire construction	gr+pod+14 floor	completed		Sahdav 9833200511	Sahdav	somayya	
+115	AS062	19/12/2012	WOM	incoming	HOT	Malad	Royal cristal	Elite construction	bas+pod+22 flr	completed		Pinakin shah 28018462	mahomad ali	dilip godambe	
+116	AS063	20/12/2012	WOM	incoming	HOT	Mira Road	salanpur nirman	salanpur nirman	bas+gr+7 floor	completed	Aakar &somaya 	Anil yadav/9768769595	Anil yadav	A.V purker	
+117	AS064	20/12/2012	WOM	lost	HOT	Santacruz	olive tower	Ananda purkar and associates	gr+11 floor	completed		Umesh 9172593969		Atul setu	
+118	AS065	24/12/2012	WOM	Qualified	hot	Jogeshwari	mashayakh art	M/S satra properties	bas+7 flo	completed		Abdul 9987199599	Asif	apm const	
+119	AS066	24/12/2012	WOM	lost	Hot	Vile Parle	pankaj shah	pankaj shah	GD+7	completed	Pankaj shah	Pankaj shah 9821313482	Vivek bhole	squre	
+120	AS067	26/12/2012	WOM	Quote	Hot	Jogeshwari	Hussain Chanawala	M.K.Enterprises	GD+12	completed	Hussain chanawala	Hussain chanawala 2266929686	Ketan	J.N hussain	
+121	AS068	27/12/2012	WOM	lost	Hot	Andheri	Manmadir	Atul developers	11 flr	completed		Anant pathak 9820061980	Rajesh Kate	navin shah	
+122	AS069	27/12/2012	WOM	lost	HOT	Borivali	park view builders	Park view developers	bas+pd+36 flor	completed		Sandeep phokekar 9869289584	K.P.N	D.O.T	
+123	AS070	31/12/2012	WOM	incoming	HOT	Goregaon	madhav enterprises	Madhav enterprises	gr+13 floor	completed		Sanjay patel 9769288779	Mukund	Rasik p hinduja	
+124	AS013/33	8/5/2013	repeted	quoted	warm	Malad	matru darshan sso	Royal builders&derel	gr+14	completed		Amit bhai 9870717272	Manoj pandy	shah and asso	
+125	AS071	1/1/2013	WOM	Qualified	hot	Andheri	shivbhoomi	Elite construction	gr+8flr	completed	Shivbhoomi	Pinakin shah 28018462	M.A	Ellora	
+126	AS072	1/1/2013	WOM	Lost	HOT	Andheri	zevery construction	elite construction	gr+16 floor	completed		Kirti bhai 022-26288833	Raj sir	Aakar &somaya	
+127	AS073	2/1/2013	WOM	lost	Hot	Kandivali	Elite construction	karwad & k.realtors	GD+12	completed	elite construction	Pinakin shah 28018462	Ankush	A.V purker	
+128	AS074	2/1/2013	WOM	Lost	HOT	Jogeshwari	SMGK associates	M.M corporaton	gr+pod2+19flr	completed		Asad 022-26799471	Jyosef faiz	Reja kabul	
+129	AS075	4/1/2013	WOM	lost	hot	Borivali	sai taj	Siddhivinayak developers	GD+7	completed		Nilesh sir 9870288770	Salim ji	Sanjay neve	
+130	AS076	4/1/2013	WOM	lost	hot	Borivali	Satra Park	Satra group	GD+8	completed		Vinod pokharana 987004200	Prasad	Vivek bhole	
+131	AS077	4/1/2013	WOM	lost	hot	Borivali	Sterling	Key stone realtors	GD+7	completed		Mr.satish 66766811	Hirendra	m.m.pagnis	
+132	AS078	5/1/2013	WOM	incoming	HOT	Bandra	uma construction	uma construction	GR+pod+13flr	completed		Rajendra 9820189588		Land scape	
+133	AS079	5/1/2013	WOM	incoming	HOT	Borivali	Right channel	right channel construction	gr+7 flr	completed		Sudar bhai 9892617590	irfan	Vivek bhole	
+134	AS080	5/1/2013	WOM	incoming	HOT	Mira Road	Tanvi	Tanvi builders	gr+21 flr	completed		Mihir 9146142392			
+135	AS081	7/1/2013	WOM	lost	hot	Goregaon	madhav enterprises	Dharmesh construction	ST+13 FLR	completed		Sanjay patel 9869288779	Chirag tank	Rasik p hinduja	
+136	AS082	7/1/2013	WOM	lost	hot	Andheri	Shub Enterprises	Shivbhoomi	gr+9 flr	completed		Vinay pandy 9820282125	M.A	Navin shah	
+137	AS083	7/1/2013	WOM	incoming	HOT	Borivali	Kamala Landmark	A.K.developer	gr+47 flr	completed		Santosh bhai 67898100	Tatoba	Vivek bhole	
+138	AS084	7/1/2013	WOM	lost	hot	Kandivali	M/S Kamla group	Park view developers	bas+pod+21 floor	completed		Lekhraj 24982426	P.K.N	skyline	
+139	AS085	8/1/2013	WOM	incoming	HOT	Jogeshwari	Vittal Darshan	Western developers	GD+21	completed		Anand sir 2226799471	Hussain bhai		
+140	AS086	8/1/2013	WOM	lost	hot	Goregaon	Chirag infra pvt.ltd	Chirag infra pvt ltd	2pod+14floor	completed		Gopal sir 9892685634	Gopal sir		
+141	AS087	8/1/2013	WOM	lost	hot	Jogeshwari	Rezvi builder	Rezvi builders	bas+10flr	completed		Rizwan sir 26490686	Rizwan sir	Rizvi	
+142	AS088	11/1/2013	WOM	Quote	hot	Santacurz	Poshna builders	Indo borese infre strscher	gr+12 flr	completed		Harish 9172593969	Harish	Jain patel	
+143	AS089	12/1/2013	WOM	incoming	HOT	Mira Road	Shreem CHS	Right channel construction	gr+7th flr	completed	Devendra pandey	Sudhir bhai 9892617590	irfan	D.O.T	
+144	AS090	14/1/2013	WOM	Lost	HOT	Andheri	swastik house	Swastick house developers	gr+16 flr	completed		Sundarlal jain 9820081941	Sundarlal jain	Abhishek singh	
+145	AS091	14/1/2013	WOM	incoming	HOT	Andheri	zevery construction	elite construction	gr+16 floor	completed		Kirti bhai 022-26288833	Raj sir	Aakar &somaya	
+146	AS092	14/1/2013	WOM	lost	hot	Santacurz	Runwal symphony	Runwal developers pvt.ltd	gr+bas+pod+15 floor	completed		Manisha thakur 7738044238	Manisha thakur	Vivek bhole	
+147	AS093	15/1/2013	WOM	lost	hot	Borivali	Siddhivinayak developers	Siddhivinayak developers	gr+7flr	completed		Nilesh sir 9870288770	Salimji	Hiral somaya	
+148	AS094	15/1/2013	WOM	lost	hot	Borivali	Crystal height	Nirala construction	bas+8th floor	completed		Amit jain 9819940839	Amit jain	Vivek bhole	
+149	AS095	15/1/2013	WOM	incoming	HOT	Jogeshwari	Hussain Chanawala	M.K.Enterprises	GD+12	completed		Hussain chanawala 2266929686	Ketan	J.N hussain	
+150	AS096	16/1/2013	WOM	Qualified	hot	Santacurz	Poshna builders	Indo borese infre strscher	gr+12 flr	completed		Harish 9172593969	Harish	Jain patel	

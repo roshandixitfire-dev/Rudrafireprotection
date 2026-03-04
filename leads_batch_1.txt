@@ -1,0 +1,50 @@
+﻿1	AS001	10/12/2012	WOM	qualified	HOT	Santakruz	Runwal symphony	Runwal developers pvt.ltd	Gr+Bas+Pod+15fl	15 Fl compl	Sandeep runwal	Manisha Thakur	Mr.sameer patil	Vivek bhole	
+2	AS013/1		referral	qualified	Hot	Borivali	samarpan exotica	Kanakia Spaces				Sabir			Call on 6 pm
+3	AS013/2	16/03/2013	referral	Quoted	Hot	Borivali	satra park	satra group		80%		vinod pokharkar 987004200			incorrect number 19/08/16
+4	AS002	16/10/2012	WOM	incoming	warm	Mumbai(e)	Mahada project	B.G.shirkhe	22 floor	16 fl comp	Mahada	Addle	Mr.s.l.chowke	Hafiz	
+5	AS013/3		referral	Win	Hot	Andheri	gujrati samaj	M/S satra properties	gr+7 upper flr	completed		vinod pokharkar 987004200		pagnis	incorrect no 19/08/16
+6	AS003	17/10/2012	WOM	Lost	HOT	Kandivali	Jeevandeep	Mahaveer developers	s+3 p0d+20 flr	16 th flr		98202 30931			Not receving call
+7	AS013/4		referral	quated	Hot	Andheri	stertling	key stone realtor	ba+g+7+r/b+g+7+comm	completed		Mr. Satish,66766888, 61116111			busy in the meeing (27/7/16)
+8	AS004	17/10/2012	WOM	incoming	HOT	Kandivali	Veer tower	Bhadra enterpress	7pod+10fl+30 flr	3 years	Nimesh Shah-9324246348	Alpesh Dhrod/9867740654	Rahul Shah-65762530/9664460850		Mr. Nimesh is not receiving call (27/7/16)
+9		12/1/2016	WOM			Lower parel		kamala group,2nd flr, kamala house, kamala city, senapati bapat marg, 			Mahendra Rao	Nilam madam/24982428			not getting confrimation from owner
+10		7/3/2015	Times of India			Goregaon (w)	Arista	Sahajanand Developers, Opp.Joggers Park, Siddharth Nagar, Goregaon (W)				Girish -28719800			call tomorrow (27/7/2016)
+11	AS005	17/10/2012	WOM	incoming	HOT	Kandivali	Blue impress	atul developer	22 flr	2 years		Dinesh - 26836357	sales@atulprojects.com		profile sent on 30/6/16 call tmrw (27/7/16)
+12	AS013/6		WOM	quated	hot	Vishal apartment, nr. Tanishq, borivali west	Crystal height, Borivali	Nirala Construction				Amit Jain/9819940839	nirala constructus@ymail.com	022 2805 3016	currently not available for meeting possibly in end of this month(20/7/16)
+13	AS013/7	3/8/2013	WOM	Quated	Hot	Vashi		Concrete Builders				vishal tapase 9270323677/8097924781	vishal tapase	metita	not required they will call
+14	AS007	20/12/2012	WOM	3 years	HOT	Borivali	Nirvana	kamala land mark	gr+7pod+47 flr	3years		santosh bhai 67898100	mr.pandy9920211628	Vivek bhole	not receving call 
+15	AS008	20/12/2012	WOM	2 to 3 yr	hot	Borivali	Kamala enterprises	kamala group	bas+pod+21 floor	22 flr	k.t.gowani	lekraj 24982426	yadavji9987067236	skyline	rejected
+16								J.K. Enterprises				santosh vishwakarma 9867887462			Not required will call
+17	AS009	22/12/2012	WOM	quote	Hot	Malad	Mahakali redevelopers	vidhi realiters	gr+15 A&B&C	completed		(022) 29679667	Sharma/9820191177		Not required will call (27/7/16)
+18	AS013/9	3/7/2013	WOM	incoming	warm	vile parle	sheetal   	pankaj shah	gr+7	3 slab		santosh 9821323482	krishna sir	vivek bhole	no answer 
+19	AS010	22/12/2012	WOM	Qualified	hot	Borivali	Royal heristage	kunal builders	gr+16flr	13 floor		sunil  mehta 9930049009	menon		Not required will call (19/08/16)
+20	AS013/10	3/7/2013	WOM	incoming	warm	Jogeshwari	mashayakh art	squre	gr+7	2 flr		abdulla 9987199599	asif	apm const	Not required
+21	AS013/11	3/11/2013	WOM	Qualified	hot	Andheri	royal ankar	shree om sai developers	gr+b+6 flor	b+g+3flr		vijay mehra 9930844494	raja shukla	rehja kabool	Not required
+22	AS011	23/12/2012	WOM	incoming	Hot	Goregaon	Acme hill	Dharmesh construction	gr+15flr	9th floor	dharmesh construn	shah sir 67570000	chirag tank	vivek bhole	said call on 
+23	AS012	25/12/2012	WOM	incoming	HOT	Mira Road	tanvi builders	tanvi builders	gr+21 flr	under	tanvi	mihir 9146142392			call 22aug to confirm date 
+24	AS013/12	3/11/2013	WOM	incoming	Hot	Andheri	guru nivas	guru nivas developers	bas+b+12 flr	completed	inder sahani	bharat jadhav 9821699709		dubey	call after sometimes 
+25	AS013	26/10/2012	WOM	incoming	hot	Andheri	Akshay Raj Buidwell	akshay raj buidwel	gr+3pd+14 flo	13 floor		mr.mahesh			
+26	AS013/13		WOM	incoming	hot	vile parle		time gold	gr+7	3 flr	pankaj shah	pankaj shah 9821313482			no answer 
+27	AS014	26/10/2012	WOM	lost	cool	Andheri	Manmadir	shub enterprises	11 flr	9th floor	g.t somani	kulkarni 28605738	rajesh kate		incorrect number
+28	AS013/14	3/12/2013	WOM	incoming	Hot	Borivali	gardeb blue	A.K.developer	g+8th	g+7th		chandrashekhar 9833677375	chandrashekhar/9833677335	sanjashah	call on 22 aug
+29	AS015	31/10/2012	WOM	Quote	Hot	Borivali	Amichember Ltd	mhata group	8 th floor	7 flr		bharat bhai/ankesh	bharat bhai	squre	
+30	AS016	11/2/2012	WOM	qualified	hot	Borivali	Ambrosia	park view developers	bas+pd+36 flor	POD3		sandeep phonke 9869289584	sandeep phonke		incorrect number
+31	AS013/16	13/03/2013	WOM	lost	hot	Goregaon	labh shree enteprises	labh shree enteprises	gr+7	gr+7flr		asif 9768708481		jhon dentak	lost
+32	AS017	11/6/2012	WOM	lost	Hot	Andheri	Shub Enterprises	shivbhoomi	gr+8flr	gr+6th flr		silver star 9820282125	vinay pandy		call on 22aug
+33	AS013/17	19/03/2013	WOM	incoming	warm	Goregaon	anjani kumar co pvt ltd	Bhutra lakshya	gr+7	gr+3slab		Pankaj	ganesh	nanada purkar and associates	call after few days
+34	AS013/18	18/03/2013	referral	quoted	HOT	thane	Runwal garden	Runwal developers pvt.ltd	15 flr			manisha thakur 7738044387			already quoted 
+35	AS018	11/6/2012	WOM	lost	HOT	Goregaon	Arendlya	chirag infra pvt ltd	2pod+14floor	9th floor+pod		gopal sir 9892685634			out of town call some another day
+36	AS019	11/6/2012	WOM	incoming	HOT	Goregaon	Ganesh nivas	swami krupa developers	bas+6 flo	4th slab rcc		rahul			
+37	AS013/19	20/03/2013	WOM	incoming	HOT	Andheri	suyog	zevery construction	16 flr	10 flr		kirti bhai 022-26288833	raj sir		call after 1 hour
+38	AS020	29/11/2012	WOM	incoming	HOT	malad	Lotus link square	lotus group of comp.	gr+4pod+18flr	gr+4pod+2floor		santosh  66914501	ashish devre	vivek bhole	unavailable contact number
+39	AS013/20	20/03/2013	WOM	incoming	HOT	Andheri	vittal darshan	western developers	21 flr	15 slab		anand sir 2226799471	hussain bhai		not required 
+40	AS021	29/11/2012	WOM	Lost	HOT	Kandivali	Rajkamal	raj property	gr+7th+A&B wing	4th slab rcc		akhilesh	chotulal	abhijit mehta	
+41	AS013/21	22/03/2013	WOM	incoming	HOT	Borivali	om siddhagiri chs	karwad & karawa kiran realtors	 gr+12	6 flr rcc		vinod karwa 9820052159	ankush sir	arvind nanda purkar	call 22 aug
+42	AS013/22	22/03/2013	WOM	Qualified	HOT	Borivali	Sai Shruthi	Elite construction	gr+15 flr+floor	14 flr 		8879851903	mohomad ali	Dilip godambe	call 23 aug wil fix meet
+43	AS022	29/11/2012	WOM	Lost	Hp	mulund	Saptratng tower	Raja developers	gr+2pod+14 flor	15 slab		mr.vanwari 9869057502	santosh  garad	reza kabol	call 22 aug will fix meet
+44	AS023	30/11/2012	WOM	Qualified	HOT	Bandra	Hamrahi	uma construction	GR+pod+13flr	8th flor		rajendra 9820189588		land scape	no answer 
+45	AS013/23	23/03/2013	repeted	quoted	HOT	Juhu	Mangal kutir	Shamik enterprises	gr+14	completed		atish kamble 9821795684			already quoted
+46	AS013/24	29/3/2013	WOM	incoming	Hot	Borivali	rajendra kutir	jinam v realtors	gr+8	4th rcc/3 floor bw	subhash sir	piyush sir 9820791528	piyush sir		no ans
+47	AS024	30/11/2012	WOM	incoming	HOT	parle(w)	Aristlo cloud	Aristlo cloud	gr+9 flr	gr+8th		niranjan dosh 2261300000	sandeep mistry		
+48	AS013/25	29/3/2013	WOM	Quated	hot	vile parle	Laxmi kunj	nilkhant developers	gr+7	6 flr com ,7 rcc work		mr.gada	manish ji8898859983	squre ans enginr	
+49	AS025	30/11/2012	WOM	Qualified	HOT	parle(w)	Shivam construct	sony tare	gr+9 flr(2 wing)	8th rcc gng	satish sirdesai	patel n panchal 91677955845			
+50	AS026	12/1/2012	WOM	1 yr	HOT	Borivali	Gopal krishna	right channel construction	gr+7 flr	completed	devendra pandey	sudhir bhai 9892617590	irfan	DOT	
