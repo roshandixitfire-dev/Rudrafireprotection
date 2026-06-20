@@ -37,6 +37,7 @@ export default function Client360View({ client, accessLevel }: Client360ViewProp
     const [sites, setSites] = useState<any[]>([])
     const [isAddSiteOpen, setIsAddSiteOpen] = useState(false)
     const [loadingSites, setLoadingSites] = useState(true)
+    const [isHeaderExpanded, setIsHeaderExpanded] = useState(false)
 
     const fetchSites = async () => {
         const result = await getSitesAction(Number(client.id))
@@ -83,54 +84,69 @@ export default function Client360View({ client, accessLevel }: Client360ViewProp
     return (
         <div className="w-full space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Back Button & Header */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 relative">
                 <div className="space-y-4">
-                    <button
-                        onClick={() => router.back()}
-                        className="flex items-center gap-2 text-slate-500 hover:text-primary transition-colors font-medium text-sm group"
-                    >
-                        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                        Back to All Clients
-                    </button>
+                    <div className="flex items-center justify-between">
+                        <button
+                            onClick={() => router.back()}
+                            className="flex items-center gap-2 text-slate-500 hover:text-primary transition-colors font-medium text-sm group"
+                        >
+                            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                            Back to All Clients
+                        </button>
 
-                    <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary text-2xl font-bold border border-primary/20">
+                        {/* Mobile Header Toggle Menu */}
+                        <div className="md:hidden flex items-center gap-2">
+                            <span className="text-secondary font-bold text-sm bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200">
+                                {client.name?.substring(0, 15)}{client.name?.length > 15 ? '...' : ''}
+                            </span>
+                            <button
+                                onClick={() => setIsHeaderExpanded(!isHeaderExpanded)}
+                                className="p-2 text-slate-500 hover:text-primary hover:bg-slate-100 rounded-xl transition-colors shrink-0 border border-slate-100"
+                            >
+                                <MoreVertical className="w-5 h-5" />
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className={`flex items-start md:items-center gap-4 transition-all duration-300 ${isHeaderExpanded ? 'block md:flex' : 'hidden md:flex'}`}>
+                        <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary text-2xl font-bold border border-primary/20 shrink-0">
                             {client.name?.charAt(0)}
                         </div>
                         <div className="space-y-1">
-                            <div className="flex items-center gap-3">
-                                <h1 className="text-3xl font-black text-slate-900 tracking-tight">{client.name || 'Unnamed Client'}</h1>
-                                <span className="px-3 py-1 bg-emerald-100 text-emerald-600 rounded-full text-[10px] font-bold uppercase tracking-wider border border-emerald-200">
+                            <div className="flex flex-wrap items-center gap-2 md:gap-3">
+                                <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">{client.name || 'Unnamed Client'}</h1>
+                                <span className="px-3 py-1 bg-emerald-100 text-emerald-600 rounded-full text-[10px] font-bold uppercase tracking-wider border border-emerald-200 whitespace-nowrap">
                                     {client.status || 'Active'}
                                 </span>
                             </div>
-                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-slate-500 text-sm">
-                                <div className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-primary" /> {client.address || 'No Address Provided'}</div>
-                                <div className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 text-slate-400" /> +91-XXXXXXXXXX</div>
-                                <div className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5 text-slate-400" /> contact@example.com</div>
+                            <div className="flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center gap-x-4 gap-y-2 text-slate-500 text-sm mt-2 md:mt-0">
+                                <div className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-primary shrink-0" /> <span className="line-clamp-1">{client.address || 'No Address Provided'}</span></div>
+                                <div className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" /> +91-XXXXXXXXXX</div>
+                                <div className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" /> contact@example.com</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                    <div className="group relative">
-                        <button className="flex items-center gap-2 bg-slate-900 hover:bg-black text-white px-5 py-3 rounded-xl font-bold text-sm transition-all shadow-xl active:scale-95">
+                <div className={`flex items-center gap-3 transition-opacity duration-300 ${isHeaderExpanded ? 'block md:flex' : 'hidden md:flex'}`}>
+                    <div className="group relative w-full md:w-auto">
+                        <button className="flex items-center justify-center gap-2 bg-slate-900 hover:bg-black text-white w-full md:w-auto px-5 py-3 rounded-xl font-bold text-sm transition-all shadow-xl active:scale-95">
                             Quick Actions
                             <ChevronRight className="w-4 h-4" />
                         </button>
-                        <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-slate-100 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden">
+                        <div className="absolute right-0 top-full mt-2 w-full md:w-48 bg-white border border-slate-100 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden">
                             <button
                                 onClick={handleCreateQuote}
-                                className="w-full px-4 py-3 text-left text-sm hover:bg-slate-50 transition-colors flex items-center gap-2 text-slate-700"
+                                className="w-full px-4 py-3 text-left text-sm hover:bg-slate-50 transition-colors flex items-center gap-2 text-slate-700 font-medium"
                             >
-                                <FileText className="w-4 h-4" /> Create Quote
+                                <FileText className="w-4 h-4 text-primary" /> Create Quote
                             </button>
                             <button
                                 onClick={handleScheduleService}
-                                className="w-full px-4 py-3 text-left text-sm hover:bg-slate-50 transition-colors flex items-center gap-2 text-slate-700 border-t border-slate-50"
+                                className="w-full px-4 py-3 text-left text-sm hover:bg-slate-50 transition-colors flex items-center gap-2 text-slate-700 font-medium border-t border-slate-50"
                             >
-                                <Calendar className="w-4 h-4" /> Schedule Service
+                                <Calendar className="w-4 h-4 text-primary" /> Schedule Service
                             </button>
                         </div>
                     </div>
@@ -140,12 +156,12 @@ export default function Client360View({ client, accessLevel }: Client360ViewProp
             {/* Tabs Layout */}
             <div className="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden min-h-[600px]">
                 {/* Sidebar/Top Tabs */}
-                <div className="flex border-b border-slate-100 bg-slate-50/50">
+                <div className="flex overflow-x-auto scroller-hidden border-b border-slate-100 bg-slate-50/50">
                     {tabs.map((tab) => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id as any)}
-                            className={`flex items-center gap-2 px-8 py-5 text-sm font-bold transition-all relative ${activeTab === tab.id
+                            className={`flex items-center gap-2 px-6 md:px-8 py-4 md:py-5 text-sm font-bold transition-all relative whitespace-nowrap ${activeTab === tab.id
                                 ? 'text-primary'
                                 : 'text-slate-400 hover:text-slate-600'
                                 }`}

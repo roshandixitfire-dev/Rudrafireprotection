@@ -244,8 +244,8 @@ export const BulkImportModal: React.FC<BulkImportModalProps> = ({ isOpen, onClos
                                     <Check className="w-3 h-3" /> Validated Format
                                 </div>
                             </div>
-                            <div className="overflow-x-auto border border-slate-100 rounded-2xl">
-                                <table className="w-full text-left text-sm">
+                            <div className="overflow-x-auto border border-slate-100 rounded-2xl custom-scrollbar scroller-hidden">
+                                <table className="w-full text-left text-sm min-w-max">
                                     <thead className="bg-slate-50 border-b border-slate-100">
                                         <tr>
                                             {Object.entries(mappings).map(([_, dbKey]) => {
@@ -264,7 +264,7 @@ export const BulkImportModal: React.FC<BulkImportModalProps> = ({ isOpen, onClos
                                                 {Object.keys(mappings).map((colIdx) => {
                                                     const dbKey = mappings[parseInt(colIdx)]
                                                     return dbKey ? (
-                                                        <td key={colIdx} className="px-4 py-3 text-slate-600 font-medium truncate max-w-[150px]">
+                                                        <td key={colIdx} className="px-4 py-3 text-slate-600 font-medium truncate max-w-[200px]">
                                                             {row[parseInt(colIdx)] || <span className="text-slate-300 italic">empty</span>}
                                                         </td>
                                                     ) : null
@@ -321,6 +321,12 @@ export const BulkImportModal: React.FC<BulkImportModalProps> = ({ isOpen, onClos
                     </div>
                 </div>
             </div>
+            <style jsx>{`
+                .scroller-hidden::-webkit-scrollbar { display: none; }
+                .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
+                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+            `}</style>
         </div>
     )
 }

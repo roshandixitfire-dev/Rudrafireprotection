@@ -123,13 +123,13 @@ export default function LeadForm({ onClose, initialData }: LeadFormProps) {
                 <div className="p-4 md:p-6 max-h-[80vh] overflow-y-auto custom-scrollbar">
                     {error && <p className="text-red-500 text-xs font-bold bg-red-50 p-2 rounded-lg border border-red-100 mb-4 flex items-center gap-2"><AlertCircle className="w-3.5 h-3.5" />{error}</p>}
 
-                    <form action={handleSubmit} id="lead-form" className="space-y-6">
+                    <form action={handleSubmit} id="lead-form" className="space-y-4">
                         {/* Section 1: Basic Details */}
-                        <div className="bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
-                            <h3 className="text-xs font-bold text-slate-900 pb-2 mb-4 flex items-center gap-2 border-b border-slate-200/60">
+                        <div className="bg-slate-50/50 p-3 rounded-2xl border border-slate-100">
+                            <h3 className="text-[11px] font-bold text-slate-900 pb-2 mb-3 flex items-center gap-2 border-b border-slate-200/60">
                                 <Info className="w-3.5 h-3.5 text-primary" /> Core Information
                             </h3>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
                                 <div className="form-group">
                                     <label>SR.NO</label>
                                     <input name="sr_no" defaultValue={getInit('sr_no') || autoData.sr_no} placeholder="e.g. 1" />
@@ -161,11 +161,11 @@ export default function LeadForm({ onClose, initialData }: LeadFormProps) {
                         </div>
 
                         {/* Section 2: Project Details */}
-                        <div className="bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
-                            <h3 className="text-xs font-bold text-slate-900 pb-2 mb-4 flex items-center gap-2 border-b border-slate-200/60">
+                        <div className="bg-slate-50/50 p-3 rounded-2xl border border-slate-100">
+                            <h3 className="text-[11px] font-bold text-slate-900 pb-2 mb-3 flex items-center gap-2 border-b border-slate-200/60">
                                 <Building2 className="w-3.5 h-3.5 text-primary" /> Project Details
                             </h3>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-3">
                                 <div className="form-group sm:col-span-2">
                                     <label>Project Name</label>
                                     <input name="project_name" defaultValue={getInit('project_name')} placeholder="e.g. Runwal Symphony" />
@@ -174,14 +174,14 @@ export default function LeadForm({ onClose, initialData }: LeadFormProps) {
                                     <label>Developer</label>
                                     <input name="developer" defaultValue={getInit('developer')} placeholder="e.g. Runwal Developers" />
                                 </div>
-                                <div className="form-group">
+                                <div className="form-group col-span-2 sm:col-span-1">
                                     <label>Location</label>
                                     <div className="relative">
                                         <MapPin className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
                                         <input name="location" list="locationOptions" className="pl-8 w-full" defaultValue={getInit('location')} placeholder="e.g. Borivali" />
                                     </div>
                                 </div>
-                                <div className="form-group sm:col-span-2">
+                                <div className="form-group col-span-2">
                                     <label>Configuration</label>
                                     <div className="grid grid-cols-5 gap-2">
                                         <div className="flex flex-col gap-1">
@@ -217,7 +217,7 @@ export default function LeadForm({ onClose, initialData }: LeadFormProps) {
                                         <input name="rera_no" className="pl-8 w-full" defaultValue={getInit('rera_no')} placeholder="e.g. P518000..." />
                                     </div>
                                 </div>
-                                <div className="form-group sm:col-span-2">
+                                <div className="form-group col-span-2">
                                     <label>Google Maps Location</label>
                                     <div className="relative">
                                         <Globe className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
@@ -228,12 +228,12 @@ export default function LeadForm({ onClose, initialData }: LeadFormProps) {
                         </div>
 
                         {/* Section 3: Contact Persons */}
-                        <div className="bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
-                            <h3 className="text-xs font-bold text-slate-900 pb-2 mb-4 flex items-center gap-2 border-b border-slate-200/60">
+                        <div className="bg-slate-50/50 p-3 rounded-2xl border border-slate-100">
+                            <h3 className="text-[11px] font-bold text-slate-900 pb-2 mb-3 flex items-center gap-2 border-b border-slate-200/60">
                                 <User className="w-3.5 h-3.5 text-primary" /> Key Contacts
                             </h3>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="form-group sm:col-span-2">
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="form-group col-span-2">
                                     <label>Owner Name</label>
                                     <input name="owner_name" defaultValue={getInit('owner_name')} placeholder="e.g. Sandeep Runwal" />
                                 </div>
@@ -253,7 +253,7 @@ export default function LeadForm({ onClose, initialData }: LeadFormProps) {
                                     <label>Site Incharge Number</label>
                                     <input name="site_incharge_number" defaultValue={getInit('site_incharge_number')} placeholder="e.g. +91 97..." />
                                 </div>
-                                <div className="form-group sm:col-span-2">
+                                <div className="form-group col-span-2">
                                     <label>Architect</label>
                                     <input name="architect" defaultValue={getInit('architect')} placeholder="e.g. Vivek Bhole" />
                                 </div>
@@ -261,8 +261,8 @@ export default function LeadForm({ onClose, initialData }: LeadFormProps) {
                         </div>
 
                         {/* Section 4: Remarks */}
-                        <div className="bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
-                            <h3 className="text-xs font-bold text-slate-900 pb-2 mb-4 flex items-center gap-2 border-b border-slate-200/60">
+                        <div className="bg-slate-50/50 p-3 rounded-2xl border border-slate-100">
+                            <h3 className="text-[11px] font-bold text-slate-900 pb-2 mb-3 flex items-center gap-2 border-b border-slate-200/60">
                                 <FileText className="w-3.5 h-3.5 text-primary" /> Additional Information
                             </h3>
                             <div className="form-group">
@@ -321,12 +321,12 @@ export default function LeadForm({ onClose, initialData }: LeadFormProps) {
                 .custom-scrollbar::-webkit-scrollbar { width: 4px; }
                 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
                 .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-                .form-group { display: flex; flex-direction: column; gap: 3px; }
-                label { font-size: 9px; color: #64748b; font-weight: 800; text-transform: uppercase; letter-spacing: 0.3px; }
+                .form-group { display: flex; flex-direction: column; gap: 2px; }
+                label { font-size: 8px; color: #64748b; font-weight: 800; text-transform: uppercase; letter-spacing: 0.2px; }
                 input, select, textarea {
-                    padding: 7px 10px; background: #fff;
-                    border: 1px solid #e2e8f0; border-radius: 10px;
-                    color: #0f172a; font-size: 13px; outline: none;
+                    padding: 5px 8px; background: #fff;
+                    border: 1px solid #e2e8f0; border-radius: 8px;
+                    color: #0f172a; font-size: 12px; outline: none;
                     transition: all 0.2s;
                 }
                 input:focus, textarea:focus { border-color: #e11d48; background: #fff; box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.1); }

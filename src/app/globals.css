@@ -8,11 +8,31 @@
   --text-primary: #0f172a;
   --text-secondary: #64748b;
 
-  /* Sidebar Styles — light theme to match app background */
+  /* Sidebar Styles — Light theme by default */
   --sidebar-bg: #ffffff;
-  --sidebar-text: #334155;
-  --sidebar-hover-bg: #f1f5f9;
-  --sidebar-active-bg: #e11d48;
+  --sidebar-text: #64748b;
+  --sidebar-hover-bg: #f8fafc;
+  --sidebar-active-bg: rgba(225, 29, 72, 0.05);
+  --sidebar-active-text: #e11d48;
+  --sidebar-active-border: #e11d48;
+}
+
+/* Dark mode theme for sidebar */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --sidebar-bg: #1e293b;
+    --sidebar-text: #94a3b8;
+    --sidebar-hover-bg: #334155;
+    --sidebar-active-bg: rgba(225, 29, 72, 0.1);
+    --sidebar-active-text: #ffffff;
+  }
+}
+
+.dark {
+  --sidebar-bg: #1e293b;
+  --sidebar-text: #94a3b8;
+  --sidebar-hover-bg: #334155;
+  --sidebar-active-bg: rgba(225, 29, 72, 0.1);
   --sidebar-active-text: #ffffff;
 }
 
@@ -112,15 +132,13 @@ body {
   width: 260px;
   background-color: var(--sidebar-bg) !important;
   height: 100vh !important;
-  position: fixed;
-  left: 0;
-  top: 0;
   display: flex;
   flex-direction: column;
   transition: all 0.3s ease;
   z-index: 100;
   border-right: 1px solid #e2e8f0;
   box-shadow: 4px 0 16px rgba(15, 23, 42, 0.06);
+  flex-shrink: 0;
 }
 
 .sidebar.collapsed {
@@ -138,9 +156,9 @@ body {
 }
 
 .brand-text {
-  color: #0f172a !important;
-  font-weight: 700;
-  font-size: 1.1rem;
+  color: var(--sidebar-active-text) !important;
+  font-weight: 800;
+  font-size: 1.25rem;
   letter-spacing: 0.5px;
   white-space: nowrap;
   overflow: hidden;
@@ -183,7 +201,10 @@ body {
 .nav-item.active {
   background: var(--sidebar-active-bg) !important;
   color: var(--sidebar-active-text) !important;
-  box-shadow: 0 8px 20px rgba(225, 29, 72, 0.35);
+  border-left: 5px solid var(--sidebar-active-border);
+  border-radius: 0 12px 12px 0;
+  margin-left: -14px;
+  padding-left: 23px;
   font-weight: 600;
 }
 
@@ -198,19 +219,21 @@ body {
 
 .dashboard-shell {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
 }
 
 .dashboard-main {
   flex: 1;
-  margin-left: 260px;
+  min-width: 0;
+  height: 100vh;
+  overflow-y: auto;
   transition: all 0.3s ease;
   background: #f8fafc;
 }
 
-.sidebar.collapsed+.dashboard-main {
-  margin-left: 78px;
-}
+/* Sidebar collapsed state is handled by the shared class */
 
 .dashboard-content {
   padding: 1rem 2rem;

@@ -46,8 +46,8 @@ export async function getQuotations() {
         if (error) throw error
         return { success: true, data }
     } catch (error: any) {
-        console.error('Error fetching quotations:', error)
-        return { success: false, error: error.message }
+        console.error('Error fetching quotations:', error?.message || error, error?.stack)
+        return { success: false, error: error?.message || 'Unknown error' }
     }
 }
 
@@ -199,6 +199,106 @@ export async function updateQuotation(id: string, quoteData: QuotationData, item
         return { success: true }
     } catch (error: any) {
         console.error('Error updating quotation:', error)
+        return { success: false, error: error.message }
+    }
+}
+
+/**
+ * Fetch all invoices (legacy_invoices table used by the invoice form).
+ */
+export async function getInvoices() {
+    try {
+        const supabase = await createClient()
+        // Primary: legacy_invoices (used by LegacyInvoiceModule)
+        const { data: legacyData, error: legacyError } = await supabase
+            .from('legacy_invoices')
+            .select('*, clients(name)')
+            .order('invoice_date', { ascending: false })
+
+        if (legacyError) {
+            // Fallback: try old invoices table
+            const { data: fallback } = await supabase
+                .from('invoices')
+                .select('*, clients(name)')
+                .order('issue_date', { ascending: false })
+            return { success: true, data: fallback || [] }
+        }
+
+        return { success: true, data: legacyData || [] }
+    } catch (error: any) {
+        console.error('Error fetching invoices:', error?.message || error, error?.stack)
+        return { success: false, error: error?.message || 'Unknown error', data: [] }
+    }
+}
+
+/**
+ * Delete a quotation by ID.
+ */
+export async function deleteQuotation(id: string) {
+    try {
+        const supabase = await createClient()
+        // Delete items first (FK constraint)
+        await supabase.from('quotation_items').delete().eq('quotation_id', id)
+        const { error } = await supabase.from('quotations').delete().eq('id', id)
+        if (error) throw error
+        revalidatePath('/dashboard/sales')
+        return { success: true }
+    } catch (error: any) {
+        console.error('Error deleting quotation:', error)
+        return { success: false, error: error.message }
+    }
+}
+
+/**
+ * Delete an invoice by ID.
+ */
+export async function deleteInvoice(id: string) {
+    try {
+        const supabase = await createClient()
+        const { error } = await supabase.from('legacy_invoices').delete().eq('id', id)
+        await supabase.from('invoices').delete().eq('id', id)
+        
+        if (error) {
+            console.error('Legacy Invoice delete error:', error)
+        }
+        revalidatePath('/dashboard/sales')
+        return { success: true }
+    } catch (error: any) {
+        console.error('Error deleting invoice:', error)
+        return { success: false, error: error.message }
+    }
+}
+
+export async function updateQuotationStatus(id: string, status: string) {
+    try {
+        const supabase = await createClient()
+        const { error } = await supabase.from('quotations').update({ status }).eq('id', id)
+        if (error) throw error
+        
+        revalidatePath('/dashboard/sales')
+        return { success: true }
+    } catch (error: any) {
+        console.error('Error updating status:', error)
+        return { success: false, error: error.message }
+    }
+}
+
+export async function payInvoice(id: string, paymentData: any) {
+    try {
+        const supabase = await createClient()
+        
+        const { error: e1 } = await supabase.from('legacy_invoices')
+            .update({ status: 'Paid', payment_details: paymentData })
+            .eq('id', id)
+            
+        const { error: e2 } = await supabase.from('invoices')
+            .update({ status: 'Paid', payment_details: paymentData })
+            .eq('id', id)
+        
+        revalidatePath('/dashboard/sales')
+        return { success: true }
+    } catch (error: any) {
+        console.error('Error mapping payment:', error)
         return { success: false, error: error.message }
     }
 }

@@ -145,7 +145,54 @@ export default function ClientMasterTable({
             {/* List View */}
             {viewMode === 'list' ? (
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                    <div className="overflow-x-auto">
+                    <div className="block md:hidden divide-y divide-slate-100">
+                        {filteredData.length === 0 ? (
+                            <div className="py-10 text-center text-slate-400 flex flex-col items-center gap-2">
+                                <Building2 className="w-7 h-7 text-slate-300" />
+                                <p className="text-sm">No clients found.</p>
+                            </div>
+                        ) : filteredData.map((client) => (
+                            <div key={client.id} className="p-4 space-y-2 cursor-pointer hover:bg-slate-50 transition-colors" onClick={() => router.push(`/dashboard/clients/${client.id}`)}>
+                                {/* Top Row: Name and Contract Value */}
+                                <div className="flex items-start justify-between gap-2">
+                                    <div className="flex-1 min-w-0">
+                                        <div className="font-bold text-slate-900 text-[15px] leading-tight break-words">{client.name}</div>
+                                        <div className="text-xs text-slate-500 truncate mt-0.5">{client.address || 'No Address Provided'}</div>
+                                    </div>
+                                    <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                                        {Number(client.contract_value) > 0 && (
+                                            <span className="px-2 py-0.5 text-[10px] font-black uppercase rounded-md bg-slate-50 border border-slate-100 text-slate-800">
+                                                ₹{Number(client.contract_value).toLocaleString()}
+                                            </span>
+                                        )}
+                                        {/* Action Icons right below contract value */}
+                                        <div className="flex flex-col gap-1 mt-1">
+                                            <button onClick={(e) => { e.stopPropagation(); onEdit?.(client) }} className="p-1 text-primary bg-primary/5 rounded border border-primary/10 hover:bg-primary/10 transition-colors" title="Edit">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 Z"></path></svg>
+                                            </button>
+                                            <button onClick={(e) => { e.stopPropagation(); onDelete?.(client.id) }} className="p-1 text-red-500 bg-red-50 rounded border border-red-100/50 hover:bg-red-100 transition-colors" title="Delete">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 pr-8">
+                                    <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{client.area || '-'}</span>
+                                    {client.priority && (
+                                        <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-widest ${getPriorityColor(client.priority)}`}>
+                                            {client.priority}
+                                        </span>
+                                    )}
+                                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-widest border border-slate-200/50 bg-slate-100/80 text-slate-600">
+                                        {client.category || 'RESIDENTIAL'}
+                                    </span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* ── DESKTOP TABLE VIEW ── */}
+                    <div className="hidden md:block overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="bg-slate-50/50 border-bottom border-slate-100">

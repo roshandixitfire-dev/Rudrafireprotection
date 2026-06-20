@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { getUserWithRole } from '@/utils/supabase/auth'
 import ClientSidebar from '@/components/ClientSidebar'
 import ClientTopbar from '@/components/ClientTopbar'
+import { SidebarProvider } from '@/components/SidebarProvider'
 
 export default async function PortalLayout({ children }: { children: React.ReactNode }) {
     const userWithRole = await getUserWithRole()
@@ -15,17 +16,19 @@ export default async function PortalLayout({ children }: { children: React.React
     }
 
     return (
-        <div className="dashboard-shell portal-shell">
-            <ClientSidebar />
-            <div className="dashboard-main">
-                <ClientTopbar
-                    email={userWithRole.user.email}
-                    company={userWithRole.company}
-                />
-                <main className="dashboard-content">
-                    {children}
-                </main>
+        <SidebarProvider>
+            <div className="dashboard-shell portal-shell">
+                <ClientSidebar />
+                <div className="dashboard-main">
+                    <ClientTopbar
+                        email={userWithRole.user.email}
+                        company={userWithRole.company}
+                    />
+                    <main className="dashboard-content">
+                        {children}
+                    </main>
+                </div>
             </div>
-        </div>
+        </SidebarProvider>
     )
 }

@@ -45,7 +45,7 @@ function CRMPageContent() {
     const [error, setError] = useState<any>(null)
     const [isDemo, setIsDemo] = useState(false)
     const [activeTab, setActiveTab] = useState<'leads' | 'clients' | 'analytics'>(tabParam || 'leads')
-    const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(true)
+    const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(false)
     const [editingClient, setEditingClient] = useState<any>(null)
     const [isAddingClient, setIsAddingClient] = useState(false)
 
@@ -131,7 +131,7 @@ function CRMPageContent() {
 
     return (
         <div className="flex bg-slate-50 min-h-screen">
-            <div className={`flex-1 min-w-0 transition-all duration-300 ${isRightSidebarOpen ? 'mr-[260px]' : 'mr-[78px]'}`}>
+            <div className={`flex-1 min-w-0 transition-all duration-300 ${isRightSidebarOpen ? 'md:mr-[260px]' : 'md:mr-[78px]'}`}>
                 <div className="p-0 md:p-2 pb-20">
                     {/* Progress / Breadcrumbs */}
                     <div className="flex items-center gap-2 px-4 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
@@ -170,49 +170,52 @@ function CRMPageContent() {
                         <div className="flex border-b border-slate-100 bg-slate-50/50">
                             <button
                                 onClick={() => handleTabChange('leads')}
-                                className={`flex-1 py-3 text-sm font-bold tracking-wide transition-colors flex items-center justify-center gap-2 ${activeTab === 'leads' ? 'text-primary border-b-2 border-primary bg-white' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'}`}
+                                className={`flex-1 py-3 text-xs sm:text-sm font-bold tracking-wide transition-colors flex items-center justify-center gap-1.5 ${activeTab === 'leads' ? 'text-primary border-b-2 border-primary bg-white' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'}`}
                             >
-                                Leads & Inquiries
-                                <span className={`text-[10px] px-2 py-0.5 rounded-full ${activeTab === 'leads' ? 'bg-primary/10 text-primary' : 'bg-slate-200 text-slate-500'}`}>
+                                <span className="hidden sm:inline">Leads &amp; Inquiries</span>
+                                <span className="sm:hidden">Leads</span>
+                                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${activeTab === 'leads' ? 'bg-primary/10 text-primary' : 'bg-slate-200 text-slate-500'}`}>
                                     {leads.length}
                                 </span>
                             </button>
                             <button
                                 onClick={() => handleTabChange('clients')}
-                                className={`flex-1 py-3 text-sm font-bold tracking-wide transition-colors flex items-center justify-center gap-2 ${activeTab === 'clients' ? 'text-primary border-b-2 border-primary bg-white' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'}`}
+                                className={`flex-1 py-3 text-xs sm:text-sm font-bold tracking-wide transition-colors flex items-center justify-center gap-1.5 ${activeTab === 'clients' ? 'text-primary border-b-2 border-primary bg-white' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'}`}
                             >
-                                All Clients Master
-                                <span className={`text-[10px] px-2 py-0.5 rounded-full ${activeTab === 'clients' ? 'bg-primary/10 text-primary' : 'bg-slate-200 text-slate-500'}`}>
+                                <span className="hidden sm:inline">All Clients Master</span>
+                                <span className="sm:hidden">Clients</span>
+                                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${activeTab === 'clients' ? 'bg-primary/10 text-primary' : 'bg-slate-200 text-slate-500'}`}>
                                     {clients.length}
                                 </span>
                             </button>
                             <button
                                 onClick={() => handleTabChange('analytics')}
-                                className={`flex-1 py-3 text-sm font-bold tracking-wide transition-colors flex items-center justify-center gap-2 ${activeTab === 'analytics' ? 'text-primary border-b-2 border-primary bg-white' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'}`}
+                                className={`flex-1 py-3 text-xs sm:text-sm font-bold tracking-wide transition-colors flex items-center justify-center gap-1.5 ${activeTab === 'analytics' ? 'text-primary border-b-2 border-primary bg-white' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'}`}
                             >
                                 Analytics
                             </button>
                         </div>
 
-                        <div className="p-3 flex items-center justify-between bg-white flex-wrap gap-3">
-                            <div className="relative group w-full md:w-80">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
+                        <div className="p-3 flex items-center bg-white gap-2 border-b border-slate-100 overflow-x-auto scroller-hidden shrink-0">
+                            <div className="relative group flex-1 min-w-[120px] sm:w-64 sm:flex-none">
+                                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
                                 <input
                                     type="search"
-                                    placeholder={`Search ${activeTab === 'leads' ? 'leads' : 'clients'}...`}
-                                    className="w-full pl-9 pr-4 h-9 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all"
+                                    placeholder={`Search...`}
+                                    className="w-full pl-8 pr-3 h-9 bg-slate-50 border border-slate-200 rounded-lg text-[11px] sm:text-xs focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
                             </div>
 
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1.5 flex-shrink-0">
                                 <button
                                     onClick={() => activeTab === 'leads' ? setIsBulkImportLeadsOpen(true) : setIsBulkImportClientsOpen(true)}
-                                    className="flex items-center justify-center gap-1.5 px-3 h-9 bg-slate-50 text-slate-700 rounded-lg text-xs font-bold border border-slate-200 hover:bg-slate-100 transition-all shadow-sm"
+                                    className="flex items-center justify-center gap-1.5 px-2 sm:px-3 h-9 bg-slate-50 text-slate-700 rounded-lg text-xs font-bold border border-slate-200 hover:bg-slate-100 transition-all shadow-sm"
+                                    title="Bulk Import"
                                 >
                                     <Download className="w-3.5 h-3.5 text-emerald-600" />
-                                    <span className="hidden md:inline">Bulk Import</span>
+                                    <span className="hidden sm:inline">Import</span>
                                 </button>
 
                                 <button
@@ -223,22 +226,25 @@ function CRMPageContent() {
                                             setIsAddingClient(true)
                                         }
                                     }}
-                                    className="flex items-center justify-center gap-1.5 bg-primary hover:bg-primary/90 text-white px-3 h-9 rounded-lg font-bold text-xs transition-all shadow-sm whitespace-nowrap"
+                                    className="flex items-center justify-center gap-1.5 bg-primary hover:bg-primary/90 text-white px-2 sm:px-3 h-9 rounded-lg font-bold text-xs transition-all shadow-sm whitespace-nowrap"
+                                    title={activeTab === 'leads' ? 'Add Lead' : 'Add Client'}
                                 >
                                     <Plus className="w-3.5 h-3.5" />
-                                    <span>Add {activeTab === 'leads' ? 'Lead' : 'Client'}</span>
+                                    <span className="hidden sm:inline">Add {activeTab === 'leads' ? 'Lead' : 'Client'}</span>
                                 </button>
 
                                 <div className={`flex items-center bg-slate-50 p-1 rounded-lg border border-slate-200 h-9 transition-opacity ${activeTab !== 'analytics' ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
                                     <button
                                         onClick={() => setViewMode('list')}
-                                        className={`px-2 h-full rounded transition-all flex items-center justify-center ${viewMode === 'list' ? 'bg-white shadow-sm text-primary' : 'text-slate-400 hover:text-slate-600'}`}
+                                        className={`px-1.5 sm:px-2 h-full rounded transition-all flex items-center justify-center ${viewMode === 'list' ? 'bg-white shadow-sm text-primary' : 'text-slate-400 hover:text-slate-600'}`}
+                                        title="List View"
                                     >
                                         <List className="w-3.5 h-3.5" />
                                     </button>
                                     <button
                                         onClick={() => setViewMode('grid')}
-                                        className={`px-2 h-full rounded transition-all flex items-center justify-center ${viewMode === 'grid' ? 'bg-white shadow-sm text-primary' : 'text-slate-400 hover:text-slate-600'}`}
+                                        className={`px-1.5 sm:px-2 h-full rounded transition-all flex items-center justify-center ${viewMode === 'grid' ? 'bg-white shadow-sm text-primary' : 'text-slate-400 hover:text-slate-600'}`}
+                                        title="Grid View"
                                     >
                                         <LayoutGrid className="w-3.5 h-3.5" />
                                     </button>
@@ -289,92 +295,94 @@ function CRMPageContent() {
                 </div>
             </div>
 
-            <RightSidebar
-                title="System Activity"
-                isOpen={isRightSidebarOpen}
-                onToggle={() => setIsRightSidebarOpen(!isRightSidebarOpen)}
-            >
-                <div className="space-y-6 overflow-visible">
-                    <div className={`${isRightSidebarOpen ? 'bg-slate-50/50 p-4' : 'bg-transparent p-0 overflow-visible'} rounded-2xl border ${isRightSidebarOpen ? 'border-slate-100' : 'border-transparent'} shadow-sm transition-all`}>
-                        {isRightSidebarOpen && (
-                            <div className="flex justify-between items-center mb-4">
-                                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Metrics Overview</span>
-                                <TrendingUp className="w-3.5 h-3.5 text-primary" />
-                            </div>
-                        )}
-
-                        {!isRightSidebarOpen && (
-                            <div className="flex flex-col items-center mb-4 gap-4 relative group overflow-visible">
-                                <TrendingUp className="w-5 h-5 text-primary cursor-help" />
-                                <div className="absolute right-full mr-3 px-3 py-1.5 bg-slate-900 text-white text-[11px] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 whitespace-nowrap z-[1000] shadow-2xl translate-x-3 group-hover:translate-x-0 border border-slate-700/50">
-                                    Metrics Overview
-                                    <div className="absolute top-1/2 -right-1.5 -translate-y-1/2 w-3 h-3 bg-slate-900 rotate-45 border-r border-t border-slate-700/50" />
-                                </div>
-                                <div className="w-full h-px bg-slate-100" />
-                            </div>
-                        )}
-
-                        <div className={`grid ${isRightSidebarOpen ? 'gap-3' : 'gap-4'}`}>
-                            {statsToDisplay.map((stat, i) => (
-                                <div
-                                    key={i}
-                                    className={`relative group ${stat.bg} rounded-xl ${isRightSidebarOpen ? 'p-3' : 'p-2'} border border-white shadow-sm hover:shadow-md transition-all flex flex-col ${isRightSidebarOpen ? 'items-start' : 'items-center'} justify-center overflow-visible`}
-                                >
-                                    {!isRightSidebarOpen && (
-                                        <div className="absolute right-full mr-3 px-3 py-1.5 bg-slate-900 text-white text-[11px] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 whitespace-nowrap z-[1000] shadow-2xl translate-x-3 group-hover:translate-x-0 border border-slate-700/50">
-                                            {stat.label}
-                                            <div className="absolute top-1/2 -right-1.5 -translate-y-1/2 w-3 h-3 bg-slate-900 rotate-45 border-r border-t border-slate-700/50" />
-                                        </div>
-                                    )}
-                                    {isRightSidebarOpen && (
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <div className={`w-1.5 h-1.5 rounded-full ${stat.dot}`} />
-                                            <span className={`text-[10px] font-bold tracking-wider uppercase ${stat.color}`}>{stat.label}</span>
-                                        </div>
-                                    )}
-                                    <span className={`${isRightSidebarOpen ? 'text-2xl' : 'text-xl'} font-black text-slate-800 tracking-tight`}>{stat.value}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className={`bg-white rounded-2xl border border-slate-100 shadow-sm transition-all overflow-visible ${isRightSidebarOpen ? 'p-4' : 'p-2 flex flex-col items-center'}`}>
-                        <div className={`flex items-center gap-2 text-slate-800 relative group ${isRightSidebarOpen ? 'mb-4' : 'mb-2'}`}>
-                            <Clock className={`text-primary ${isRightSidebarOpen ? 'w-4 h-4' : 'w-5 h-5 cursor-help'}`} />
-                            {!isRightSidebarOpen && (
-                                <div className="absolute right-full mr-3 px-3 py-1.5 bg-slate-900 text-white text-[11px] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 whitespace-nowrap z-[1000] shadow-2xl translate-x-3 group-hover:translate-x-0 border border-slate-700/50">
-                                    Recent Activity
-                                    <div className="absolute top-1/2 -right-1.5 -translate-y-1/2 w-3 h-3 bg-slate-900 rotate-45 border-r border-t border-slate-700/50" />
+            <div className="hidden md:block">
+                <RightSidebar
+                    title="System Activity"
+                    isOpen={isRightSidebarOpen}
+                    onToggle={() => setIsRightSidebarOpen(!isRightSidebarOpen)}
+                >
+                    <div className="space-y-6 overflow-visible">
+                        <div className={`${isRightSidebarOpen ? 'bg-slate-50/50 p-4' : 'bg-transparent p-0 overflow-visible'} rounded-2xl border ${isRightSidebarOpen ? 'border-slate-100' : 'border-transparent'} shadow-sm transition-all`}>
+                            {isRightSidebarOpen && (
+                                <div className="flex justify-between items-center mb-4">
+                                    <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Metrics Overview</span>
+                                    <TrendingUp className="w-3.5 h-3.5 text-primary" />
                                 </div>
                             )}
-                            {isRightSidebarOpen && <span className="font-bold text-xs">Recent Activity</span>}
+
+                            {!isRightSidebarOpen && (
+                                <div className="flex flex-col items-center mb-4 gap-4 relative group overflow-visible">
+                                    <TrendingUp className="w-5 h-5 text-primary cursor-help" />
+                                    <div className="absolute right-full mr-3 px-3 py-1.5 bg-slate-900 text-white text-[11px] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 whitespace-nowrap z-[1000] shadow-2xl translate-x-3 group-hover:translate-x-0 border border-slate-700/50">
+                                        Metrics Overview
+                                        <div className="absolute top-1/2 -right-1.5 -translate-y-1/2 w-3 h-3 bg-slate-900 rotate-45 border-r border-t border-slate-700/50" />
+                                    </div>
+                                    <div className="w-full h-px bg-slate-100" />
+                                </div>
+                            )}
+
+                            <div className={`grid ${isRightSidebarOpen ? 'gap-3' : 'gap-4'}`}>
+                                {statsToDisplay.map((stat, i) => (
+                                    <div
+                                        key={i}
+                                        className={`relative group ${stat.bg} rounded-xl ${isRightSidebarOpen ? 'p-3' : 'p-2'} border border-white shadow-sm hover:shadow-md transition-all flex flex-col ${isRightSidebarOpen ? 'items-start' : 'items-center'} justify-center overflow-visible`}
+                                    >
+                                        {!isRightSidebarOpen && (
+                                            <div className="absolute right-full mr-3 px-3 py-1.5 bg-slate-900 text-white text-[11px] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 whitespace-nowrap z-[1000] shadow-2xl translate-x-3 group-hover:translate-x-0 border border-slate-700/50">
+                                                {stat.label}
+                                                <div className="absolute top-1/2 -right-1.5 -translate-y-1/2 w-3 h-3 bg-slate-900 rotate-45 border-r border-t border-slate-700/50" />
+                                            </div>
+                                        )}
+                                        {isRightSidebarOpen && (
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <div className={`w-1.5 h-1.5 rounded-full ${stat.dot}`} />
+                                                <span className={`text-[10px] font-bold tracking-wider uppercase ${stat.color}`}>{stat.label}</span>
+                                            </div>
+                                        )}
+                                        <span className={`${isRightSidebarOpen ? 'text-2xl' : 'text-xl'} font-black text-slate-800 tracking-tight`}>{stat.value}</span>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                        {isRightSidebarOpen ? (
-                            <div className="space-y-3">
-                                <div className="text-[10px] text-slate-500 p-2 bg-slate-50 rounded-lg">
-                                    No recent updates to show
-                                </div>
-                                <button className="w-full py-2 bg-slate-900 text-white rounded-xl text-[10px] font-bold tracking-wider uppercase hover:bg-slate-800 transition-colors">
-                                    View History
-                                </button>
+
+                        <div className={`bg-white rounded-2xl border border-slate-100 shadow-sm transition-all overflow-visible ${isRightSidebarOpen ? 'p-4' : 'p-2 flex flex-col items-center'}`}>
+                            <div className={`flex items-center gap-2 text-slate-800 relative group ${isRightSidebarOpen ? 'mb-4' : 'mb-2'}`}>
+                                <Clock className={`text-primary ${isRightSidebarOpen ? 'w-4 h-4' : 'w-5 h-5 cursor-help'}`} />
+                                {!isRightSidebarOpen && (
+                                    <div className="absolute right-full mr-3 px-3 py-1.5 bg-slate-900 text-white text-[11px] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 whitespace-nowrap z-[1000] shadow-2xl translate-x-3 group-hover:translate-x-0 border border-slate-700/50">
+                                        Recent Activity
+                                        <div className="absolute top-1/2 -right-1.5 -translate-y-1/2 w-3 h-3 bg-slate-900 rotate-45 border-r border-t border-slate-700/50" />
+                                    </div>
+                                )}
+                                {isRightSidebarOpen && <span className="font-bold text-xs">Recent Activity</span>}
                             </div>
-                        ) : (
-                            <div className="relative group">
-                                <button
-                                    onClick={() => setIsAuditLogOpen(true)}
-                                    className="w-10 h-10 bg-slate-900 text-white rounded-xl flex items-center justify-center hover:bg-slate-800 transition-colors shadow-sm"
-                                >
-                                    <History className="w-4 h-4" />
-                                </button>
-                                <div className="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-2 py-1 bg-slate-900 text-white text-[10px] font-bold rounded-md opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 whitespace-nowrap z-[1000] shadow-2xl translate-x-3 group-hover:translate-x-0 border border-slate-700/50">
-                                    View History
-                                    <div className="absolute top-1/2 -right-1.5 -translate-y-1/2 w-3 h-3 bg-slate-900 rotate-45 border-r border-t border-slate-700/50" />
+                            {isRightSidebarOpen ? (
+                                <div className="space-y-3">
+                                    <div className="text-[10px] text-slate-500 p-2 bg-slate-50 rounded-lg">
+                                        No recent updates to show
+                                    </div>
+                                    <button className="w-full py-2 bg-slate-900 text-white rounded-xl text-[10px] font-bold tracking-wider uppercase hover:bg-slate-800 transition-colors">
+                                        View History
+                                    </button>
                                 </div>
-                            </div>
-                        )}
+                            ) : (
+                                <div className="relative group">
+                                    <button
+                                        onClick={() => setIsAuditLogOpen(true)}
+                                        className="w-10 h-10 bg-slate-900 text-white rounded-xl flex items-center justify-center hover:bg-slate-800 transition-colors shadow-sm"
+                                    >
+                                        <History className="w-4 h-4" />
+                                    </button>
+                                    <div className="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-2 py-1 bg-slate-900 text-white text-[10px] font-bold rounded-md opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 whitespace-nowrap z-[1000] shadow-2xl translate-x-3 group-hover:translate-x-0 border border-slate-700/50">
+                                        View History
+                                        <div className="absolute top-1/2 -right-1.5 -translate-y-1/2 w-3 h-3 bg-slate-900 rotate-45 border-r border-t border-slate-700/50" />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </div>
-            </RightSidebar>
+                </RightSidebar>
+            </div>
 
             {isLeadFormOpen && (
                 <LeadForm

@@ -92,6 +92,8 @@ export async function createClientAction(formData: FormData) {
             priority: formData.get('priority') as string,
             amc_start_date: formData.get('amcStartDate') ? formData.get('amcStartDate') as string : null,
             amc_end_date: formData.get('amcEndDate') ? formData.get('amcEndDate') as string : null,
+            next_service: formData.get('nextService') ? formData.get('nextService') as string : null,
+            next_refilling: formData.get('nextRefilling') ? formData.get('nextRefilling') as string : null,
         }
 
         // Recent work logic
@@ -203,6 +205,8 @@ export async function updateClientAction(id: number, formData: FormData) {
             priority: formData.get('priority') as string,
             amc_start_date: formData.get('amcStartDate') ? formData.get('amcStartDate') as string : null,
             amc_end_date: formData.get('amcEndDate') ? formData.get('amcEndDate') as string : null,
+            next_service: formData.get('nextService') ? formData.get('nextService') as string : null,
+            next_refilling: formData.get('nextRefilling') ? formData.get('nextRefilling') as string : null,
         }
 
         // Handle conditional updates
@@ -437,6 +441,23 @@ export async function getSitesAction(clientId: number) {
         return { success: true, data }
     } catch (e: any) {
         console.error('Error fetching sites:', e)
+        return { success: false, error: e.message }
+    }
+}
+
+export async function getDailyServiceCountAction(date: string) {
+    try {
+        const supabase = await createClient()
+        // Check next_service column in clients table for the given date
+        const { count, error } = await supabase
+            .from('clients')
+            .select('*', { count: 'exact', head: true })
+            .eq('next_service', date)
+
+        if (error) throw error
+        return { success: true, count: count || 0 }
+    } catch (e: any) {
+        console.error('Error checking service capacity:', e)
         return { success: false, error: e.message }
     }
 }

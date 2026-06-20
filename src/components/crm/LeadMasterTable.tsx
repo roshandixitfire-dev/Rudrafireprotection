@@ -105,8 +105,49 @@ export default function LeadMasterTable({ leads: initialLeads, hideToolbar = fal
                     onLeadClick={openView}
                 />
             ) : (
-                <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
-                    <div className="overflow-x-auto">
+                <div className="bg-white overflow-hidden">
+                    {/* ── MOBILE CARD VIEW (hidden on md+) ── */}
+                    <div className="block md:hidden divide-y divide-slate-100">
+                        {filteredLeads.length === 0 ? (
+                            <div className="py-10 text-center text-slate-400 flex flex-col items-center gap-2">
+                                <Target className="w-7 h-7 text-slate-300" />
+                                <p className="text-sm">No leads found.</p>
+                            </div>
+                        ) : filteredLeads.map((lead) => (
+                            <div key={lead.id} className="p-4 space-y-2">
+                                <div className="flex items-start justify-between gap-2">
+                                    <div className="flex-1 min-w-0">
+                                        <div className="font-bold text-slate-900 text-sm truncate">{lead.project_name || 'Unnamed Project'}</div>
+                                        <div className="text-xs text-slate-500 truncate">{lead.developer || 'Unknown Developer'}</div>
+                                    </div>
+                                    <span className={`px-2 py-0.5 text-[10px] font-bold uppercase rounded-md flex-shrink-0 ${getStageClass(lead.stage)}`}>
+                                        {lead.stage || 'NEW'}
+                                    </span>
+                                </div>
+                                <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
+                                    <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{lead.location || '-'}</span>
+                                    <span className="flex items-center gap-1"><Building2 className="w-3 h-3" />{lead.const_status || '-'}</span>
+                                    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-widest ${getCategoryClass(lead.category)}`}>
+                                        {lead.category || 'COLD'}
+                                    </span>
+                                </div>
+                                <div className="flex gap-2 pt-1">
+                                    <button onClick={() => openView(lead)} className="flex-1 py-1.5 text-xs font-semibold text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors">
+                                        View
+                                    </button>
+                                    <button onClick={() => openEdit(lead)} className="flex-1 py-1.5 text-xs font-semibold text-primary bg-red-50 rounded-lg hover:bg-red-100 transition-colors">
+                                        Edit
+                                    </button>
+                                    <button onClick={() => handleDelete(lead.id)} className="py-1.5 px-3 text-xs font-semibold text-red-500 bg-red-50 rounded-lg hover:bg-red-100 transition-colors">
+                                        Del
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* ── DESKTOP TABLE VIEW (hidden on mobile) ── */}
+                    <div className="hidden md:block overflow-x-auto">
                         <table className="w-full text-left text-sm text-slate-600 border-collapse">
                             <thead className="bg-slate-50 border-b border-slate-100 text-xs uppercase font-bold text-slate-500 tracking-wider">
                                 <tr>
@@ -186,6 +227,7 @@ export default function LeadMasterTable({ leads: initialLeads, hideToolbar = fal
                     </div>
                 </div>
             )}
+
 
             {isModalOpen && (
                 <LeadForm

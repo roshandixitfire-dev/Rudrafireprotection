@@ -4,7 +4,7 @@ import { DEMO_INVOICES } from '@/utils/demo-data'
 import ModuleClientWrapper from '@/components/ModuleClientWrapper'
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
-import { Plus } from 'lucide-react'
+import { Plus, FileText } from 'lucide-react'
 
 const columns = [
     { key: 'invoiceNo', label: 'Invoice No.' },
@@ -56,13 +56,22 @@ export default async function InvoicesPage() {
                     </h1>
                     <p className="text-sm text-slate-500 mt-1">Manage and track your business billing.</p>
                 </div>
-                <Link
-                    href="/dashboard/invoices/new"
-                    className="flex items-center gap-2 bg-[#714b67] hover:bg-[#5a3c52] text-white px-6 py-3 rounded-2xl font-black text-sm transition-all shadow-lg active:scale-95"
-                >
-                    <Plus className="w-5 h-5" />
-                    Create Invoice
-                </Link>
+                <div className="flex items-center gap-3">
+                    <Link
+                        href="/dashboard/invoices/legacy"
+                        className="flex items-center gap-2 bg-[#E3242B] hover:bg-[#c01f24] text-white px-5 py-3 rounded-2xl font-black text-sm transition-all shadow-lg active:scale-95"
+                    >
+                        <FileText className="w-5 h-5" />
+                        Legacy Invoice
+                    </Link>
+                    <Link
+                        href="/dashboard/invoices/new"
+                        className="flex items-center gap-2 bg-[#714b67] hover:bg-[#5a3c52] text-white px-6 py-3 rounded-2xl font-black text-sm transition-all shadow-lg active:scale-95"
+                    >
+                        <Plus className="w-5 h-5" />
+                        Create Invoice
+                    </Link>
+                </div>
             </div>
             <ModuleClientWrapper
                 title=""

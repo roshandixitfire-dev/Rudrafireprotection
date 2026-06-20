@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, Plus, Trash2, FileText, CheckCircle2, Loader2, Save } from 'lucide-react'
+import { X, Plus, Trash2, FileText, Loader2, Save } from 'lucide-react'
 import { createQuotation, updateQuotation } from '@/app/dashboard/sales/actions'
 
 interface QuotationFormProps {
@@ -36,15 +36,12 @@ export default function QuotationForm({ isOpen, onClose, initialData, clients, o
     const [status, setStatus] = useState(initialData?.status || 'Draft')
     const [notes, setNotes] = useState(initialData?.notes || '')
 
-    // Auto-generate number: RFP/25-26/0000X
-    const [quotationNumber, setQuotationNumber] = useState(
+    const [quotationNumber] = useState(
         initialData?.quotation_number || `RFP/25-26/${String(Math.floor(1 + Math.random() * 9999)).padStart(5, '0')}`
     )
 
-    // UI State
     const [formTab, setFormTab] = useState<'details' | 'quote_history' | 'approval_history'>('details')
 
-    // Order Lines
     const [lines, setLines] = useState<any[]>(initialData?.items?.length > 0 ? initialData.items : [{
         id: crypto.randomUUID(),
         product_description: '',
@@ -61,7 +58,6 @@ export default function QuotationForm({ isOpen, onClose, initialData, clients, o
         return () => { document.body.style.overflow = 'unset' }
     }, [isOpen])
 
-    // --- Calculation Logic --- //
     const calculateLineTotal = (qty: number, price: number, taxRate: number) => {
         const base = qty * price
         const tax = base * (taxRate / 100)
@@ -72,8 +68,6 @@ export default function QuotationForm({ isOpen, onClose, initialData, clients, o
         setLines(prev => prev.map(line => {
             if (line.id !== id) return line
             const updatedLine = { ...line, [field]: value }
-
-            // Recalculate total if numerical fields change
             if (['quantity', 'unit_price', 'tax_rate'].includes(field)) {
                 updatedLine.total_price = calculateLineTotal(
                     Number(updatedLine.quantity) || 0,
@@ -98,11 +92,10 @@ export default function QuotationForm({ isOpen, onClose, initialData, clients, o
     }
 
     const removeLine = (id: string) => {
-        if (lines.length === 1) return // Keep at least one line
+        if (lines.length === 1) return
         setLines(prev => prev.filter(l => l.id !== id))
     }
 
-    // Totals
     const subtotal = lines.reduce((acc, line) => acc + ((Number(line.quantity) || 0) * (Number(line.unit_price) || 0)), 0)
     const taxTotal = lines.reduce((acc, line) => {
         const base = (Number(line.quantity) || 0) * (Number(line.unit_price) || 0)
@@ -119,7 +112,6 @@ export default function QuotationForm({ isOpen, onClose, initialData, clients, o
             return
         }
 
-        // Clean up items for the DB
         const cleanedLines = lines
             .filter(l => l.product_description.trim() !== '')
             .map((l, index) => ({
@@ -165,11 +157,8 @@ export default function QuotationForm({ isOpen, onClose, initialData, clients, o
                 result = await createQuotation(payload, cleanedLines)
             }
 
-            if (!result.success) {
-                throw new Error(result.error)
-            }
+            if (!result.success) throw new Error(result.error)
 
-            // Provide full object back to table to avoid refresh
             onSuccess({
                 id: isEdit ? initialData.id : (result as any).data?.id,
                 ...payload,
@@ -184,33 +173,34 @@ export default function QuotationForm({ isOpen, onClose, initialData, clients, o
         }
     }
 
-
     if (!isOpen) return null
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 pb-20 sm:pb-6">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4">
             <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
 
-            <div className="relative w-full max-w-6xl max-h-[90vh] bg-white rounded-2xl shadow-2xl flex flex-col animate-in zoom-in-95 duration-200">
-                {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50 rounded-t-2xl">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-primary/10 text-primary rounded-xl">
-                            <FileText className="w-5 h-5" />
+            {/* Modal: full-screen sheet on mobile, centered dialog on sm+ */}
+            <div className="relative w-full sm:max-w-6xl h-[95dvh] sm:max-h-[90vh] bg-white sm:rounded-2xl shadow-2xl flex flex-col animate-in slide-in-from-bottom sm:zoom-in-95 duration-200 rounded-t-2xl overflow-hidden">
+
+                {/* ── HEADER ── */}
+                <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100 bg-slate-50/50 flex-shrink-0">
+                    <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                        <div className="p-1.5 sm:p-2 bg-primary/10 text-primary rounded-xl flex-shrink-0">
+                            <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
                         </div>
-                        <div>
-                            <h2 className="text-xl font-bold text-slate-900">
-                                {isEdit ? `Edit Quotation ${quotationNumber}` : 'New Quotation'}
+                        <div className="min-w-0">
+                            <h2 className="text-base sm:text-xl font-bold text-slate-900 truncate">
+                                {isEdit ? `Edit • ${quotationNumber}` : 'New Quotation'}
                             </h2>
-                            <p className="text-xs font-semibold text-slate-500 mt-0.5">
+                            <p className="text-[10px] sm:text-xs font-semibold text-slate-500 mt-0.5 hidden sm:block">
                                 Create a detailed quote for a client
                             </p>
                         </div>
                     </div>
 
-                    {/* Progress Bar (Odoo Style Segmented) */}
-                    <div className="hidden lg:flex items-center overflow-hidden rounded-xl border border-slate-200">
-                        {['Draft', 'Needs Approval', 'Requirement Change', 'Rejected', 'Approved', 'Submit'].map((s, idx, arr) => {
+                    {/* Status progress — only desktop */}
+                    <div className="hidden lg:flex items-center overflow-hidden rounded-xl border border-slate-200 mx-4">
+                        {['Draft', 'Needs Approval', 'Requirement Change', 'Rejected', 'Approved', 'Submit'].map((s, idx) => {
                             const isActive = status === s
                             return (
                                 <button
@@ -222,33 +212,44 @@ export default function QuotationForm({ isOpen, onClose, initialData, clients, o
                                         ${idx !== 0 ? 'border-l border-white/20' : ''}
                                     `}
                                 >
-                                    {isActive && <div className="absolute right-0 top-1/2 -mt-2 w-0 h-0 border-y-8 border-y-transparent border-l-8 border-l-primary z-10 translate-x-full"></div>}
+                                    {isActive && <div className="absolute right-0 top-1/2 -mt-2 w-0 h-0 border-y-8 border-y-transparent border-l-8 border-l-primary z-10 translate-x-full" />}
                                     {s}
                                 </button>
                             )
                         })}
                     </div>
 
-                    <button
-                        onClick={onClose}
-                        className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
-                    >
+                    {/* Mobile: status pill */}
+                    <div className="flex lg:hidden items-center gap-2 mr-2">
+                        <select
+                            className="h-8 px-2 text-xs font-bold bg-primary/10 text-primary border border-primary/20 rounded-lg focus:outline-none"
+                            value={status}
+                            onChange={(e) => setStatus(e.target.value)}
+                        >
+                            {['Draft', 'Needs Approval', 'Requirement Change', 'Rejected', 'Approved', 'Submit'].map(s => (
+                                <option key={s} value={s}>{s}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <button onClick={onClose} className="p-1.5 sm:p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-colors flex-shrink-0">
                         <X className="w-5 h-5" />
                     </button>
                 </div>
 
+                {/* ── ERROR BANNER ── */}
                 {error && (
-                    <div className="mx-6 mt-6 p-4 bg-red-50 text-red-700 font-medium rounded-xl border border-red-200 text-sm">
+                    <div className="mx-4 sm:mx-6 mt-3 sm:mt-4 p-3 sm:p-4 bg-red-50 text-red-700 font-medium rounded-xl border border-red-200 text-xs sm:text-sm flex-shrink-0">
                         {error}
                     </div>
                 )}
 
-                {/* Form Body */}
-                <div className="flex-1 overflow-y-auto w-full p-6 pb-12">
-                    <form id="quote-form" onSubmit={handleSubmit} className="space-y-8">
+                {/* ── BODY (scrollable) ── */}
+                <div className="flex-1 overflow-y-auto w-full">
+                    <form id="quote-form" onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-6 pb-4">
 
-                        {/* Tabs Navigation */}
-                        <div className="flex border-b border-slate-200">
+                        {/* Tab Navigation */}
+                        <div className="flex border-b border-slate-200 overflow-x-auto">
                             {[
                                 { id: 'details', label: 'Details' },
                                 { id: 'quote_history', label: 'Quote History' },
@@ -258,53 +259,57 @@ export default function QuotationForm({ isOpen, onClose, initialData, clients, o
                                     key={tab.id}
                                     type="button"
                                     onClick={() => setFormTab(tab.id as any)}
-                                    className={`px-6 py-3 text-sm font-bold tracking-wide transition-colors border-b-2 ${formTab === tab.id ? 'text-primary border-primary bg-slate-50/50' : 'text-slate-500 border-transparent hover:text-slate-800 hover:bg-slate-50/30'}`}
+                                    className={`px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold tracking-wide transition-colors border-b-2 whitespace-nowrap flex-shrink-0
+                                        ${formTab === tab.id ? 'text-primary border-primary bg-slate-50/50' : 'text-slate-500 border-transparent hover:text-slate-800 hover:bg-slate-50/30'}`}
                                 >
                                     {tab.label}
                                 </button>
                             ))}
                         </div>
 
-                        {/* Tab Content: Details */}
-                        <div className={`transition-opacity duration-300 space-y-8 ${formTab === 'details' ? 'block' : 'hidden'}`}>
-                            {/* Master Information */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 bg-slate-50 p-6 rounded-b-2xl rounded-tr-2xl border border-slate-100">
+                        {/* ── DETAILS TAB ── */}
+                        <div className={`space-y-6 ${formTab === 'details' ? 'block' : 'hidden'}`}>
+
+                            {/* Master Info: 2-col on md+, 1-col on mobile */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5 bg-slate-50 p-4 sm:p-6 rounded-2xl border border-slate-100">
+
+                                {/* LEFT COLUMN */}
                                 <div className="space-y-4">
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         <div>
-                                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Quote Name</label>
+                                            <label className="block text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Quote Name</label>
                                             <input
                                                 type="text"
-                                                className="w-full h-11 px-4 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                                                className="w-full h-10 sm:h-11 px-3 sm:px-4 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                                                 value={quoteName}
                                                 onChange={(e) => setQuoteName(e.target.value)}
                                                 placeholder="E.g., Server Rack Setup"
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Quote Number</label>
+                                            <label className="block text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Quote Number</label>
                                             <input
                                                 type="text"
-                                                className="w-full h-11 px-4 bg-slate-100 border border-slate-200 rounded-xl text-sm font-bold text-slate-600 focus:outline-none"
+                                                className="w-full h-10 sm:h-11 px-3 sm:px-4 bg-slate-100 border border-slate-200 rounded-xl text-sm font-bold text-slate-600 focus:outline-none"
                                                 value={quotationNumber}
                                                 readOnly
                                             />
                                         </div>
                                     </div>
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         <div>
-                                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Quote Code</label>
+                                            <label className="block text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Quote Code</label>
                                             <input
                                                 type="text"
-                                                className="w-full h-11 px-4 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                                                className="w-full h-10 sm:h-11 px-3 sm:px-4 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                                                 value={quoteCode}
                                                 onChange={(e) => setQuoteCode(e.target.value)}
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Customer / Account</label>
+                                            <label className="block text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Customer / Account</label>
                                             <select
-                                                className="w-full h-11 px-4 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                                                className="w-full h-10 sm:h-11 px-3 sm:px-4 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                                                 value={clientId}
                                                 onChange={(e) => setClientId(e.target.value)}
                                                 required
@@ -314,20 +319,20 @@ export default function QuotationForm({ isOpen, onClose, initialData, clients, o
                                             </select>
                                         </div>
                                     </div>
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         <div>
-                                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Deal / Opportunity</label>
+                                            <label className="block text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Deal / Opportunity</label>
                                             <input
                                                 type="text"
-                                                className="w-full h-11 px-4 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                                                className="w-full h-10 sm:h-11 px-3 sm:px-4 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                                                 value={deal}
                                                 onChange={(e) => setDeal(e.target.value)}
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Quote Type</label>
+                                            <label className="block text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Quote Type</label>
                                             <select
-                                                className="w-full h-11 px-4 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                                                className="w-full h-10 sm:h-11 px-3 sm:px-4 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                                                 value={quoteType}
                                                 onChange={(e) => setQuoteType(e.target.value)}
                                             >
@@ -343,9 +348,9 @@ export default function QuotationForm({ isOpen, onClose, initialData, clients, o
                                     </div>
                                     {quoteType === 'Door' && (
                                         <div className="animate-in slide-in-from-top-2 duration-300">
-                                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Door Type</label>
+                                            <label className="block text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Door Type</label>
                                             <select
-                                                className="w-full h-11 px-4 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                                                className="w-full h-10 sm:h-11 px-3 sm:px-4 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                                                 value={doorType}
                                                 onChange={(e) => setDoorType(e.target.value)}
                                             >
@@ -357,32 +362,34 @@ export default function QuotationForm({ isOpen, onClose, initialData, clients, o
                                         </div>
                                     )}
                                 </div>
+
+                                {/* RIGHT COLUMN */}
                                 <div className="space-y-4">
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         <div>
-                                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Quotation Date</label>
+                                            <label className="block text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Quotation Date</label>
                                             <input
                                                 type="date"
-                                                className="w-full h-11 px-4 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                                                className="w-full h-10 sm:h-11 px-3 sm:px-4 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                                                 value={quotationDate}
                                                 onChange={(e) => setQuotationDate(e.target.value)}
                                                 required
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Expiration Date</label>
+                                            <label className="block text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Expiration Date</label>
                                             <input
                                                 type="date"
-                                                className="w-full h-11 px-4 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                                                className="w-full h-10 sm:h-11 px-3 sm:px-4 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                                                 value={expirationDate}
                                                 onChange={(e) => setExpirationDate(e.target.value)}
                                             />
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Valid Till (Terms)</label>
+                                        <label className="block text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Valid Till (Terms)</label>
                                         <select
-                                            className="w-full h-11 px-4 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                                            className="w-full h-10 sm:h-11 px-3 sm:px-4 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                                             value={paymentTerms}
                                             onChange={(e) => setPaymentTerms(e.target.value)}
                                         >
@@ -395,7 +402,7 @@ export default function QuotationForm({ isOpen, onClose, initialData, clients, o
                                 </div>
                             </div>
 
-                            {/* Order Lines Section */}
+                            {/* ── ORDER LINES ── */}
                             <div>
                                 <div className="flex border-b border-slate-200 mb-4">
                                     <div className="px-4 py-2 border-b-2 border-primary text-primary font-bold text-sm">
@@ -403,12 +410,86 @@ export default function QuotationForm({ isOpen, onClose, initialData, clients, o
                                     </div>
                                 </div>
 
-                                <div className="overflow-x-auto">
+                                {/* MOBILE: card-per-line layout */}
+                                <div className="block sm:hidden space-y-3">
+                                    {lines.map((line, idx) => (
+                                        <div key={line.id} className="bg-slate-50 border border-slate-200 rounded-2xl p-3 space-y-3">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Line {idx + 1}</span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeLine(line.id)}
+                                                    disabled={lines.length === 1}
+                                                    className="p-1 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-30"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                            <div>
+                                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Description</label>
+                                                <textarea
+                                                    rows={2}
+                                                    className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none font-medium"
+                                                    placeholder="Product or service description"
+                                                    value={line.product_description}
+                                                    onChange={(e) => updateLine(line.id, 'product_description', e.target.value)}
+                                                />
+                                            </div>
+                                            <div className="grid grid-cols-3 gap-2">
+                                                <div>
+                                                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Qty</label>
+                                                    <input
+                                                        type="number"
+                                                        min="0"
+                                                        step="any"
+                                                        className="w-full h-9 px-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 font-medium text-center"
+                                                        value={line.quantity || ''}
+                                                        onChange={(e) => updateLine(line.id, 'quantity', e.target.value)}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Price ₹</label>
+                                                    <input
+                                                        type="number"
+                                                        min="0"
+                                                        step="any"
+                                                        className="w-full h-9 px-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 font-medium text-center"
+                                                        value={line.unit_price || ''}
+                                                        onChange={(e) => updateLine(line.id, 'unit_price', e.target.value)}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Tax</label>
+                                                    <select
+                                                        className="w-full h-9 px-1.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none font-medium"
+                                                        value={line.tax_rate}
+                                                        onChange={(e) => updateLine(line.id, 'tax_rate', e.target.value)}
+                                                    >
+                                                        <option value="0">0%</option>
+                                                        <option value="5">5%</option>
+                                                        <option value="12">12%</option>
+                                                        <option value="18">18%</option>
+                                                        <option value="28">28%</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div className="flex justify-between items-center pt-1 border-t border-slate-200">
+                                                <span className="text-xs text-slate-500 font-medium">Subtotal</span>
+                                                <span className="text-sm font-black text-slate-800">
+                                                    ₹{line.total_price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* DESKTOP: table layout */}
+                                <div className="hidden sm:block overflow-x-auto">
                                     <table className="w-full text-sm text-left align-middle border-collapse">
                                         <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
                                             <tr>
                                                 <th className="px-3 py-3 w-[45%]">Description</th>
-                                                <th className="px-3 py-3 w-[15%]">Quantity</th>
+                                                <th className="px-3 py-3 w-[13%]">Quantity</th>
                                                 <th className="px-3 py-3 w-[15%]">Unit Price (₹)</th>
                                                 <th className="px-3 py-3 w-[12%]">Taxes (%)</th>
                                                 <th className="px-3 py-3 w-[15%] text-right">Subtotal</th>
@@ -421,38 +502,27 @@ export default function QuotationForm({ isOpen, onClose, initialData, clients, o
                                                     <td className="p-2">
                                                         <textarea
                                                             rows={2}
-                                                            className="w-full p-2 bg-transparent hover:bg-white border hover:border-slate-200 rounded-lg text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all resize-none font-medium"
+                                                            className="w-full p-2 bg-transparent hover:bg-white border border-transparent hover:border-slate-200 rounded-lg text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all resize-none font-medium"
                                                             placeholder="Product or service description"
                                                             value={line.product_description}
                                                             onChange={(e) => updateLine(line.id, 'product_description', e.target.value)}
-                                                            required
                                                         />
                                                     </td>
                                                     <td className="p-2">
-                                                        <input
-                                                            type="number"
-                                                            min="0"
-                                                            step="any"
-                                                            className="w-full p-2 bg-transparent hover:bg-white border hover:border-slate-200 rounded-lg text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                                                        <input type="number" min="0" step="any"
+                                                            className="w-full p-2 bg-transparent hover:bg-white border border-transparent hover:border-slate-200 rounded-lg text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
                                                             value={line.quantity || ''}
-                                                            onChange={(e) => updateLine(line.id, 'quantity', e.target.value)}
-                                                            required
-                                                        />
+                                                            onChange={(e) => updateLine(line.id, 'quantity', e.target.value)} />
                                                     </td>
                                                     <td className="p-2">
-                                                        <input
-                                                            type="number"
-                                                            min="0"
-                                                            step="any"
-                                                            className="w-full p-2 bg-transparent hover:bg-white border hover:border-slate-200 rounded-lg text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                                                        <input type="number" min="0" step="any"
+                                                            className="w-full p-2 bg-transparent hover:bg-white border border-transparent hover:border-slate-200 rounded-lg text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
                                                             value={line.unit_price || ''}
-                                                            onChange={(e) => updateLine(line.id, 'unit_price', e.target.value)}
-                                                            required
-                                                        />
+                                                            onChange={(e) => updateLine(line.id, 'unit_price', e.target.value)} />
                                                     </td>
                                                     <td className="p-2">
                                                         <select
-                                                            className="w-full p-2 bg-transparent hover:bg-white border hover:border-slate-200 rounded-lg text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                                                            className="w-full p-2 bg-transparent hover:bg-white border border-transparent hover:border-slate-200 rounded-lg text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
                                                             value={line.tax_rate}
                                                             onChange={(e) => updateLine(line.id, 'tax_rate', e.target.value)}
                                                         >
@@ -467,12 +537,9 @@ export default function QuotationForm({ isOpen, onClose, initialData, clients, o
                                                         ₹{line.total_price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                     </td>
                                                     <td className="p-2 text-center">
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => removeLine(line.id)}
+                                                        <button type="button" onClick={() => removeLine(line.id)}
                                                             className="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
-                                                            disabled={lines.length === 1}
-                                                        >
+                                                            disabled={lines.length === 1}>
                                                             <Trash2 className="w-4 h-4" />
                                                         </button>
                                                     </td>
@@ -483,30 +550,24 @@ export default function QuotationForm({ isOpen, onClose, initialData, clients, o
                                 </div>
 
                                 <div className="mt-4">
-                                    <button
-                                        type="button"
-                                        onClick={addLine}
-                                        className="flex items-center gap-2 text-sm font-bold text-primary hover:text-primary/80 transition-colors"
-                                    >
+                                    <button type="button" onClick={addLine} className="flex items-center gap-2 text-sm font-bold text-primary hover:text-primary/80 transition-colors">
                                         <Plus className="w-4 h-4" /> Add a product
                                     </button>
                                 </div>
 
-                                {/* Breakdown & Totals */}
-                                <div className="flex flex-col md:flex-row justify-between gap-8 pt-8 border-t border-slate-100 mt-8">
-                                    {/* Notes */}
+                                {/* Totals + Notes */}
+                                <div className="flex flex-col md:flex-row justify-between gap-6 pt-6 border-t border-slate-100 mt-6">
                                     <div className="flex-1">
                                         <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Terms and Conditions</label>
                                         <textarea
-                                            className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all resize-none min-h-[120px]"
+                                            className="w-full p-3 sm:p-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all resize-none min-h-[100px] sm:min-h-[120px]"
                                             placeholder="Enter terms and conditions, warranty details, or customer notes..."
                                             value={notes}
                                             onChange={(e) => setNotes(e.target.value)}
                                         />
                                     </div>
 
-                                    {/* Summary Right Align */}
-                                    <div className="w-full md:w-80 space-y-3 bg-slate-50 p-6 rounded-2xl border border-slate-100 h-fit">
+                                    <div className="w-full md:w-72 space-y-3 bg-slate-50 p-4 sm:p-6 rounded-2xl border border-slate-100 h-fit">
                                         <div className="flex justify-between items-center text-sm">
                                             <span className="text-slate-500 font-medium">Untaxed Amount:</span>
                                             <span className="font-bold text-slate-800">₹{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
@@ -516,37 +577,36 @@ export default function QuotationForm({ isOpen, onClose, initialData, clients, o
                                             <span className="font-bold text-slate-800">₹{taxTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                         </div>
                                         <div className="flex justify-between items-center pt-1">
-                                            <span className="text-lg font-black text-slate-900">Total:</span>
-                                            <span className="text-2xl font-black text-primary">₹{grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                            <span className="text-base font-black text-slate-900">Total:</span>
+                                            <span className="text-xl sm:text-2xl font-black text-primary">₹{grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Tab Content: Quote History */}
-                        <div className={`transition-opacity duration-300 ${formTab === 'quote_history' ? 'block' : 'hidden'}`}>
+                        {/* Quote History Tab */}
+                        <div className={formTab === 'quote_history' ? 'block' : 'hidden'}>
                             <div className="bg-slate-50 p-8 rounded-2xl border border-slate-100 text-center">
                                 <p className="text-slate-500 font-medium">No past revisions for this quote.</p>
                             </div>
                         </div>
 
-                        {/* Tab Content: Approval History */}
-                        <div className={`transition-opacity duration-300 ${formTab === 'approval_history' ? 'block' : 'hidden'}`}>
+                        {/* Approval History Tab */}
+                        <div className={formTab === 'approval_history' ? 'block' : 'hidden'}>
                             <div className="bg-slate-50 p-8 rounded-2xl border border-slate-100 text-center">
                                 <p className="text-slate-500 font-medium">No approval requests yet.</p>
                             </div>
                         </div>
-
                     </form>
                 </div>
 
-                {/* Footer Controls */}
-                <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 rounded-b-2xl flex items-center justify-between">
+                {/* ── FOOTER ── */}
+                <div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-slate-100 bg-slate-50/50 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2 flex-shrink-0">
                     <button
                         type="button"
                         onClick={onClose}
-                        className="px-6 h-11 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold text-sm hover:bg-slate-50 transition-colors"
+                        className="w-full sm:w-auto px-6 h-11 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold text-sm hover:bg-slate-50 transition-colors"
                         disabled={loading}
                     >
                         Cancel
@@ -555,18 +615,13 @@ export default function QuotationForm({ isOpen, onClose, initialData, clients, o
                     <button
                         type="submit"
                         form="quote-form"
-                        className="flex items-center justify-center gap-2 bg-slate-900 hover:bg-black text-white px-8 h-11 rounded-xl font-bold text-sm transition-all shadow-md active:scale-95 disabled:opacity-70"
+                        className="w-full sm:w-auto flex items-center justify-center gap-2 bg-slate-900 hover:bg-black text-white px-8 h-11 rounded-xl font-bold text-sm transition-all shadow-md active:scale-95 disabled:opacity-70"
                         disabled={loading}
                     >
-                        {loading ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                            <Save className="w-4 h-4" />
-                        )}
+                        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                         <span>{isEdit ? 'Save Changes' : 'Confirm Quotation'}</span>
                     </button>
                 </div>
-
             </div>
         </div>
     )

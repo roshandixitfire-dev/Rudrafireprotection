@@ -1,0 +1,241 @@
+.quotation-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: #1a1a1a;
+    background-color: transparent;
+}
+
+.quotation-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+@media (min-width: 640px) {
+    .quotation-card {
+        padding: 1.5rem;
+        margin-bottom: 1.25rem;
+    }
+}
+
+@media (min-width: 768px) {
+    .quotation-card {
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+    }
+}
+
+.quotation-header {
+    border-bottom: 2px solid #ef4444;
+    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.brand-section h1 {
+    color: #ef4444;
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: -0.025em;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.form-input {
+    padding: 0.625rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.section-container {
+    margin-top: 3rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.section-header {
+    background: #f1f5f9;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.section-title {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 1.1rem;
+}
+
+.boq-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.boq-table th {
+    background: #f8fafc;
+    text-align: left;
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    color: #64748b;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.boq-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.boq-input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 0.25rem;
+}
+
+.boq-input:focus {
+    outline: 1px solid #ef4444;
+    background: white;
+}
+
+.summary-sheet {
+    margin-top: 3rem;
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 2rem;
+}
+
+.summary-table {
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+
+.total-row {
+    background: #fef2f2;
+    font-weight: 700;
+}
+
+.terms-section {
+    margin-top: 3rem;
+    padding: 2rem;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+
+.print-preview {
+    display: none;
+}
+
+@media print {
+
+    /* Hide ALL dashboard sidebars and UI elements */
+    .sidebar,
+    .right-sidebar,
+    .sidebar-nav,
+    .no-print,
+    aside,
+    nav,
+    header,
+    button,
+    .flex-shrink-0 {
+        display: none !important;
+    }
+
+    /* Reset dashboard layout constraints */
+    .dashboard-layout,
+    .main-content,
+    main,
+    .flex-1 {
+        display: block !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        overflow: visible !important;
+        min-height: auto !important;
+    }
+
+    body {
+        background: white !important;
+    }
+
+    .quotation-container {
+        padding: 0 !important;
+        margin: 0 !important;
+        background: white !important;
+        width: 100% !important;
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+    }
+
+    .quotation-card {
+        box-shadow: none !important;
+        padding: 0 !important;
+        border: none !important;
+    }
+
+    .print-preview {
+        display: block !important;
+        width: 100% !important;
+        padding: 0 !important;
+    }
+
+    /* Force A4 layout correctly */
+    @page {
+        size: A4;
+        margin: 10mm;
+    }
+
+    /* Prevent awkward breaks inside tables */
+    tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+
+    .page-break-before {
+        page-break-before: always;
+    }
+
+    /* Hide Lucide icons if they cause issues */
+    svg {
+        display: none !important;
+    }
+}

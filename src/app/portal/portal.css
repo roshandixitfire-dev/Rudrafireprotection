@@ -8,9 +8,8 @@
 
 /* ===== Portal Sidebar ===== */
 .portal-brand-logo {
-    width: 42px;
-    /* Increased 50% from 28px */
-    height: auto;
+    height: 52px;
+    width: auto;
     object-fit: contain;
     animation: brandReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards, flamePulse 3s ease-in-out infinite alternate;
     opacity: 0;
@@ -632,9 +631,9 @@
 }
 
 .login-logo {
-    width: 120px;
-    /* Increased 50% from 80px */
-    height: auto;
+    height: 140px;
+    width: auto;
+    max-width: 100%;
     margin-bottom: 24px;
     object-fit: contain;
     animation: brandReveal 1s cubic-bezier(0.16, 1, 0.3, 1) forwards, flamePulse 2s ease-in-out infinite alternate;

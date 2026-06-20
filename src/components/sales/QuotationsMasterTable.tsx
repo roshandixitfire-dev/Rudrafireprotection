@@ -1,4 +1,5 @@
 'use client'
+import Link from 'next/link'
 
 import { useState } from 'react'
 import { Plus, Search, FileText, FileDown, Eye, CheckCircle2, Clock } from 'lucide-react'
@@ -64,16 +65,25 @@ export default function QuotationsMasterTable({ initialQuotations, clients, acce
                     </div>
 
                     {(accessLevel === 'full' || accessLevel === 'admin' || accessLevel === 'employee') && (
-                        <button
-                            onClick={() => {
-                                setEditingQuotation(null)
-                                setIsFormOpen(true)
-                            }}
-                            className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 h-11 rounded-xl font-bold text-sm transition-all shadow-sm active:scale-95 shadow-red-600/20"
-                        >
-                            <Plus className="w-4 h-4" />
-                            <span>New Quotation</span>
-                        </button>
+                        <div className="flex gap-2">
+                            <Link
+                                href="/dashboard/quotations/new"
+                                className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 h-11 rounded-xl font-bold text-sm transition-all shadow-sm active:scale-95 shadow-emerald-600/20"
+                            >
+                                <Plus className="w-4 h-4" />
+                                <span>New Professional Quote</span>
+                            </Link>
+                            <button
+                                onClick={() => {
+                                    setEditingQuotation(null)
+                                    setIsFormOpen(true)
+                                }}
+                                className="flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-900 text-white px-6 h-11 rounded-xl font-bold text-sm transition-all shadow-sm active:scale-95 shadow-slate-900/10"
+                            >
+                                <Plus className="w-4 h-4" />
+                                <span>Legacy Quote</span>
+                            </button>
+                        </div>
                     )}
                 </div>
             </div>
@@ -119,26 +129,35 @@ export default function QuotationsMasterTable({ initialQuotations, clients, acce
                                             key={quote.id}
                                             className="hover:bg-slate-50/80 transition-colors group border-b border-slate-50 last:border-none"
                                         >
-                                            <td className="px-6 py-4 font-bold text-slate-900">
-                                                {quote.quotation_number}
+                                            <td className="px-6 py-4">
+                                                <div className="font-bold text-slate-900">{quote.quotation_number}</div>
+                                                <div className="mt-1.5">
+                                                    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide
+                                                        ${(quote.raw_json || quote.sections_data)
+                                                            ? 'bg-blue-50 text-blue-600 border border-blue-100'
+                                                            : 'bg-emerald-50 text-emerald-600 border border-emerald-100'}`}
+                                                    >
+                                                        {(quote.raw_json || quote.sections_data) ? 'Professional' : 'Legacy'}
+                                                    </span>
+                                                </div>
                                             </td>
                                             <td className="px-6 py-4 font-medium text-slate-700">
-                                                {quote.clients?.name || 'Unknown Client'}
+                                                {quote.clients?.name || clients?.find((c: any) => c.id === quote.client_id)?.name || quote.raw_json?.companyName || quote.raw_json?.clientName || quote.client_name || 'Unknown Client'}
                                             </td>
-                                            <td className="px-6 py-4 text-slate-500">
+                                            <td className="px-6 py-4 text-slate-500" suppressHydrationWarning>
                                                 {(() => {
                                                     const d = new Date(createdDate);
                                                     return isNaN(d.getTime()) ? 'N/A' : `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
                                                 })()}
                                             </td>
-                                            <td className={`px-6 py-4 font-medium ${isExpired ? 'text-red-600' : 'text-slate-500'}`}>
+                                            <td className={`px-6 py-4 font-medium ${isExpired ? 'text-red-600' : 'text-slate-500'}`} suppressHydrationWarning>
                                                 {(() => {
                                                     const d = new Date(validUntilDate);
                                                     return isNaN(d.getTime()) ? 'N/A' : `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
                                                 })()}
                                             </td>
-                                            <td className="px-6 py-4 font-black text-slate-700 text-right">
-                                                {quote.grand_total?.toLocaleString()}
+                                            <td className="px-6 py-4 font-black text-slate-700 text-right" suppressHydrationWarning>
+                                                {quote.grand_total ? `₹${quote.grand_total.toLocaleString('en-IN')}` : 'N/A'}
                                             </td>
                                             <td className="px-6 py-4 text-center">
                                                 <span className={`px-2.5 py-1 text-xs font-bold rounded-lg inline-flex items-center justify-center min-w-[80px] ${getStatusColor(quote.status)}`}>
@@ -149,8 +168,12 @@ export default function QuotationsMasterTable({ initialQuotations, clients, acce
                                                 <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                     <button
                                                         onClick={() => {
-                                                            setEditingQuotation(quote)
-                                                            setIsFormOpen(true)
+                                                            if (quote.raw_json || quote.sections_data) {
+                                                                window.location.href = `/dashboard/quotations/new?id=${quote.id}`
+                                                            } else {
+                                                                setEditingQuotation(quote)
+                                                                setIsFormOpen(true)
+                                                            }
                                                         }}
                                                         className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors border border-transparent hover:border-blue-100"
                                                         title="View / Edit"

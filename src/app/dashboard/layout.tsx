@@ -1,6 +1,7 @@
-import { getUserWithRole } from '@/utils/supabase/auth'
 import { redirect } from 'next/navigation'
+import { getUserWithRole } from '@/utils/supabase/auth'
 import DashboardSidebar from '@/components/DashboardSidebar'
+import { SidebarProvider } from '@/components/SidebarProvider'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
     const userWithRole = await getUserWithRole()
@@ -14,17 +15,19 @@ export default async function DashboardLayout({ children }: { children: React.Re
     }
 
     return (
-        <div className="dashboard-shell">
-            <DashboardSidebar
-                role={userWithRole.role}
-                permissions={userWithRole.permissions}
-                email={userWithRole.user.email}
-            />
-            <div className="dashboard-main">
-                <main className="dashboard-content">
-                    {children}
-                </main>
+        <SidebarProvider>
+            <div className="dashboard-shell">
+                <DashboardSidebar
+                    role={userWithRole.role}
+                    permissions={userWithRole.permissions}
+                    email={userWithRole.user.email}
+                />
+                <div className="dashboard-main">
+                    <main className="dashboard-content">
+                        {children}
+                    </main>
+                </div>
             </div>
-        </div>
+        </SidebarProvider>
     )
 }

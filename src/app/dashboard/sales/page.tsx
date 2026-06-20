@@ -1,6 +1,6 @@
 import React from 'react'
-import { getQuotations } from './actions'
-import QuotationsMasterTable from '@/components/sales/QuotationsMasterTable'
+import { getQuotations, getInvoices } from './actions'
+import SalesHub from '@/components/sales/SalesHub'
 import { createClient } from '@/utils/supabase/server'
 import { getUserWithRole } from '@/utils/supabase/auth'
 import { redirect } from 'next/navigation'
@@ -11,23 +11,32 @@ export default async function SalesPage() {
         redirect('/login')
     }
 
-    // Fetch initial list of quotations
-    const { data: quotationsData, success } = await getQuotations()
-    const quotations = success ? quotationsData || [] : []
+    // Fetch quotations
+    const { data: quotationsData, success: quotationsOk } = await getQuotations()
+    const quotations = quotationsOk ? quotationsData || [] : []
 
-    // Pre-fetch active clients so the QuotationForm dropdown has them ready
+    // Fetch invoices
+    const { data: invoicesData, success: invoicesOk } = await getInvoices()
+    const invoices = invoicesOk ? (invoicesData as any[]) || [] : []
+
+    // Fetch clients for dropdown
     let clients: any[] = []
     try {
         const supabase = await createClient()
         const { data } = await supabase.from('clients').select('id, name, address, gst_number')
         if (data) clients = data
-    } catch (e) {
-        console.error("Failed to fetch clients for dropdown", e)
+    } catch {
+        // non-fatal
     }
 
     return (
-        <div className="flex-1 min-w-0 h-screen overflow-y-auto bg-slate-50 relative p-4 md:p-8">
-            <QuotationsMasterTable initialQuotations={quotations!} clients={clients} accessLevel={userWithRole.role} />
+        <div className="flex-1 min-w-0 bg-slate-50 relative p-4 md:p-8">
+            <SalesHub
+                quotations={quotations as any[]}
+                invoices={invoices}
+                clients={clients}
+                accessLevel={userWithRole.role}
+            />
         </div>
     )
 }
