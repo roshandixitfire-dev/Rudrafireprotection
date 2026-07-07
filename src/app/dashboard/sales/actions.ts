@@ -35,19 +35,42 @@ export async function getQuotations() {
     try {
         const supabase = await createClient()
 
-        const { data, error } = await supabase
+        const { data: proQuotes } = await supabase
             .from('quotations')
             .select(`
                 *,
                 clients (name)
             `)
-            .order('created_at', { ascending: false })
 
-        if (error) throw error
-        return { success: true, data }
+        const { data: legacyQuotes } = await supabase
+            .from('legacy_quotations')
+            .select('*')
+
+        const { data: amcQuotes } = await supabase
+            .from('amc_quotations')
+            .select('*')
+
+        const combined: any[] = []
+        if (proQuotes) {
+            combined.push(...proQuotes.map(q => ({ ...q, type: 'professional' })))
+        }
+        if (legacyQuotes) {
+            combined.push(...legacyQuotes.map(q => ({ ...q, type: 'legacy' })))
+        }
+        if (amcQuotes) {
+            combined.push(...amcQuotes.map(q => ({ ...q, type: 'amc' })))
+        }
+
+        combined.sort((a, b) => {
+            const dateA = new Date(a.created_at || 0).getTime()
+            const dateB = new Date(b.created_at || 0).getTime()
+            return dateB - dateA
+        })
+
+        return { success: true, data: combined }
     } catch (error: any) {
         console.error('Error fetching quotations:', error?.message || error, error?.stack)
-        return { success: false, error: error?.message || 'Unknown error' }
+        return { success: false, error: error?.message || 'Unknown error', data: [] }
     }
 }
 
@@ -237,10 +260,11 @@ export async function getInvoices() {
 export async function deleteQuotation(id: string) {
     try {
         const supabase = await createClient()
-        // Delete items first (FK constraint)
+        // Delete items first (FK constraint for professional quotes)
         await supabase.from('quotation_items').delete().eq('quotation_id', id)
-        const { error } = await supabase.from('quotations').delete().eq('id', id)
-        if (error) throw error
+        await supabase.from('quotations').delete().eq('id', id)
+        await supabase.from('legacy_quotations').delete().eq('id', id)
+        await supabase.from('amc_quotations').delete().eq('id', id)
         revalidatePath('/dashboard/sales')
         return { success: true }
     } catch (error: any) {
@@ -272,8 +296,9 @@ export async function deleteInvoice(id: string) {
 export async function updateQuotationStatus(id: string, status: string) {
     try {
         const supabase = await createClient()
-        const { error } = await supabase.from('quotations').update({ status }).eq('id', id)
-        if (error) throw error
+        await supabase.from('quotations').update({ status }).eq('id', id)
+        await supabase.from('legacy_quotations').update({ status }).eq('id', id)
+        await supabase.from('amc_quotations').update({ status }).eq('id', id)
         
         revalidatePath('/dashboard/sales')
         return { success: true }

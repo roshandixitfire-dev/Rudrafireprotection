@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import { fetchNextQuotationNumber } from '@/utils/documentVersioning';
 import { AMCQuotation, AMCItem, AMCPackage } from './types';
@@ -33,6 +34,9 @@ const DEFAULT_AMC_TERMS = [
 
 
 const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
+    const searchParams = useSearchParams();
+    const id = searchParams.get('id');
+
     const [data, setData] = useState<AMCQuotation>({
         quoteNo: '', // Set on mount
         date: new Date().toISOString().split('T')[0],
@@ -47,12 +51,46 @@ const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
 
     const [showPreview, setShowPreview] = useState(false);
     const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+    const [savedId, setSavedId] = useState<string | null>(null);
 
     useEffect(() => {
+        if (id) {
+            supabase
+                .from('amc_quotations')
+                .select('*')
+                .eq('id', id)
+                .single()
+                .then(({ data: dbQuote, error }) => {
+                    if (dbQuote) {
+                        setData({
+                            quoteNo: dbQuote.quotation_number,
+                            date: dbQuote.quotation_date,
+                            toTitle: dbQuote.to_title || 'The Hon Chairman/ Hon Secretary,',
+                            companyName: dbQuote.company_name || '',
+                            street: dbQuote.street || '',
+                            location: dbQuote.location || '',
+                            city: dbQuote.city || '',
+                            state: dbQuote.state || 'Maharashtra',
+                            pin: dbQuote.pin || '',
+                            contactPerson: dbQuote.contact_person || '',
+                            contactNumber: dbQuote.contact_number || '',
+                            items: dbQuote.items || DEFAULT_AMC_ITEMS,
+                            packages: dbQuote.packages || DEFAULT_AMC_PACKAGES,
+                            terms: dbQuote.terms || DEFAULT_AMC_TERMS,
+                            totalAmount: dbQuote.grand_total || 0,
+                        });
+                        setSavedId(dbQuote.id);
+                    } else if (error) {
+                        console.error('Error loading AMC quote:', error);
+                    }
+                });
+            return;
+        }
+
         if (!data.quoteNo) {
             fetchNextQuotationNumber('amc').then(no => setData(prev => ({ ...prev, quoteNo: no })));
         }
-    }, []);
+    }, [id]);
 
     const updateField = (field: keyof AMCQuotation, value: any) => {
         setData(prev => ({ ...prev, [field]: value }));
@@ -76,7 +114,7 @@ const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
     const saveAMCQuotation = async () => {
         setSaveStatus('saving');
         try {
-            const { error } = await supabase.from('amc_quotations').upsert({
+            const payload: any = {
                 quotation_number: data.quoteNo,
                 quotation_date: data.date,
                 to_title: data.toTitle,
@@ -93,9 +131,17 @@ const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                 terms: data.terms,
                 grand_total: data.totalAmount,
                 updated_at: new Date().toISOString(),
-            }, { onConflict: 'quotation_number' });
+            };
+            if (savedId) {
+                payload.id = savedId;
+            }
+            const { data: res, error } = await supabase.from('amc_quotations')
+                .upsert(payload, { onConflict: 'quotation_number' })
+                .select('id')
+                .single();
 
             if (error) throw error;
+            if (res?.id) setSavedId(res.id);
             setSaveStatus('saved');
             setTimeout(() => setSaveStatus('idle'), 3000);
         } catch (err) {

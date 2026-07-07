@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import { fetchNextQuotationNumber } from '@/utils/documentVersioning';
 import QuotationStickyHeader from './QuotationStickyHeader';
@@ -95,6 +96,7 @@ export interface LegacyQuotation {
     termsItems: string[];
     sgstPct: number;
     cgstPct: number;
+    showTaxColumn?: boolean;
 }
 
 // ─── Flame SVG ──────────────────────────────────────────────────────────────────
@@ -133,6 +135,7 @@ const defaultData: LegacyQuotation = {
     termsItems: TC_PRESETS[0].items,
     sgstPct: 9,
     cgstPct: 9,
+    showTaxColumn: true,
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -308,7 +311,7 @@ const LegacyQuotePreview: React.FC<{ data: LegacyQuotation }> = ({ data }) => {
                                             <th style={{ ...td, width: 30, textAlign: 'center', fontWeight: 700 }}>Qty</th>
                                             <th style={{ ...td, width: 32, textAlign: 'center', fontWeight: 700 }}>Unit</th>
                                             <th style={{ ...td, width: 48, textAlign: 'center', fontWeight: 700 }}>Rate</th>
-                                            <th style={{ ...td, width: 32, textAlign: 'center', fontWeight: 700 }}>Tax%</th>
+                                            {data.showTaxColumn !== false && <th style={{ ...td, width: 32, textAlign: 'center', fontWeight: 700 }}>Tax%</th>}
                                             <th style={{ ...td, width: 64, textAlign: 'right', fontWeight: 700 }}>Amount</th>
                                         </tr>
                                     </thead>
@@ -323,54 +326,57 @@ const LegacyQuotePreview: React.FC<{ data: LegacyQuotation }> = ({ data }) => {
                                                 <td style={{ ...td, textAlign: 'center' }}>{item.qty}</td>
                                                 <td style={{ ...td, textAlign: 'center' }}>{item.unit}</td>
                                                 <td style={{ ...td, textAlign: 'right' }}>{item.rate.toLocaleString('en-IN')}</td>
-                                                <td style={{ ...td, textAlign: 'center' }}>{item.taxPct > 0 ? `${item.taxPct}%` : '-'}</td>
+                                                {data.showTaxColumn !== false && <td style={{ ...td, textAlign: 'center' }}>{item.taxPct > 0 ? `${item.taxPct}%` : '-'}</td>}
                                                 <td style={{ ...td, textAlign: 'right', fontFamily: 'monospace' }}>{fmt(item.amount)}</td>
                                             </tr>
                                         ))}
-                                        <tr><td style={{ ...td, height: 18 }} colSpan={7}></td></tr>
+                                        <tr><td style={{ ...td, height: 18 }} colSpan={data.showTaxColumn !== false ? 7 : 6}></td></tr>
                                         <tr>
-                                            <td style={{ ...td, borderRight: 'none', textAlign: 'right', fontWeight: 700, fontSize: 9 }} colSpan={6}>Gross Total :</td>
+                                            <td style={{ ...td, borderRight: 'none', textAlign: 'right', fontWeight: 700, fontSize: 9 }} colSpan={data.showTaxColumn !== false ? 6 : 5}>Gross Total :</td>
                                             <td style={{ ...td, textAlign: 'right', fontWeight: 700, fontFamily: 'monospace' }}>{fmt(baseAmount)}</td>
                                         </tr>
                                         <tr>
-                                            <td style={{ ...td, borderRight: 'none', textAlign: 'right', fontSize: 9 }} colSpan={6}>Output SGST @{data.sgstPct}% :</td>
+                                            <td style={{ ...td, borderRight: 'none', textAlign: 'right', fontSize: 9 }} colSpan={data.showTaxColumn !== false ? 6 : 5}>Output SGST @{data.sgstPct}% :</td>
                                             <td style={{ ...td, textAlign: 'right', fontFamily: 'monospace' }}>{sgstAmt > 0 ? fmt(sgstAmt) : '-'}</td>
                                         </tr>
                                         <tr>
-                                            <td style={{ ...td, borderRight: 'none', textAlign: 'right', fontSize: 9 }} colSpan={6}>Output CGST @{data.cgstPct}% :</td>
+                                            <td style={{ ...td, borderRight: 'none', textAlign: 'right', fontSize: 9 }} colSpan={data.showTaxColumn !== false ? 6 : 5}>Output CGST @{data.cgstPct}% :</td>
                                             <td style={{ ...td, textAlign: 'right', fontFamily: 'monospace' }}>{cgstAmt > 0 ? fmt(cgstAmt) : '-'}</td>
                                         </tr>
                                         <tr>
-                                            <td style={{ ...td, borderRight: 'none', textAlign: 'right', fontWeight: 800, fontSize: 9, background: '#eee' }} colSpan={6}>Grand Total :</td>
+                                            <td style={{ ...td, borderRight: 'none', textAlign: 'right', fontWeight: 800, fontSize: 9, background: '#eee' }} colSpan={data.showTaxColumn !== false ? 6 : 5}>Grand Total :</td>
                                             <td style={{ ...td, textAlign: 'right', fontWeight: 800, fontFamily: 'monospace', background: '#eee' }}>{fmt(grandTotal)}</td>
                                         </tr>
-                                    </tbody>
-                                </table>
+                                     </tbody>
+                                 </table>
 
-                                <div style={{ display: 'flex', border: '1px solid #000', borderTop: 'none' }}>
-                                    <div style={{ flex: 1, padding: '8px', borderRight: '1px solid #000' }}>
-                                        <div style={{ fontSize: 10, fontWeight: 800, textDecoration: 'underline', marginBottom: 4 }}>Terms &amp; Conditions :-</div>
-                                        <ol style={{ margin: 0, paddingLeft: 14, fontSize: 10.5, color: '#333' }}>
-                                            {data.termsItems.map((t, i) => (
-                                                <li key={i} style={{ marginBottom: 2 }}>{t}</li>
-                                            ))}
-                                        </ol>
-                                    </div>
-                                    <div style={{ width: '40%', padding: '8px' }}>
-                                        <div style={{ fontSize: 10, fontWeight: 800, textDecoration: 'underline', marginBottom: 4 }}>BANK DETAILS</div>
-                                        <div style={{ fontSize: 10.5, lineHeight: 1.6 }}>
-                                            <div style={{ fontWeight: 700 }}>Rudra Fire Protection</div>
-                                            <div>Bank: State Bank Of India</div>
-                                            <div>Account Number : 40698757999</div>
-                                            <div>IFSC Code : SBIN0016719</div>
-                                        </div>
-                                    </div>
-                                </div>
+                                 {/* Terms & Conditions */}
+                                 <div style={{ border: '1px solid #000', marginTop: '-1px', padding: '8px', boxDecorationBreak: 'clone', WebkitBoxDecorationBreak: 'clone' }}>
+                                     <div style={{ fontSize: 10, fontWeight: 800, textDecoration: 'underline', marginBottom: 4 }}>Terms &amp; Conditions :-</div>
+                                     <ol style={{ margin: 0, paddingLeft: 14, fontSize: 10.5, color: '#333' }}>
+                                         {data.termsItems.map((t, i) => (
+                                             <li key={i} style={{ marginBottom: 2 }}>{t}</li>
+                                         ))}
+                                     </ol>
+                                 </div>
 
-                                <div style={{ border: '1px solid #000', borderTop: 'none', padding: '10px 15px', height: '110px' }}>
-                                    <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 50 }}>For, Rudra Fire Protection</div>
-                                    <div style={{ fontSize: 10, fontWeight: 800 }}>Authorised Signatory</div>
-                                </div>
+                                 {/* Bank Details */}
+                                 <div style={{ border: '1px solid #000', marginTop: '-1px', padding: '8px' }}>
+                                     <div style={{ fontSize: 10, fontWeight: 800, textDecoration: 'underline', marginBottom: 4 }}>BANK DETAILS</div>
+                                     <div style={{ fontSize: 10.5, lineHeight: 1.5, color: '#333' }}>
+                                         <span style={{ fontWeight: 700, marginRight: 20 }}>Rudra Fire Protection</span>
+                                         <span style={{ marginRight: 20 }}>Bank: State Bank Of India</span>
+                                         <span style={{ marginRight: 20 }}>Account Number : 40698757999</span>
+                                         <span>IFSC Code : SBIN0016719</span>
+                                     </div>
+                                 </div>
+
+                                 {/* Signature Block */}
+                                 <div style={{ border: '1px solid #000', marginTop: '-1px', padding: '10px 15px', height: '110px' }}>
+                                     <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 50 }}>For, Rudra Fire Protection</div>
+                                     <div style={{ fontSize: 10, fontWeight: 800 }}>Authorised Signatory</div>
+                                 </div>
+
                             </div>
                         </td>
                     </tr>
@@ -517,6 +523,9 @@ const ClientSearchInput: React.FC<{
 const DRAFT_KEY = 'rudra-legacy-quote-draft';
 
 const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
+    const searchParams = useSearchParams();
+    const id = searchParams.get('id');
+
     // SSR-safe default — no localStorage in initializer (avoids hydration mismatch)
     const [data, setData] = useState<LegacyQuotation>(defaultData);
     const [catalog, setCatalog] = useState(CATALOG_ITEMS);
@@ -529,8 +538,62 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
     const [dbStatus, setDbStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
     const [savedId, setSavedId] = useState<string | null>(null);
 
-    // Single mount effect: restore draft OR fetch new sequence number from DB
+    // Catalog Add Form State
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [newItem, setNewItem] = useState({ title: '', description: '', unit: 'Nos', rate: '' });
+
+    // Load custom catalog from localStorage on mount
     useEffect(() => {
+        try {
+            const saved = localStorage.getItem('rudra-legacy-catalog');
+            if (saved) {
+                setCatalog(JSON.parse(saved));
+            }
+        } catch {}
+    }, []);
+
+    // Save catalog to localStorage when it changes
+    useEffect(() => {
+        try {
+            localStorage.setItem('rudra-legacy-catalog', JSON.stringify(catalog));
+        } catch {}
+    }, [catalog]);
+
+    const handleSaveCatalog = (shouldClose: boolean) => {
+        if (!newItem.title.trim()) return;
+        const rateVal = parseFloat(newItem.rate) || 0;
+        const newCat = {
+            title: newItem.title.trim(),
+            description: newItem.description.trim(),
+            unit: newItem.unit,
+            rate: rateVal
+        };
+        setCatalog(prev => [newCat, ...prev]);
+        setNewItem({ title: '', description: '', unit: 'Nos', rate: '' });
+        if (shouldClose) {
+            setShowAddForm(false);
+        }
+    };
+
+    // Single mount effect: restore draft OR fetch new sequence number from DB OR load from DB
+    useEffect(() => {
+        if (id) {
+            supabase
+                .from('legacy_quotations')
+                .select('*')
+                .eq('id', id)
+                .single()
+                .then(({ data: dbQuote, error }) => {
+                    if (dbQuote && dbQuote.raw_json) {
+                        setData(dbQuote.raw_json as unknown as LegacyQuotation);
+                        setSavedId(dbQuote.id);
+                    } else if (error) {
+                        console.error('Error loading legacy quote:', error);
+                    }
+                });
+            return;
+        }
+
         try {
             const saved = localStorage.getItem(DRAFT_KEY);
             if (saved) {
@@ -541,17 +604,18 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
         } catch { }
         // No draft — fetch sequential number from DB
         fetchNextQuotationNumber('legacy').then(no => setData(prev => ({ ...prev, date: todayISO(), quoteNo: no })));
-    }, []);
+    }, [id]);
 
     // ─── Auto-save draft to localStorage ──────────────────────────────────
     useEffect(() => {
+        if (id) return; // Skip draft autosave when editing an existing quote
         const t = setTimeout(() => {
             localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
             setDraftSaved(true);
             setTimeout(() => setDraftSaved(false), 1500);
         }, 600);
         return () => clearTimeout(t);
-    }, [data]);
+    }, [data, id]);
 
     // ─── Save to Supabase DB ────────────────────────────────────────────────
     const saveToDb = async () => {
@@ -623,9 +687,9 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
         setCatalog(prev => [...prev, newCat]);
     };
 
-    const clearDraft = () => {
+    const clearDraft = async () => {
         localStorage.removeItem(DRAFT_KEY);
-        const newQuoteNo = genQuoteNo();
+        const newQuoteNo = await fetchNextQuotationNumber('legacy');
         setData({ ...defaultData, quoteNo: newQuoteNo });
     };
 
@@ -810,7 +874,7 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                     </div>
                 )}
                 {/* Tax rates */}
-                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
                     <div>
                         <label className="form-label text-[10px]">SGST %</label>
                         <input type="number" value={data.sgstPct} onChange={e => setData(p => ({ ...p, sgstPct: parseFloat(e.target.value) || 0 }))} className="form-input text-xs w-full py-1.5" />
@@ -818,6 +882,16 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                     <div>
                         <label className="form-label text-[10px]">CGST %</label>
                         <input type="number" value={data.cgstPct} onChange={e => setData(p => ({ ...p, cgstPct: parseFloat(e.target.value) || 0 }))} className="form-input text-xs w-full py-1.5" />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, height: 32, paddingBottom: 4 }}>
+                        <input type="checkbox" id="showTaxColumnCheckbox" 
+                            checked={data.showTaxColumn !== false} 
+                            onChange={e => setData(p => ({ ...p, showTaxColumn: e.target.checked }))} 
+                            style={{ cursor: 'pointer', width: 14, height: 14 }}
+                        />
+                        <label htmlFor="showTaxColumnCheckbox" style={{ fontSize: 11, fontWeight: 600, color: '#334155', cursor: 'pointer', userSelect: 'none' }}>
+                            Show Tax% Column
+                        </label>
                     </div>
                 </div>
             </div>
@@ -834,17 +908,93 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
 
                 {showCatalog && (
                     <div style={{ background: '#fff', border: '1px solid #ddd', borderRadius: 6, padding: 12, marginBottom: 12 }}>
-                        <div style={{ fontWeight: 700, fontSize: 12, marginBottom: 8, color: '#1a73e8' }}>📦 Click an item to add it</div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                            <div style={{ fontWeight: 700, fontSize: 12, color: '#1a73e8' }}>📦 Click an item to add it</div>
+                            <button onClick={() => setShowAddForm(v => !v)}
+                                style={{ padding: '5px 12px', background: showAddForm ? '#dc2626' : '#16a34a', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>
+                                {showAddForm ? '✕ Cancel' : '➕ Add Item to Catalog'}
+                            </button>
+                        </div>
+
+                        {showAddForm && (
+                            <form onSubmit={e => e.preventDefault()} style={{ background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: 6, padding: 12, marginBottom: 12 }}>
+                                <div style={{ fontWeight: 700, fontSize: 11, marginBottom: 8, color: '#475569' }}>➕ Add New Catalog Item</div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 8 }}>
+                                    <div>
+                                        <label style={{ fontSize: 9.5, fontWeight: 600, color: '#475569', display: 'block', marginBottom: 2 }}>Item Title</label>
+                                        <input required placeholder="e.g. ABC TYPE Extinguisher Refilling" value={newItem.title}
+                                            onChange={e => setNewItem(prev => ({ ...prev, title: e.target.value }))}
+                                            className="form-input text-xs w-full" style={{ padding: '4px 8px' }} />
+                                    </div>
+                                    <div>
+                                        <label style={{ fontSize: 9.5, fontWeight: 600, color: '#475569', display: 'block', marginBottom: 2 }}>Rate (₹)</label>
+                                        <input required type="number" placeholder="570" value={newItem.rate}
+                                            onChange={e => setNewItem(prev => ({ ...prev, rate: e.target.value }))}
+                                            className="form-input text-xs w-full" style={{ padding: '4px 8px' }} />
+                                    </div>
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 8 }}>
+                                    <div>
+                                        <label style={{ fontSize: 9.5, fontWeight: 600, color: '#475569', display: 'block', marginBottom: 2 }}>Unit</label>
+                                        <select value={newItem.unit} onChange={e => setNewItem(prev => ({ ...prev, unit: e.target.value }))}
+                                            className="form-input text-xs w-full" style={{ padding: '4px 8px' }}>
+                                            <option value="Nos">Nos</option>
+                                            <option value="Mtr">Mtr</option>
+                                            <option value="Lot">Lot</option>
+                                            <option value="Set">Set</option>
+                                            <option value="Sq.Mtr">Sq.Mtr</option>
+                                            <option value="Kg">Kg</option>
+                                            <option value="LS">LS</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label style={{ fontSize: 9.5, fontWeight: 600, color: '#475569', display: 'block', marginBottom: 2 }}>Description (Optional)</label>
+                                        <input placeholder="e.g. Servicing, Testing..." value={newItem.description}
+                                            onChange={e => setNewItem(prev => ({ ...prev, description: e.target.value }))}
+                                            className="form-input text-xs w-full" style={{ padding: '4px 8px' }} />
+                                    </div>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 10 }}>
+                                    <button type="button" onClick={() => handleSaveCatalog(true)}
+                                        style={{ padding: '6px 14px', background: '#16a34a', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 11, fontWeight: 700, width: '100%' }}>
+                                        💾 Save & Close
+                                    </button>
+                                    <button type="button" onClick={() => handleSaveCatalog(false)}
+                                        style={{ padding: '6px 14px', background: '#1e3a8a', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 11, fontWeight: 700, width: '100%' }}>
+                                        ➕ Save & Add New
+                                    </button>
+                                </div>
+                            </form>
+                        )}
+
                         <input placeholder="Search..." value={catalogSearch} onChange={e => setCatalogSearch(e.target.value)}
                             className="form-input text-xs" style={{ marginBottom: 10, maxWidth: 300 }} />
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 8, maxHeight: 240, overflowY: 'auto' }}>
                             {filteredCatalog.map((cat, i) => (
-                                <div key={i} onClick={() => addFromCatalog(cat)}
-                                    style={{ border: '1px solid #ddd', borderRadius: 6, padding: '7px 10px', cursor: 'pointer', background: '#f8f8f8' }}
-                                    onMouseEnter={e => (e.currentTarget.style.background = '#e8f0fe')}
-                                    onMouseLeave={e => (e.currentTarget.style.background = '#f8f8f8')}>
-                                    <div style={{ fontWeight: 700, fontSize: 11 }}>{cat.title}</div>
-                                    <div style={{ fontSize: 9.5, color: '#666', marginTop: 2 }}>₹{cat.rate.toLocaleString('en-IN')} / {cat.unit}</div>
+                                <div key={i} style={{ position: 'relative' }}>
+                                    <div onClick={() => addFromCatalog(cat)}
+                                        style={{ border: '1px solid #ddd', borderRadius: 6, padding: '7px 10px', paddingRight: '28px', cursor: 'pointer', background: '#f8f8f8' }}
+                                        onMouseEnter={e => (e.currentTarget.style.background = '#e8f0fe')}
+                                        onMouseLeave={e => (e.currentTarget.style.background = '#f8f8f8')}>
+                                        <div style={{ fontWeight: 700, fontSize: 11 }}>{cat.title}</div>
+                                        <div style={{ fontSize: 9.5, color: '#666', marginTop: 2 }}>₹{cat.rate.toLocaleString('en-IN')} / {cat.unit}</div>
+                                    </div>
+                                    <button 
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (window.confirm(`Delete "${cat.title}" from catalog?`)) {
+                                                setCatalog(prev => prev.filter(item => item.title !== cat.title));
+                                            }
+                                        }}
+                                        style={{
+                                            position: 'absolute', top: 5, right: 5, background: 'transparent', border: 'none',
+                                            color: '#94a3b8', fontSize: 12, cursor: 'pointer', padding: '2px 5px', borderRadius: 4
+                                        }}
+                                        onMouseEnter={e => (e.currentTarget.style.color = '#dc2626')}
+                                        onMouseLeave={e => (e.currentTarget.style.color = '#94a3b8')}
+                                    >
+                                        ✕
+                                    </button>
                                 </div>
                             ))}
                         </div>
@@ -855,7 +1005,10 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
                         <thead>
                             <tr style={{ background: '#eee' }}>
-                                {['Sr.', 'Title', 'Description', 'Qty', 'Unit', 'Rate ₹', 'Tax %', 'Amount ₹', ''].map(h => (
+                                {(data.showTaxColumn !== false 
+                                    ? ['Sr.', 'Title', 'Description', 'Qty', 'Unit', 'Rate ₹', 'Tax %', 'Amount ₹', '']
+                                    : ['Sr.', 'Title', 'Description', 'Qty', 'Unit', 'Rate ₹', 'Amount ₹', '']
+                                ).map(h => (
                                     <th key={h} style={{ border: '1px solid #ccc', padding: '5px 6px', textAlign: 'left', fontWeight: 600, whiteSpace: 'nowrap' }}>{h}</th>
                                 ))}
                             </tr>
@@ -892,12 +1045,14 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                                             onFocus={e => e.target.select()}
                                             className="form-input text-xs" style={{ minWidth: 60 }} />
                                     </td>
-                                    <td style={{ border: '1px solid #e2e8f0', padding: 3 }}>
-                                        <input type="number" value={item.taxPct === 0 ? '' : item.taxPct}
-                                            onChange={e => updateItem(item.id, 'taxPct', parseFloat(e.target.value) || 0)}
-                                            onFocus={e => e.target.select()}
-                                            className="form-input text-xs" style={{ minWidth: 46 }} />
-                                    </td>
+                                    {data.showTaxColumn !== false && (
+                                        <td style={{ border: '1px solid #e2e8f0', padding: 3 }}>
+                                            <input type="number" value={item.taxPct === 0 ? '' : item.taxPct}
+                                                onChange={e => updateItem(item.id, 'taxPct', parseFloat(e.target.value) || 0)}
+                                                onFocus={e => e.target.select()}
+                                                className="form-input text-xs" style={{ minWidth: 46 }} />
+                                        </td>
+                                    )}
                                     <td style={{ border: '1px solid #e2e8f0', padding: '3px 6px', fontFamily: 'monospace', whiteSpace: 'nowrap', color: '#333', minWidth: 80 }}>
                                         ₹ {fmt(item.amount)}
                                     </td>

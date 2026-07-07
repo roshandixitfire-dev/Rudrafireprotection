@@ -15,7 +15,7 @@ import { SalesBulkImportModal } from './SalesBulkImportModal'
 // ─────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────
-type RecordType = 'professional' | 'legacy' | 'invoice'
+type RecordType = 'professional' | 'legacy' | 'invoice' | 'amc'
 type ViewMode = 'table' | 'card'
 
 interface SalesRecord {
@@ -74,6 +74,8 @@ function getTypeBadge(type: RecordType) {
             return <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide bg-emerald-50 text-emerald-600 border border-emerald-100">Legacy</span>
         case 'invoice':
             return <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide bg-orange-50 text-orange-600 border border-orange-100">Invoice</span>
+        case 'amc':
+            return <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide bg-blue-50 text-blue-600 border border-blue-100">AMC</span>
     }
 }
 
@@ -175,18 +177,27 @@ export default function SalesHub({ quotations, invoices, clients, accessLevel }:
     // ── Normalise all records into one list ──────────────────────
     const records: SalesRecord[] = useMemo(() => {
         const quoteRecords: SalesRecord[] = allRecords.quotations.map(q => {
-            const isPro = !!(q.raw_json || q.sections_data)
+            const isPro = q.type === 'professional'
+            const isAmc = q.type === 'amc'
+            const isLegacy = q.type === 'legacy'
+
             const validUntil = q.expiration_date || (() => {
-                const d = new Date(q.quotation_date)
+                const dateVal = q.quotation_date || q.quote_date || new Date().toISOString()
+                const d = new Date(dateVal)
                 d.setDate(d.getDate() + 30)
                 return d.toISOString()
             })()
+
+            let recordType: RecordType = 'legacy'
+            if (isPro) recordType = 'professional'
+            else if (isAmc) recordType = 'amc'
+
             return {
                 id: String(q.id),
-                recordType: isPro ? 'professional' : 'legacy',
-                number: q.quotation_number || '—',
-                client: q.clients?.name || clients?.find((c: any) => c.id === q.client_id)?.name || q.raw_json?.companyName || q.client_name || 'Unknown',
-                date: q.quotation_date,
+                recordType,
+                number: q.quotation_number || q.quote_no || '—',
+                client: q.clients?.name || q.company_name || q.raw_json?.companyName || q.client_name || 'Unknown',
+                date: q.quotation_date || q.quote_date,
                 validUntil,
                 value: q.grand_total ?? 0,
                 status: q.status || 'Draft',
@@ -236,9 +247,10 @@ export default function SalesHub({ quotations, invoices, clients, accessLevel }:
             window.location.href = `/dashboard/invoices/legacy`
         } else if (r.recordType === 'professional') {
             window.location.href = `/dashboard/quotations/new?id=${r.id}`
+        } else if (r.recordType === 'amc') {
+            window.location.href = `/dashboard/quotations/legacy?tab=amc&id=${r.id}`
         } else {
-            // Legacy quote — navigate to the legacy quotation page
-            window.location.href = `/dashboard/quotations/legacy`
+            window.location.href = `/dashboard/quotations/legacy?id=${r.id}`
         }
     }
 
