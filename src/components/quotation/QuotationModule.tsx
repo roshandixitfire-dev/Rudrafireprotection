@@ -11,14 +11,12 @@ import {
 import BOQSectionComponent from './BOQSection';
 import SectionSelector from './SectionSelector';
 import QuotationPreview from './QuotationPreview';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import QuotationStickyHeader from './QuotationStickyHeader';
 import './quotation.css';
+import { checkClientExists, addClientToCRM, createLeadFromQuotation } from '@/utils/crmHelper';
 
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+const supabase = createClient();
 
 const DESIGNATIONS = ['Developer', 'Project Manager', 'Site Incharge', 'Sales Manager', 'Architect', 'Consultant', 'Builder', 'Director', 'Managing Director', 'Partner'];
 
@@ -395,6 +393,7 @@ const PageToggle: React.FC<{ pages: PrintPages; onChange: (p: PrintPages) => voi
 
 // ─── Main QuotationModule ─────────────────────────────────────────────────────
 const QuotationModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
+    const router = useRouter();
     const [quotation, setQuotation] = useState<Quotation>(defaultQuotation());
     const [selectorOpen, setSelectorOpen] = useState(true);
     const [makesSectionOpen, setMakesSectionOpen] = useState(false);
@@ -405,6 +404,25 @@ const QuotationModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
     const [sectionsHistory, setSectionsHistory] = useState<Section[][]>([]); // undo stack
     const searchParams = useSearchParams();
     const quoteId = searchParams.get('id');
+
+    const [clientExists, setClientExists] = useState(true);
+    const [addToCRM, setAddToCRM] = useState(false);
+
+    useEffect(() => {
+        if (!quotation.companyName || quotation.companyName.trim().length < 2) {
+            setClientExists(true);
+            setAddToCRM(false);
+            return;
+        }
+        const delayCheck = setTimeout(async () => {
+            const exists = await checkClientExists(quotation.companyName);
+            setClientExists(exists);
+            if (exists) {
+                setAddToCRM(false);
+            }
+        }, 500);
+        return () => clearTimeout(delayCheck);
+    }, [quotation.companyName]);
 
     const handleAddSections = (newSections: Section[]) => {
         setSectionsHistory(prev => [...prev, quotation.sections]); // save snapshot
@@ -449,6 +467,19 @@ const QuotationModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
     const saveToDatabase = async () => {
         setSaveStatus('saving');
         try {
+            if (addToCRM && !clientExists && quotation.companyName.trim()) {
+                await addClientToCRM({
+                    name: quotation.companyName,
+                    address: quotation.address,
+                    area: quotation.projectLocation,
+                    contact_person: quotation.contactPerson,
+                    phone: quotation.mobile,
+                    email: quotation.email,
+                });
+                setClientExists(true);
+                setAddToCRM(false);
+            }
+
             const payload = {
                 quotation_number: quotation.quotationNo,
                 quotation_date: quotation.date,
@@ -476,11 +507,47 @@ const QuotationModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                 status: 'Draft' as const,
                 notes: quotation.subject,
             };
-            const { error } = await supabase.from('quotations')
-                .upsert(payload, { onConflict: 'quotation_number' });
-            setSaveStatus(error ? 'error' : 'saved');
+            let res, error;
+            if (quoteId) {
+                const { data: updateData, error: updateError } = await supabase.from('quotations')
+                    .update(payload)
+                    .eq('id', quoteId)
+                    .select('id')
+                    .single();
+                res = updateData;
+                error = updateError;
+            } else {
+                const { data: insertData, error: insertError } = await supabase.from('quotations')
+                    .insert(payload)
+                    .select('id')
+                    .single();
+                res = insertData;
+                error = insertError;
+            }
+
+            if (error) {
+                console.error('Supabase error:', error);
+                throw new Error(error.message || JSON.stringify(error));
+            }
+
+            await createLeadFromQuotation({
+                projectName: quotation.projectName || quotation.companyName,
+                companyName: quotation.companyName,
+                location: quotation.projectLocation || quotation.address,
+                contactPerson: quotation.contactPerson,
+                mobile: quotation.mobile,
+                remarks: `Automatically created from Professional Quotation ${quotation.quotationNo}`,
+            });
+
+            setSaveStatus('saved');
+            router.refresh();
             setTimeout(() => setSaveStatus('idle'), 3000);
-        } catch { setSaveStatus('error'); setTimeout(() => setSaveStatus('idle'), 3000); }
+        } catch (err: any) {
+            console.error('Error saving quotation or creating lead:', err);
+            alert(`Error saving quotation: ${err.message || 'Unknown error'}`);
+            setSaveStatus('error');
+            setTimeout(() => setSaveStatus('idle'), 3000);
+        }
     };
 
     const CollapseCard: React.FC<{
@@ -512,7 +579,14 @@ const QuotationModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                         <button onClick={saveToDatabase} disabled={saveStatus === 'saving'} style={{ padding: '7px 16px', background: saveStatus === 'saved' ? '#16a34a' : saveStatus === 'error' ? '#dc2626' : '#1a73e8', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
                             {saveStatus === 'saving' ? '⏳ Saving...' : saveStatus === 'saved' ? '✓ Saved!' : saveStatus === 'error' ? '✗ Error – Retry' : '💾 Save'}
                         </button>
-                        <button onClick={() => window.print()} style={{ padding: '8px 18px', background: '#E3242B', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
+                        <button onClick={() => {
+                            const originalTitle = document.title;
+                            const sanitizedName = quotation.companyName ? quotation.companyName.replace(/[^a-z0-9]/gi, '_').toLowerCase() : 'project';
+                            const safeQuoteNo = quotation.quotationNo ? quotation.quotationNo.replace(/[^a-z0-9]/gi, '_') : 'quote';
+                            document.title = `${safeQuoteNo}_${sanitizedName}`;
+                            window.print();
+                            setTimeout(() => { document.title = originalTitle; }, 1000);
+                        }} style={{ padding: '8px 18px', background: '#E3242B', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
                             Preview / Print →
                         </button>
                     </>
@@ -548,6 +622,17 @@ const QuotationModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                     <div>
                         <label className="form-label text-[10px]">Company / To</label>
                         <input className="form-input text-xs w-full py-1.5" name="companyName" value={quotation.companyName} onChange={inp} />
+                        {!clientExists && quotation.companyName.trim().length >= 2 && (
+                            <label className="flex items-center gap-1.5 mt-1 cursor-pointer select-none text-[10px] font-bold text-red-600 bg-red-50 p-1 px-2 rounded border border-red-200">
+                                <input
+                                    type="checkbox"
+                                    checked={addToCRM}
+                                    onChange={e => setAddToCRM(e.target.checked)}
+                                    className="cursor-pointer"
+                                />
+                                ➕ Add to CRM?
+                            </label>
+                        )}
                     </div>
                     <div>
                         <label className="form-label text-[10px]">Kind Attn. / Contact</label>

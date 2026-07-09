@@ -1,12 +1,14 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import { fetchNextQuotationNumber } from '@/utils/documentVersioning';
 import { AMCQuotation, AMCItem, AMCPackage } from './types';
 import AMCQuotePreview from './AMCQuotePreview';
 import QuotationStickyHeader from './QuotationStickyHeader';
 import './quotation.css';
+import { ClientSearchInput } from './ClientSearchInput';
+import { checkClientExists, addClientToCRM, createLeadFromQuotation } from '@/utils/crmHelper';
 
 const supabase = createClient();
 
@@ -34,6 +36,7 @@ const DEFAULT_AMC_TERMS = [
 
 
 const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
+    const router = useRouter();
     const searchParams = useSearchParams();
     const id = searchParams.get('id');
 
@@ -41,7 +44,7 @@ const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
         quoteNo: '', // Set on mount
         date: new Date().toISOString().split('T')[0],
         toTitle: 'The Hon Chairman/ Hon Secretary,',
-        companyName: '', street: '', location: '', city: '', state: 'Maharashtra', pin: '',
+        companyName: '', street: '', location: '', city: 'Mumbai', state: 'Maharashtra', pin: '',
         contactPerson: '', contactNumber: '',
         items: DEFAULT_AMC_ITEMS,
         packages: DEFAULT_AMC_PACKAGES,
@@ -52,6 +55,39 @@ const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
     const [showPreview, setShowPreview] = useState(false);
     const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
     const [savedId, setSavedId] = useState<string | null>(null);
+
+    const [clientExists, setClientExists] = useState(true);
+    const [addToCRM, setAddToCRM] = useState(false);
+
+    useEffect(() => {
+        if (!data.companyName || data.companyName.trim().length < 2) {
+            setClientExists(true);
+            setAddToCRM(false);
+            return;
+        }
+        const delayCheck = setTimeout(async () => {
+            const exists = await checkClientExists(data.companyName);
+            setClientExists(exists);
+            if (exists) {
+                setAddToCRM(false);
+            }
+        }, 500);
+        return () => clearTimeout(delayCheck);
+    }, [data.companyName]);
+
+    const onClientSelect = (c: any) => {
+        setData(prev => ({
+            ...prev,
+            companyName: c.name,
+            street: c.address || '',
+            location: c.area || '',
+            city: c.district || '',
+            state: c.state || 'Maharashtra',
+            pin: c.pincode || '',
+            contactPerson: c.contact_person || c.contact_name || '',
+            contactNumber: c.phone || '',
+        }));
+    };
 
     useEffect(() => {
         if (id) {
@@ -114,6 +150,21 @@ const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
     const saveAMCQuotation = async () => {
         setSaveStatus('saving');
         try {
+            if (addToCRM && !clientExists && data.companyName.trim()) {
+                await addClientToCRM({
+                    name: data.companyName,
+                    address: data.street,
+                    area: data.location,
+                    district: data.city,
+                    state: data.state,
+                    pincode: data.pin,
+                    contact_person: data.contactPerson,
+                    phone: data.contactNumber,
+                });
+                setClientExists(true);
+                setAddToCRM(false);
+            }
+
             const payload: any = {
                 quotation_number: data.quoteNo,
                 quotation_date: data.date,
@@ -132,20 +183,45 @@ const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                 grand_total: data.totalAmount,
                 updated_at: new Date().toISOString(),
             };
+            let res, error;
             if (savedId) {
-                payload.id = savedId;
+                const { data: updateData, error: updateError } = await supabase.from('amc_quotations')
+                    .update(payload)
+                    .eq('id', savedId)
+                    .select('id')
+                    .single();
+                res = updateData;
+                error = updateError;
+            } else {
+                const { data: insertData, error: insertError } = await supabase.from('amc_quotations')
+                    .insert(payload)
+                    .select('id')
+                    .single();
+                res = insertData;
+                error = insertError;
             }
-            const { data: res, error } = await supabase.from('amc_quotations')
-                .upsert(payload, { onConflict: 'quotation_number' })
-                .select('id')
-                .single();
 
-            if (error) throw error;
+            if (error) {
+                console.error('Supabase error:', error);
+                throw new Error(error.message || JSON.stringify(error));
+            }
+
+            await createLeadFromQuotation({
+                projectName: data.companyName,
+                companyName: data.companyName,
+                location: [data.street, data.location].filter(Boolean).join(', '),
+                contactPerson: data.contactPerson,
+                mobile: data.contactNumber,
+                remarks: `Automatically created from AMC Quotation ${data.quoteNo}`,
+            });
+
             if (res?.id) setSavedId(res.id);
             setSaveStatus('saved');
+            router.refresh();
             setTimeout(() => setSaveStatus('idle'), 3000);
-        } catch (err) {
-            console.error(err);
+        } catch (err: any) {
+            console.error('Error saving AMC quotation:', err);
+            alert(`Error saving AMC quotation: ${err.message || 'Unknown error'}`);
             setSaveStatus('error');
             setTimeout(() => setSaveStatus('idle'), 3000);
         }
@@ -159,7 +235,14 @@ const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                     borderBottom: '1px solid #333', alignItems: 'center', flexShrink: 0
                 }}>
                     <button onClick={() => setShowPreview(false)} style={{ padding: '6px 14px', background: '#555', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}>← Edit</button>
-                    <button onClick={() => window.print()} style={{ padding: '6px 14px', background: '#E3242B', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}>🖨 Print / PDF</button>
+                    <button onClick={() => {
+                        const originalTitle = document.title;
+                        const sanitizedName = data.companyName ? data.companyName.replace(/[^a-z0-9]/gi, '_').toLowerCase() : 'project';
+                        const safeQuoteNo = data.quoteNo ? data.quoteNo.replace(/[^a-z0-9]/gi, '_') : 'quote';
+                        document.title = `${safeQuoteNo}_${sanitizedName}`;
+                        window.print();
+                        setTimeout(() => { document.title = originalTitle; }, 1000);
+                    }} style={{ padding: '6px 14px', background: '#E3242B', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}>🖨 Print / PDF</button>
                     <span style={{ color: '#aaa', fontSize: 11, marginLeft: 'auto' }}>AMC Preview Mode</span>
                 </div>
                 <div style={{ flex: 1, overflow: 'auto', padding: '20px 0' }}>
@@ -189,8 +272,23 @@ const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
             {/* ── TOP CARD: Master Details ── */}
             <div className="quotation-card no-print">
                 <div className="mb-3">
-                    <label className="form-label mb-1 block">Company Name</label>
-                    <input className="form-input text-xs w-full py-1.5" value={data.companyName} onChange={e => updateField('companyName', e.target.value)} placeholder="Type to search clients..." />
+                    <label className="form-label mb-1 block">🔍 Search Client / Project (CRM)</label>
+                    <ClientSearchInput
+                        value={data.companyName}
+                        onChange={v => updateField('companyName', v)}
+                        onSelect={onClientSelect}
+                    />
+                    {!clientExists && data.companyName.trim().length >= 2 && (
+                        <label style={{ width: 'fit-content', display: 'flex', alignItems: 'center', gap: 6, marginTop: 6, cursor: 'pointer', userSelect: 'none', fontSize: 10, fontWeight: 'bold', color: '#dc2626', backgroundColor: '#fef2f2', padding: '4px 8px', borderRadius: 4, border: '1px solid #fecaca' }}>
+                            <input
+                                type="checkbox"
+                                checked={addToCRM}
+                                onChange={e => setAddToCRM(e.target.checked)}
+                                style={{ margin: 0, cursor: 'pointer', width: 'auto', height: 'auto' }}
+                            />
+                            ➕ Add to CRM?
+                        </label>
+                    )}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-3">
@@ -213,11 +311,23 @@ const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                     </div>
                     <div>
                         <label className="form-label text-[10px]">Location / Area</label>
-                        <input className="form-input text-xs w-full py-1.5" value={data.location} onChange={e => updateField('location', e.target.value)} />
+                        <input list="mumbai-locations" className="form-input text-xs w-full py-1.5" value={data.location} onChange={e => updateField('location', e.target.value)} placeholder="e.g. Borivali West" />
+                        <datalist id="mumbai-locations">
+                            <option value="Borivali East" />
+                            <option value="Borivali West" />
+                            <option value="Kandivali East" />
+                            <option value="Kandivali West" />
+                            <option value="Malad East" />
+                            <option value="Malad West" />
+                            <option value="Goregaon East" />
+                            <option value="Goregaon West" />
+                            <option value="Andheri East" />
+                            <option value="Andheri West" />
+                        </datalist>
                     </div>
 
                     <div>
-                        <label className="form-label text-[10px]">City / District</label>
+                        <label className="form-label text-[10px]">City</label>
                         <input className="form-input text-xs w-full py-1.5" value={data.city} onChange={e => updateField('city', e.target.value)} />
                     </div>
                     <div>
@@ -276,7 +386,26 @@ const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                         type="number"
                         className="form-input text-xs"
                         value={isNaN(data.totalAmount) ? '' : data.totalAmount}
-                        onChange={e => updateField('totalAmount', e.target.value === '' ? 0 : parseFloat(e.target.value))}
+                        onChange={e => {
+                            const val = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                            setData(prev => {
+                                const updatedPackages = prev.packages.map(pkg => {
+                                    let discount = 0;
+                                    if (pkg.years === 2) discount = 0.05;
+                                    else if (pkg.years === 3) discount = 0.10;
+                                    else if (pkg.years === 5) discount = 0.15;
+                                    return {
+                                        ...pkg,
+                                        amount: Math.round(pkg.years * val * (1 - discount))
+                                    };
+                                });
+                                return {
+                                    ...prev,
+                                    totalAmount: val,
+                                    packages: updatedPackages
+                                };
+                            });
+                        }}
                         style={{ padding: '4px', width: '100px' }}
                     />
                 </div>

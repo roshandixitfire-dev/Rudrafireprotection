@@ -1,10 +1,12 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import { fetchNextQuotationNumber } from '@/utils/documentVersioning';
 import QuotationStickyHeader from './QuotationStickyHeader';
 import './quotation.css';
+import { ClientSearchInput, ClientRec } from './ClientSearchInput';
+import { checkClientExists, addClientToCRM, createLeadFromQuotation } from '@/utils/crmHelper';
 
 const supabase = createClient();
 
@@ -130,7 +132,7 @@ const defaultData: LegacyQuotation = {
     quoteNo: '', // Set on mount
     date: todayISO(),
     toTitle: 'The Hon Chairman/ Hon Secretary,',
-    companyName: '', street: '', location: '', city: '', state: 'Maharashtra', pin: '',
+    companyName: '', street: '', location: '', city: 'Mumbai', state: 'Maharashtra', pin: '',
     items: defaultItems,
     termsItems: TC_PRESETS[0].items,
     sgstPct: 9,
@@ -459,63 +461,8 @@ const ItemSearchInput: React.FC<{
     );
 };
 
-// ─── CLIENT SEARCH DROPDOWN ─────────────────────────────────────────────────────
-interface ClientRec { id: number; name: string; address?: string; area?: string; district?: string; state?: string; pincode?: string; }
-
-const ClientSearchInput: React.FC<{
-    value: string;
-    onChange: (name: string) => void;
-    onSelect: (c: ClientRec) => void;
-}> = ({ value, onChange, onSelect }) => {
-    const [results, setResults] = useState<ClientRec[]>([]);
-    const [open, setOpen] = useState(false);
-    const ref = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        if (value.length < 2) { setResults([]); setOpen(false); return; }
-        const t = setTimeout(async () => {
-            const { data } = await supabase
-                .from('clients')
-                .select('id, name, address, area, district, state, pincode')
-                .ilike('name', `%${value}%`)
-                .limit(8);
-            setResults(data || []);
-            setOpen(true);
-        }, 200);
-        return () => clearTimeout(t);
-    }, [value]);
-
-    useEffect(() => {
-        const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
-        document.addEventListener('mousedown', handler);
-        return () => document.removeEventListener('mousedown', handler);
-    }, []);
-
-    const inputS: React.CSSProperties = { border: '1px solid #ccc', borderRadius: 4, padding: '4px 8px', fontSize: 12, width: '100%', boxSizing: 'border-box' };
-
-    return (
-        <div ref={ref} style={{ position: 'relative' }}>
-            <input value={value} onChange={e => { onChange(e.target.value); setOpen(true); }}
-                placeholder="Type to search clients..." style={inputS} autoComplete="off" />
-            {open && results.length > 0 && (
-                <div style={{
-                    position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff',
-                    border: '1px solid #ccc', borderRadius: 4, zIndex: 999, maxHeight: 220, overflowY: 'auto', boxShadow: '0 4px 12px rgba(0,0,0,0.12)'
-                }}>
-                    {results.map(c => (
-                        <div key={c.id} onClick={() => { onSelect(c); setOpen(false); }}
-                            style={{ padding: '7px 10px', cursor: 'pointer', fontSize: 12, borderBottom: '1px solid #f0f0f0' }}
-                            onMouseEnter={e => (e.currentTarget.style.background = '#f0f4ff')}
-                            onMouseLeave={e => (e.currentTarget.style.background = '#fff')}>
-                            <div style={{ fontWeight: 700 }}>{c.name}</div>
-                            {(c.area || c.district) && <div style={{ fontSize: 10, color: '#888' }}>{[c.area, c.district, c.state].filter(Boolean).join(', ')}</div>}
-                        </div>
-                    ))}
-                </div>
-            )}
-        </div>
-    );
-};
+// ─── CLIENT SEARCH DROPDOWN ───
+// Imported from ClientSearchInput
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // EDITOR MODULE
@@ -523,6 +470,7 @@ const ClientSearchInput: React.FC<{
 const DRAFT_KEY = 'rudra-legacy-quote-draft';
 
 const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
+    const router = useRouter();
     const searchParams = useSearchParams();
     const id = searchParams.get('id');
 
@@ -537,6 +485,24 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
     const [draftSaved, setDraftSaved] = useState(false);
     const [dbStatus, setDbStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
     const [savedId, setSavedId] = useState<string | null>(null);
+    const [clientExists, setClientExists] = useState(true);
+    const [addToCRM, setAddToCRM] = useState(false);
+
+    useEffect(() => {
+        if (!data.companyName || data.companyName.trim().length < 2) {
+            setClientExists(true);
+            setAddToCRM(false);
+            return;
+        }
+        const delayCheck = setTimeout(async () => {
+            const exists = await checkClientExists(data.companyName);
+            setClientExists(exists);
+            if (exists) {
+                setAddToCRM(false);
+            }
+        }, 500);
+        return () => clearTimeout(delayCheck);
+    }, [data.companyName]);
 
     // Catalog Add Form State
     const [showAddForm, setShowAddForm] = useState(false);
@@ -620,39 +586,66 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
     // ─── Save to Supabase DB ────────────────────────────────────────────────
     const saveToDb = async () => {
         setDbStatus('saving');
-        const baseAmt = data.items.reduce((s, it) => s + it.amount, 0);
-        const sgstAmt = baseAmt * data.sgstPct / 100;
-        const cgstAmt = baseAmt * data.cgstPct / 100;
-        const docPayload = {
-            quote_no: data.quoteNo,
-            quote_date: data.date,
-            status: 'Draft' as const,
-            to_title: data.toTitle,
-            company_name: data.companyName,
-            street: data.street,
-            location: data.location,
-            city: data.city,
-            state: data.state,
-            pin: data.pin,
-            subtotal: baseAmt,
-            sgst_pct: data.sgstPct,
-            cgst_pct: data.cgstPct,
-            sgst_amount: sgstAmt,
-            cgst_amount: cgstAmt,
-            grand_total: baseAmt + sgstAmt + cgstAmt,
-            raw_json: data as unknown as Record<string, unknown>,
-        };
-        const { data: res, error } = savedId
-            ? await supabase.from('legacy_quotations').update(docPayload).eq('id', savedId).select('id').single()
-            : await supabase.from('legacy_quotations').insert(docPayload).select('id').single();
-        if (error) {
-            console.error('Quote save error:', JSON.stringify({ code: error.code, message: error.message, details: error.details, hint: error.hint }));
-            setDbStatus('error');
-            setTimeout(() => setDbStatus('idle'), 3000);
-        } else {
-            if (res?.id) setSavedId(res.id);
+        try {
+            if (addToCRM && !clientExists && data.companyName.trim()) {
+                await addClientToCRM({
+                    name: data.companyName,
+                    address: data.street,
+                    area: data.location,
+                    district: data.city,
+                    state: data.state,
+                    pincode: data.pin,
+                });
+                setClientExists(true);
+                setAddToCRM(false);
+            }
+
+            const baseAmt = data.items.reduce((s, it) => s + it.amount, 0);
+            const sgstAmt = baseAmt * data.sgstPct / 100;
+            const cgstAmt = baseAmt * data.cgstPct / 100;
+            const docPayload = {
+                quote_no: data.quoteNo,
+                quote_date: data.date,
+                status: 'Draft' as const,
+                to_title: data.toTitle,
+                company_name: data.companyName,
+                street: data.street,
+                location: data.location,
+                city: data.city,
+                state: data.state,
+                pin: data.pin,
+                subtotal: baseAmt,
+                sgst_pct: data.sgstPct,
+                cgst_pct: data.cgstPct,
+                sgst_amount: sgstAmt,
+                cgst_amount: cgstAmt,
+                grand_total: baseAmt + sgstAmt + cgstAmt,
+                raw_json: data as unknown as Record<string, unknown>,
+            };
+            const { data: res, error } = savedId
+                ? await supabase.from('legacy_quotations').update(docPayload).eq('id', savedId).select('id').single()
+                : await supabase.from('legacy_quotations').insert(docPayload).select('id').single();
+            
+            if (error) throw error;
+
+            await createLeadFromQuotation({
+                projectName: data.companyName,
+                companyName: data.companyName,
+                location: [data.street, data.location].filter(Boolean).join(', '),
+                remarks: `Automatically created from Legacy Quotation ${data.quoteNo}`,
+            });
+
+            if (res?.id) {
+                setSavedId(res.id);
+            }
+            router.refresh();
+            
             setDbStatus('saved');
             setTimeout(() => setDbStatus('idle'), 2500);
+        } catch (err: any) {
+            console.error('Quote save error:', err);
+            setDbStatus('error');
+            setTimeout(() => setDbStatus('idle'), 3000);
         }
     };
 
@@ -742,7 +735,14 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                     <button onClick={saveToDb} disabled={dbStatus === 'saving'} style={{ padding: '6px 14px', background: dbStatus === 'saved' ? '#16a34a' : dbStatus === 'error' ? '#dc2626' : '#1a73e8', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}>
                         {dbStatus === 'saving' ? '⏳ Saving...' : dbStatus === 'saved' ? '✓ Saved!' : dbStatus === 'error' ? '✗ Error' : '💾 Save'}
                     </button>
-                    <button onClick={() => window.print()} style={{ padding: '6px 14px', background: '#E3242B', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}>🖨 Print / PDF</button>
+                    <button onClick={() => {
+                        const originalTitle = document.title;
+                        const sanitizedName = data.companyName ? data.companyName.replace(/[^a-z0-9]/gi, '_').toLowerCase() : 'project';
+                        const safeQuoteNo = data.quoteNo ? data.quoteNo.replace(/[^a-z0-9]/gi, '_') : 'quote';
+                        document.title = `${safeQuoteNo}_${sanitizedName}`;
+                        window.print();
+                        setTimeout(() => { document.title = originalTitle; }, 1000);
+                    }} style={{ padding: '6px 14px', background: '#E3242B', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}>🖨 Print / PDF</button>
                     <span className="ml-auto text-[#aaa] text-[11px] w-full sm:w-auto text-right mt-2 sm:mt-0">A4 Preview Mode</span>
                 </div>
                 <div style={{ flex: 1, overflow: 'auto', padding: '20px 0' }}>
@@ -778,6 +778,17 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                         onChange={v => setData(p => ({ ...p, companyName: v }))}
                         onSelect={onClientSelect}
                     />
+                    {!clientExists && data.companyName.trim().length >= 2 && (
+                        <label style={{ width: 'fit-content', display: 'flex', alignItems: 'center', gap: 6, marginTop: 6, cursor: 'pointer', userSelect: 'none', fontSize: 10, fontWeight: 'bold', color: '#dc2626', backgroundColor: '#fef2f2', padding: '4px 8px', borderRadius: 4, border: '1px solid #fecaca' }}>
+                            <input
+                                type="checkbox"
+                                checked={addToCRM}
+                                onChange={e => setAddToCRM(e.target.checked)}
+                                style={{ margin: 0, cursor: 'pointer', width: 'auto', height: 'auto' }}
+                            />
+                            ➕ Add to CRM?
+                        </label>
+                    )}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-3">
@@ -805,10 +816,22 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
 
                     <div>
                         <label className="form-label text-[10px]">Location / Area</label>
-                        <input className="form-input text-xs w-full py-1.5" value={data.location} onChange={e => setData(p => ({ ...p, location: e.target.value }))} />
+                        <input list="legacy-mumbai-locations" className="form-input text-xs w-full py-1.5" value={data.location} onChange={e => setData(p => ({ ...p, location: e.target.value }))} placeholder="e.g. Borivali West" />
+                        <datalist id="legacy-mumbai-locations">
+                            <option value="Borivali East" />
+                            <option value="Borivali West" />
+                            <option value="Kandivali East" />
+                            <option value="Kandivali West" />
+                            <option value="Malad East" />
+                            <option value="Malad West" />
+                            <option value="Goregaon East" />
+                            <option value="Goregaon West" />
+                            <option value="Andheri East" />
+                            <option value="Andheri West" />
+                        </datalist>
                     </div>
                     <div>
-                        <label className="form-label text-[10px]">City / District</label>
+                        <label className="form-label text-[10px]">City</label>
                         <input className="form-input text-xs w-full py-1.5" value={data.city} onChange={e => setData(p => ({ ...p, city: e.target.value }))} />
                     </div>
                     <div>
@@ -1075,7 +1098,14 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                     </div>
                 </div>
                 <div className="mt-8 text-center py-5 border-t border-dashed border-gray-300 flex flex-wrap justify-center gap-4">
-                    <button onClick={() => window.print()}
+                    <button onClick={() => {
+                        const originalTitle = document.title;
+                        const sanitizedName = data.companyName ? data.companyName.replace(/[^a-z0-9]/gi, '_').toLowerCase() : 'project';
+                        const safeQuoteNo = data.quoteNo ? data.quoteNo.replace(/[^a-z0-9]/gi, '_') : 'quote';
+                        document.title = `${safeQuoteNo}_${sanitizedName}`;
+                        window.print();
+                        setTimeout(() => { document.title = originalTitle; }, 1000);
+                    }}
                         style={{ padding: '10px 30px', background: '#E3242B', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 700, fontSize: 14 }}>
                         🖨️ Print / Download PDF
                     </button>
