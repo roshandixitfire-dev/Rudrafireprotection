@@ -212,13 +212,24 @@ const AMCQuotePreview: React.FC<{ data: AMCQuotation }> = ({ data }) => {
                                     </ol>
                                 </div>
 
-                                <div style={{ marginTop: 20 }}>
-                                    <div style={{ fontSize: 10, fontWeight: 800, textDecoration: 'underline', marginBottom: 4 }}>BANK DETAILS</div>
-                                    <div style={{ fontSize: 10.5, lineHeight: 1.6 }}>
-                                        <div style={{ fontWeight: 700 }}>Rudra Fire Protection</div>
-                                        <div>Bank: State Bank Of India</div>
-                                        <div>Account Number : 40698757999</div>
-                                        <div>IFSC Code : SBIN0016719</div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: 20 }}>
+                                    <div>
+                                        <div style={{ fontSize: 10, fontWeight: 800, textDecoration: 'underline', marginBottom: 4 }}>BANK DETAILS</div>
+                                        <div style={{ fontSize: 10.5, lineHeight: 1.6 }}>
+                                            <div style={{ fontWeight: 700 }}>Rudra Fire Protection</div>
+                                            <div>Bank: State Bank Of India</div>
+                                            <div>Account Number : 40698757999</div>
+                                            <div>IFSC Code : SBIN0016719</div>
+                                        </div>
+                                    </div>
+                                    <div style={{ border: '1px solid #000', padding: '10px 15px', height: '110px', width: '250px', position: 'relative' }}>
+                                        <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 50 }}>For, Rudra Fire Protection</div>
+                                        {data.includeSignature !== false && (
+                                            <div style={{ position: 'absolute', bottom: '25px', left: '25px', height: '38px', pointerEvents: 'none' }}>
+                                                <img src="/signature.png" alt="Signature" style={{ height: '100%', width: 'auto', mixBlendMode: 'multiply' }} />
+                                            </div>
+                                        )}
+                                        <div style={{ fontSize: 10, fontWeight: 800 }}>Authorised Signatory</div>
                                     </div>
                                 </div>
                             </div>

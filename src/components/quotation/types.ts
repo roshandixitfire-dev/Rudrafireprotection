@@ -61,6 +61,7 @@ export interface PrintPages {
     boqPages: boolean;
     approvedMakes: boolean;
     termsConditions: boolean;
+    includeSignature?: boolean;
 }
 
 export interface Quotation {
@@ -139,6 +140,7 @@ export interface AMCQuotation {
     packages: AMCPackage[];
     terms: string[];
     totalAmount: number;
+    includeSignature?: boolean;
 }
 
 export interface QuotationSummary {

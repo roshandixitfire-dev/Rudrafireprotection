@@ -376,6 +376,7 @@ const PageToggle: React.FC<{ pages: PrintPages; onChange: (p: PrintPages) => voi
         { key: 'termsConditions', label: 'Terms & Conditions', icon: '📜' },
         { key: 'approvedMakes', label: 'Approved Makes', icon: '✅' },
         { key: 'boqPages', label: 'BOQ Pages', icon: '📋' },
+        { key: 'includeSignature', label: 'Include Signature', icon: '✍️' },
     ];
     return (
         <div className="flex flex-wrap gap-2">

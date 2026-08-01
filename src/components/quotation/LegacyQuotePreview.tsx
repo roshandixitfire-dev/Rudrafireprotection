@@ -99,6 +99,7 @@ export interface LegacyQuotation {
     sgstPct: number;
     cgstPct: number;
     showTaxColumn?: boolean;
+    includeSignature?: boolean;
 }
 
 // ─── Flame SVG ──────────────────────────────────────────────────────────────────
@@ -138,6 +139,7 @@ const defaultData: LegacyQuotation = {
     sgstPct: 9,
     cgstPct: 9,
     showTaxColumn: true,
+    includeSignature: true,
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -374,9 +376,14 @@ const LegacyQuotePreview: React.FC<{ data: LegacyQuotation }> = ({ data }) => {
                                  </div>
 
                                  {/* Signature Block */}
-                                 <div style={{ border: '1px solid #000', marginTop: '-1px', padding: '10px 15px', height: '110px' }}>
+                                 <div style={{ border: '1px solid #000', marginTop: '-1px', padding: '10px 15px', height: '110px', position: 'relative' }}>
                                      <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 50 }}>For, Rudra Fire Protection</div>
-                                     <div style={{ fontSize: 10, fontWeight: 800 }}>Authorised Signatory</div>
+                                      {data.includeSignature !== false && (
+                                          <div style={{ position: 'absolute', bottom: '25px', left: '25px', height: '38px', pointerEvents: 'none' }}>
+                                              <img src="/signature.png" alt="Signature" style={{ height: '100%', width: 'auto', mixBlendMode: 'multiply' }} />
+                                          </div>
+                                      )}
+                                      <div style={{ fontSize: 10, fontWeight: 800 }}>Authorised Signatory</div>
                                  </div>
 
                             </div>
@@ -897,7 +904,7 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                     </div>
                 )}
                 {/* Tax rates */}
-                <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
                     <div>
                         <label className="form-label text-[10px]">SGST %</label>
                         <input type="number" value={data.sgstPct} onChange={e => setData(p => ({ ...p, sgstPct: parseFloat(e.target.value) || 0 }))} className="form-input text-xs w-full py-1.5" />
@@ -914,6 +921,16 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                         />
                         <label htmlFor="showTaxColumnCheckbox" style={{ fontSize: 11, fontWeight: 600, color: '#334155', cursor: 'pointer', userSelect: 'none' }}>
                             Show Tax% Column
+                        </label>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, height: 32, paddingBottom: 4 }}>
+                        <input type="checkbox" id="includeSignatureCheckbox" 
+                            checked={data.includeSignature !== false} 
+                            onChange={e => setData(p => ({ ...p, includeSignature: e.target.checked }))} 
+                            style={{ cursor: 'pointer', width: 14, height: 14 }}
+                        />
+                        <label htmlFor="includeSignatureCheckbox" style={{ fontSize: 11, fontWeight: 600, color: '#334155', cursor: 'pointer', userSelect: 'none' }}>
+                            Include Signature
                         </label>
                     </div>
                 </div>

@@ -180,6 +180,7 @@ export const DEFAULT_PRINT_PAGES: PrintPages = {
     boqPages: true,
     approvedMakes: true,
     termsConditions: true,
+    includeSignature: true,
 };
 
 export const SAMPLE_PROJECT_DATA = {

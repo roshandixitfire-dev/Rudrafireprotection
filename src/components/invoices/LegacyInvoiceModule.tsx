@@ -365,8 +365,11 @@ const LegacyInvoicePreview: React.FC<{ data: LegacyInvoice }> = ({ data }) => {
                                     </div>
                                 </div>
 
-                                <div style={{ border: '1px solid #000', borderTop: 'none', padding: '10px 15px', height: '110px' }}>
+                                <div style={{ border: '1px solid #000', borderTop: 'none', padding: '10px 15px', height: '110px', position: 'relative' }}>
                                     <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 50 }}>For, Rudra Fire Protection</div>
+                                    <div style={{ position: 'absolute', bottom: '25px', left: '25px', height: '38px', pointerEvents: 'none' }}>
+                                        <img src="/signature.png" alt="Signature" style={{ height: '100%', width: 'auto', mixBlendMode: 'multiply' }} />
+                                    </div>
                                     <div style={{ fontSize: 10, fontWeight: 800 }}>Authorised Signatory</div>
                                 </div>
                             </div>

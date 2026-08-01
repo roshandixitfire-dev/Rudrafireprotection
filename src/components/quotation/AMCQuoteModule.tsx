@@ -50,6 +50,7 @@ const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
         packages: DEFAULT_AMC_PACKAGES,
         terms: DEFAULT_AMC_TERMS,
         totalAmount: 82500,
+        includeSignature: true,
     });
 
     const [showPreview, setShowPreview] = useState(false);
@@ -432,8 +433,18 @@ const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                     value={data.terms.join('\n')}
                     onChange={e => updateField('terms', e.target.value.split('\n'))}
                     rows={8}
-                    className="form-input text-xs w-full py-2"
+                    className="form-input text-xs w-full py-2 mb-3"
                 />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <input type="checkbox" id="amcIncludeSignature" 
+                        checked={data.includeSignature !== false} 
+                        onChange={e => updateField('includeSignature', e.target.checked)} 
+                        style={{ cursor: 'pointer', width: 14, height: 14 }}
+                    />
+                    <label htmlFor="amcIncludeSignature" style={{ fontSize: 11, fontWeight: 600, color: '#334155', cursor: 'pointer', userSelect: 'none' }}>
+                        Include Signature
+                    </label>
+                </div>
             </div>
         </div>
     );

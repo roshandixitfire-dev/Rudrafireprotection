@@ -278,8 +278,13 @@ const CoverLetterPage: React.FC<{ quotation: Quotation }> = ({ quotation }) => (
             </div>
 
             {/* Signature Block (match legacy visual style) */}
-            <div style={{ border: '1px solid #000', padding: '10px 15px', height: '110px', width: '250px', marginTop: 40 }}>
+            <div style={{ border: '1px solid #000', padding: '10px 15px', height: '110px', width: '250px', marginTop: 40, position: 'relative' }}>
                 <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 50 }}>For, Rudra Fire Protection</div>
+                {quotation.printPages.includeSignature !== false && (
+                    <div style={{ position: 'absolute', bottom: '45px', left: '25px', height: '38px', pointerEvents: 'none' }}>
+                        <img src="/signature.png" alt="Signature" style={{ height: '100%', width: 'auto', mixBlendMode: 'multiply' }} />
+                    </div>
+                )}
                 <div style={{ fontSize: 10, fontWeight: 800 }}>{quotation.preparedBy || 'Roshan Dixit'}</div>
                 <div style={{ fontSize: 10, fontWeight: 800 }}>Business Head</div>
             </div>
@@ -352,8 +357,13 @@ const SummarySheetPage: React.FC<{ quotation: Quotation; summary: QuotationSumma
 
             {/* Signature Block */}
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 20 }}>
-                <div style={{ border: '1px solid #000', padding: '10px 15px', height: '110px', width: '250px' }}>
+                <div style={{ border: '1px solid #000', padding: '10px 15px', height: '110px', width: '250px', position: 'relative' }}>
                     <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 50 }}>For, Rudra Fire Protection</div>
+                    {quotation.printPages.includeSignature !== false && (
+                        <div style={{ position: 'absolute', bottom: '45px', left: '25px', height: '38px', pointerEvents: 'none' }}>
+                            <img src="/signature.png" alt="Signature" style={{ height: '100%', width: 'auto', mixBlendMode: 'multiply' }} />
+                        </div>
+                    )}
                     <div style={{ fontSize: 10, fontWeight: 800 }}>{quotation.preparedBy || 'Roshan Dixit'}</div>
                     <div style={{ fontSize: 10, fontWeight: 800 }}>Business Head</div>
                 </div>
@@ -510,8 +520,13 @@ const TermsPage: React.FC<{ quotation: Quotation; pageNo: number }> = ({ quotati
                         <div>IFSC Code : SBIN0016719</div>
                     </div>
                 </div>
-                <div style={{ width: '50%', borderLeft: '1px solid #000', padding: '10px 15px', height: '110px' }}>
+                <div style={{ width: '50%', borderLeft: '1px solid #000', padding: '10px 15px', height: '110px', position: 'relative' }}>
                     <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 50 }}>For, Rudra Fire Protection</div>
+                    {quotation.printPages.includeSignature !== false && (
+                        <div style={{ position: 'absolute', bottom: '45px', left: '25px', height: '38px', pointerEvents: 'none' }}>
+                            <img src="/signature.png" alt="Signature" style={{ height: '100%', width: 'auto', mixBlendMode: 'multiply' }} />
+                        </div>
+                    )}
                     <div style={{ fontSize: 10, fontWeight: 800 }}>{quotation.preparedBy || 'Roshan Dixit'}</div>
                     <div style={{ fontSize: 10, fontWeight: 800 }}>Business Head</div>
                 </div>
@@ -551,8 +566,13 @@ const ApprovedMakesPage: React.FC<{ quotation: Quotation; pageNo: number }> = ({
         </table>
         
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 20 }}>
-            <div style={{ border: '1px solid #000', padding: '10px 15px', height: '110px', width: '250px' }}>
+            <div style={{ border: '1px solid #000', padding: '10px 15px', height: '110px', width: '250px', position: 'relative' }}>
                 <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 50 }}>For, Rudra Fire Protection</div>
+                {quotation.printPages.includeSignature !== false && (
+                    <div style={{ position: 'absolute', bottom: '45px', left: '25px', height: '38px', pointerEvents: 'none' }}>
+                        <img src="/signature.png" alt="Signature" style={{ height: '100%', width: 'auto', mixBlendMode: 'multiply' }} />
+                    </div>
+                )}
                 <div style={{ fontSize: 10, fontWeight: 800 }}>{quotation.preparedBy || 'Roshan Dixit'}</div>
                 <div style={{ fontSize: 10, fontWeight: 800 }}>Business Head</div>
             </div>
