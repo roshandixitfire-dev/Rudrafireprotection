@@ -7,6 +7,8 @@ import QuotationStickyHeader from './QuotationStickyHeader';
 import './quotation.css';
 import { ClientSearchInput, ClientRec } from './ClientSearchInput';
 import { checkClientExists, addClientToCRM, createLeadFromQuotation } from '@/utils/crmHelper';
+import { useFormDraft } from '@/hooks/useFormDraft';
+import DraftNoticeBanner from '@/components/common/DraftNoticeBanner';
 
 const supabase = createClient();
 
@@ -33,6 +35,18 @@ const CATALOG_ITEMS = [
     { title: 'Transportation', description: 'Transportation and logistics charges for equipment/materials.', unit: 'Job', rate: 1000 },
     { title: 'AMC - Extinguisher (Annual)', description: 'Annual maintenance contract for fire extinguishers including quarterly visits.', unit: 'Nos', rate: 300 },
     { title: 'Labour Charges', description: 'Labour charges for on-site work as agreed.', unit: 'Job', rate: 0 },
+    { title: 'ABC TYPE Extinguisher 4kg', description: 'Supply, Installation, Testing and commissioning of ABC type 4kg fire extinguisher.', unit: 'Nos', rate: 1750 },
+    { title: 'Co2 TYPE Extinguisher 4.5kg', description: 'Supply, Installation, Testing and commissioning of Co2 type 4.5kg fire extinguisher.', unit: 'Nos', rate: 4250 },
+    { title: 'ABC TYPE Extinguisher Refilling 4Kg', description: 'Servicing, Testing, Cleaning, Refilling and Reconditioning of ABC type 4kg fire extinguisher.', unit: 'Nos', rate: 450 },
+    { title: 'PUBLIC ADDRESSABLE FIRE ALARM PANEL', description: 'Providing, fixing & commissioning of microprocessor-based, Public addressable fire alarm control panel with battery backup.', unit: 'Nos', rate: 57839 },
+    { title: 'MANUAL CALLPOINT & HOOTER', description: 'Providing, fixing & commissioning of manual call point and electronic hooter.', unit: 'Nos', rate: 3090 },
+    { title: 'SMOKE DETECTORS', description: 'Installation, testing, and commissioning of smoke detectors.', unit: 'Nos', rate: 2322 },
+    { title: 'ISI Fire Hydrant Valve Replacement', description: 'Supply, Installation, Testing, Commissioning Of ISI Make Fire Hydrant Valve.', unit: 'Nos', rate: 4750 },
+    { title: 'Single ISI Hosebox Installation', description: 'Supply, Installation, Testing & Commissioning of single ISI Hosebox.', unit: 'Nos', rate: 2150 },
+    { title: 'Supply, Installation, Testing & Commissioning of Canvas Hosepipe', description: 'Canvas hose pipe installation.', unit: 'Nos', rate: 3895 },
+    { title: 'Fire Fighting System Control Panel Repair', description: 'Servicing and replacement of parts in control panel.', unit: 'Nos', rate: 18500 },
+    { title: 'Main Submersible Fire Fighting Pump Service', description: 'Servicing of main fire pump.', unit: 'Nos', rate: 19850 },
+    { title: 'Jockey Submersible Fire Fighting Pump Service', description: 'Servicing of jockey fire pump.', unit: 'Nos', rate: 13300 },
 ];
 
 // ─── T&C Presets ────────────────────────────────────────────────────────────────
@@ -351,40 +365,40 @@ const LegacyQuotePreview: React.FC<{ data: LegacyQuotation }> = ({ data }) => {
                                             <td style={{ ...td, borderRight: 'none', textAlign: 'right', fontWeight: 800, fontSize: 9, background: '#eee' }} colSpan={data.showTaxColumn !== false ? 6 : 5}>Grand Total :</td>
                                             <td style={{ ...td, textAlign: 'right', fontWeight: 800, fontFamily: 'monospace', background: '#eee' }}>{fmt(grandTotal)}</td>
                                         </tr>
-                                     </tbody>
-                                 </table>
+                                    </tbody>
+                                </table>
 
-                                 {/* Terms & Conditions */}
-                                 <div style={{ border: '1px solid #000', marginTop: '-1px', padding: '8px', boxDecorationBreak: 'clone', WebkitBoxDecorationBreak: 'clone' }}>
-                                     <div style={{ fontSize: 10, fontWeight: 800, textDecoration: 'underline', marginBottom: 4 }}>Terms &amp; Conditions :-</div>
-                                     <ol style={{ margin: 0, paddingLeft: 14, fontSize: 10.5, color: '#333' }}>
-                                         {data.termsItems.map((t, i) => (
-                                             <li key={i} style={{ marginBottom: 2 }}>{t}</li>
-                                         ))}
-                                     </ol>
-                                 </div>
+                                {/* Terms & Conditions */}
+                                <div style={{ border: '1px solid #000', marginTop: '-1px', padding: '8px', boxDecorationBreak: 'clone', WebkitBoxDecorationBreak: 'clone' }}>
+                                    <div style={{ fontSize: 10, fontWeight: 800, textDecoration: 'underline', marginBottom: 4 }}>Terms &amp; Conditions :-</div>
+                                    <ol style={{ margin: 0, paddingLeft: 14, fontSize: 10.5, color: '#333' }}>
+                                        {data.termsItems.map((t, i) => (
+                                            <li key={i} style={{ marginBottom: 2 }}>{t}</li>
+                                        ))}
+                                    </ol>
+                                </div>
 
-                                 {/* Bank Details */}
-                                 <div style={{ border: '1px solid #000', marginTop: '-1px', padding: '8px' }}>
-                                     <div style={{ fontSize: 10, fontWeight: 800, textDecoration: 'underline', marginBottom: 4 }}>BANK DETAILS</div>
-                                     <div style={{ fontSize: 10.5, lineHeight: 1.5, color: '#333' }}>
-                                         <span style={{ fontWeight: 700, marginRight: 20 }}>Rudra Fire Protection</span>
-                                         <span style={{ marginRight: 20 }}>Bank: State Bank Of India</span>
-                                         <span style={{ marginRight: 20 }}>Account Number : 40698757999</span>
-                                         <span>IFSC Code : SBIN0016719</span>
-                                     </div>
-                                 </div>
+                                {/* Bank Details */}
+                                <div style={{ border: '1px solid #000', marginTop: '-1px', padding: '8px' }}>
+                                    <div style={{ fontSize: 10, fontWeight: 800, textDecoration: 'underline', marginBottom: 4 }}>BANK DETAILS</div>
+                                    <div style={{ fontSize: 10.5, lineHeight: 1.5, color: '#333' }}>
+                                        <span style={{ fontWeight: 700, marginRight: 20 }}>Rudra Fire Protection</span>
+                                        <span style={{ marginRight: 20 }}>Bank: State Bank Of India</span>
+                                        <span style={{ marginRight: 20 }}>Account Number : 40698757999</span>
+                                        <span>IFSC Code : SBIN0016719</span>
+                                    </div>
+                                </div>
 
-                                 {/* Signature Block */}
-                                 <div style={{ border: '1px solid #000', marginTop: '-1px', padding: '10px 15px', height: '110px', position: 'relative' }}>
-                                     <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 50 }}>For, Rudra Fire Protection</div>
-                                      {data.includeSignature !== false && (
-                                          <div style={{ position: 'absolute', bottom: '25px', left: '25px', height: '38px', pointerEvents: 'none' }}>
-                                              <img src="/signature.png" alt="Signature" style={{ height: '100%', width: 'auto', mixBlendMode: 'multiply' }} />
-                                          </div>
-                                      )}
-                                      <div style={{ fontSize: 10, fontWeight: 800 }}>Authorised Signatory</div>
-                                 </div>
+                                {/* Signature Block */}
+                                <div style={{ border: '1px solid #000', marginTop: '-1px', padding: '10px 15px', height: '110px', position: 'relative' }}>
+                                    <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 50 }}>For, Rudra Fire Protection</div>
+                                    {data.includeSignature !== false && (
+                                        <div style={{ position: 'absolute', bottom: '25px', left: '25px', height: '38px', pointerEvents: 'none' }}>
+                                            <img src="/signature.png" alt="Signature" style={{ height: '100%', width: 'auto', mixBlendMode: 'multiply' }} />
+                                        </div>
+                                    )}
+                                    <div style={{ fontSize: 10, fontWeight: 800 }}>Authorised Signatory</div>
+                                </div>
 
                             </div>
                         </td>
@@ -426,8 +440,9 @@ const ItemSearchInput: React.FC<{
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
 
-    const results = value.length >= 2
-        ? catalog.filter(c => c.title.toLowerCase().includes(value.toLowerCase())).slice(0, 6)
+    const safeValue = value || '';
+    const results = safeValue.length >= 2
+        ? catalog.filter(c => c.title.toLowerCase().includes(safeValue.toLowerCase())).slice(0, 6)
         : [];
 
     useEffect(() => {
@@ -440,7 +455,7 @@ const ItemSearchInput: React.FC<{
 
     return (
         <div ref={ref} style={{ position: 'relative' }}>
-            <input value={value} onChange={e => { onChange(e.target.value); setOpen(true); }}
+            <input value={safeValue} onChange={e => { onChange(e.target.value); setOpen(true); }}
                 placeholder="Type title..." style={inputS} autoComplete="off" />
             {open && (
                 <div style={{
@@ -484,6 +499,7 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
     // SSR-safe default — no localStorage in initializer (avoids hydration mismatch)
     const [data, setData] = useState<LegacyQuotation>(defaultData);
     const [catalog, setCatalog] = useState(CATALOG_ITEMS);
+    const [isCatalogLoaded, setIsCatalogLoaded] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
     const [showCatalog, setShowCatalog] = useState(false);
     const [catalogSearch, setCatalogSearch] = useState('');
@@ -520,17 +536,26 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
         try {
             const saved = localStorage.getItem('rudra-legacy-catalog');
             if (saved) {
-                setCatalog(JSON.parse(saved));
+                const parsed = JSON.parse(saved);
+                const merged = [...parsed];
+                CATALOG_ITEMS.forEach(defaultItem => {
+                    if (!merged.some(item => item.title.toLowerCase() === defaultItem.title.toLowerCase())) {
+                        merged.push(defaultItem);
+                    }
+                });
+                setCatalog(merged);
             }
-        } catch {}
+        } catch { }
+        setIsCatalogLoaded(true);
     }, []);
 
     // Save catalog to localStorage when it changes
     useEffect(() => {
+        if (!isCatalogLoaded) return;
         try {
             localStorage.setItem('rudra-legacy-catalog', JSON.stringify(catalog));
-        } catch {}
-    }, [catalog]);
+        } catch { }
+    }, [catalog, isCatalogLoaded]);
 
     const handleSaveCatalog = (shouldClose: boolean) => {
         if (!newItem.title.trim()) return;
@@ -548,7 +573,26 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
         }
     };
 
-    // Single mount effect: restore draft OR fetch new sequence number from DB OR load from DB
+    const {
+        hasDraft,
+        draftTime,
+        lastSavedNotice,
+        saveDraft,
+        clearDraft,
+        restoreDraft,
+        discardDraft
+    } = useFormDraft<{ data: LegacyQuotation; savedId: string | null }>({
+        storageKey: DRAFT_KEY,
+        isEditingExisting: !!id,
+        onRestore: (draftObj) => {
+            if (draftObj?.data) {
+                setData(draftObj.data);
+                if (draftObj.savedId) setSavedId(draftObj.savedId);
+            }
+        }
+    });
+
+    // Single mount effect: load from DB if id present OR fetch next quote number
     useEffect(() => {
         if (id) {
             supabase
@@ -558,7 +602,30 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                 .single()
                 .then(({ data: dbQuote, error }) => {
                     if (dbQuote && dbQuote.raw_json) {
-                        setData(dbQuote.raw_json as unknown as LegacyQuotation);
+                        const raw = dbQuote.raw_json as any;
+                        if (raw.items && Array.isArray(raw.items)) {
+                            raw.items = raw.items.map((it: any, index: number) => {
+                                let title = it.title || '';
+                                let description = it.description || '';
+                                if (!title && description.includes('\n')) {
+                                    const parts = description.split('\n');
+                                    title = parts[0];
+                                    description = parts.slice(1).join('\n');
+                                }
+                                return {
+                                    id: it.id || `${Date.now()}-${index}-${Math.random()}`,
+                                    srNo: it.srNo || String(index + 1),
+                                    title,
+                                    description,
+                                    qty: String(it.qty ?? '1'),
+                                    unit: it.unit || 'Nos',
+                                    rate: Number(it.rate ?? 0),
+                                    taxPct: Number(it.taxPct ?? 18),
+                                    amount: Number(it.amount ?? 0)
+                                };
+                            });
+                        }
+                        setData(raw as LegacyQuotation);
                         setSavedId(dbQuote.id);
                     } else if (error) {
                         console.error('Error loading legacy quote:', error);
@@ -567,28 +634,19 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
             return;
         }
 
-        try {
-            const saved = localStorage.getItem(DRAFT_KEY);
-            if (saved) {
-                const parsed = JSON.parse(saved) as LegacyQuotation;
-                setData(parsed);
-                return; // draft restored, done
-            }
-        } catch { }
-        // No draft — fetch sequential number from DB
+        // Fetch sequential number from DB
         fetchNextQuotationNumber('legacy').then(no => setData(prev => ({ ...prev, date: todayISO(), quoteNo: no })));
     }, [id]);
 
-    // ─── Auto-save draft to localStorage ──────────────────────────────────
+    // Auto-save draft to localStorage via useFormDraft
     useEffect(() => {
-        if (id) return; // Skip draft autosave when editing an existing quote
-        const t = setTimeout(() => {
-            localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
-            setDraftSaved(true);
-            setTimeout(() => setDraftSaved(false), 1500);
-        }, 600);
-        return () => clearTimeout(t);
-    }, [data, id]);
+        if (!id && (data.companyName || data.street || (data.items && data.items.length > 0))) {
+            const t = setTimeout(() => {
+                saveDraft({ data, savedId });
+            }, 800);
+            return () => clearTimeout(t);
+        }
+    }, [data, savedId, id, saveDraft]);
 
     // ─── Save to Supabase DB ────────────────────────────────────────────────
     const saveToDb = async () => {
@@ -613,7 +671,6 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
             const docPayload = {
                 quote_no: data.quoteNo,
                 quote_date: data.date,
-                status: 'Draft' as const,
                 to_title: data.toTitle,
                 company_name: data.companyName,
                 street: data.street,
@@ -627,12 +684,39 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                 sgst_amount: sgstAmt,
                 cgst_amount: cgstAmt,
                 grand_total: baseAmt + sgstAmt + cgstAmt,
+                status: 'Sent',
                 raw_json: data as unknown as Record<string, unknown>,
             };
-            const { data: res, error } = savedId
-                ? await supabase.from('legacy_quotations').update(docPayload).eq('id', savedId).select('id').single()
-                : await supabase.from('legacy_quotations').insert(docPayload).select('id').single();
-            
+            let res, error;
+            if (savedId) {
+                const updateRes = await supabase.from('legacy_quotations').update(docPayload).eq('id', savedId).select('id').single();
+                res = updateRes.data;
+                error = updateRes.error;
+            } else {
+                const insertRes = await supabase.from('legacy_quotations').insert(docPayload).select('id').single();
+                res = insertRes.data;
+                error = insertRes.error;
+
+                // Self-healing: if insert fails because of duplicate quote_no key, find the existing ID and update it instead
+                if (error && error.code === '23505') {
+                    const { data: existing } = await supabase
+                        .from('legacy_quotations')
+                        .select('id')
+                        .eq('quote_no', docPayload.quote_no)
+                        .single();
+                    if (existing?.id) {
+                        const retryRes = await supabase
+                            .from('legacy_quotations')
+                            .update(docPayload)
+                            .eq('id', existing.id)
+                            .select('id')
+                            .single();
+                        res = retryRes.data;
+                        error = retryRes.error;
+                    }
+                }
+            }
+
             if (error) throw error;
 
             await createLeadFromQuotation({
@@ -646,11 +730,13 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                 setSavedId(res.id);
             }
             router.refresh();
-            
+
             setDbStatus('saved');
             setTimeout(() => setDbStatus('idle'), 2500);
         } catch (err: any) {
             console.error('Quote save error:', err);
+            const errMsg = err?.message || err?.details || (typeof err === 'object' ? JSON.stringify(err) : String(err));
+            alert(`Error saving quotation: ${errMsg}`);
             setDbStatus('error');
             setTimeout(() => setDbStatus('idle'), 3000);
         }
@@ -687,8 +773,8 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
         setCatalog(prev => [...prev, newCat]);
     };
 
-    const clearDraft = async () => {
-        localStorage.removeItem(DRAFT_KEY);
+    const handleNewQuote = async () => {
+        clearDraft();
         const newQuoteNo = await fetchNextQuotationNumber('legacy');
         setData({ ...defaultData, quoteNo: newQuoteNo });
     };
@@ -763,11 +849,18 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
 
     return (
         <div className="quotation-container">
+            <DraftNoticeBanner
+                hasDraft={hasDraft}
+                draftTime={draftTime}
+                lastSavedNotice={lastSavedNotice}
+                onRestore={restoreDraft}
+                onDiscard={discardDraft}
+            />
             {/* Header */}
             <QuotationStickyHeader
                 actions={
                     <>
-                        <button onClick={clearDraft} style={{ padding: '7px 14px', background: '#fff', color: '#888', border: '1px solid #ddd', borderRadius: 6, cursor: 'pointer', fontSize: 12 }}>🆕 New Quote</button>
+                        <button onClick={handleNewQuote} style={{ padding: '7px 14px', background: '#fff', color: '#888', border: '1px solid #ddd', borderRadius: 6, cursor: 'pointer', fontSize: 12 }}>🆕 New Quote</button>
                         <button onClick={saveToDb} disabled={dbStatus === 'saving'} style={{ padding: '7px 16px', background: dbStatus === 'saved' ? '#16a34a' : dbStatus === 'error' ? '#dc2626' : '#1a73e8', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
                             {dbStatus === 'saving' ? '⏳ Saving...' : dbStatus === 'saved' ? '✓ Saved!' : dbStatus === 'error' ? '✗ Error – Retry' : '💾 Save'}
                         </button>
@@ -914,9 +1007,9 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                         <input type="number" value={data.cgstPct} onChange={e => setData(p => ({ ...p, cgstPct: parseFloat(e.target.value) || 0 }))} className="form-input text-xs w-full py-1.5" />
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, height: 32, paddingBottom: 4 }}>
-                        <input type="checkbox" id="showTaxColumnCheckbox" 
-                            checked={data.showTaxColumn !== false} 
-                            onChange={e => setData(p => ({ ...p, showTaxColumn: e.target.checked }))} 
+                        <input type="checkbox" id="showTaxColumnCheckbox"
+                            checked={data.showTaxColumn !== false}
+                            onChange={e => setData(p => ({ ...p, showTaxColumn: e.target.checked }))}
                             style={{ cursor: 'pointer', width: 14, height: 14 }}
                         />
                         <label htmlFor="showTaxColumnCheckbox" style={{ fontSize: 11, fontWeight: 600, color: '#334155', cursor: 'pointer', userSelect: 'none' }}>
@@ -924,9 +1017,9 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                         </label>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, height: 32, paddingBottom: 4 }}>
-                        <input type="checkbox" id="includeSignatureCheckbox" 
-                            checked={data.includeSignature !== false} 
-                            onChange={e => setData(p => ({ ...p, includeSignature: e.target.checked }))} 
+                        <input type="checkbox" id="includeSignatureCheckbox"
+                            checked={data.includeSignature !== false}
+                            onChange={e => setData(p => ({ ...p, includeSignature: e.target.checked }))}
                             style={{ cursor: 'pointer', width: 14, height: 14 }}
                         />
                         <label htmlFor="includeSignatureCheckbox" style={{ fontSize: 11, fontWeight: 600, color: '#334155', cursor: 'pointer', userSelect: 'none' }}>
@@ -1019,7 +1112,7 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                                         <div style={{ fontWeight: 700, fontSize: 11 }}>{cat.title}</div>
                                         <div style={{ fontSize: 9.5, color: '#666', marginTop: 2 }}>₹{cat.rate.toLocaleString('en-IN')} / {cat.unit}</div>
                                     </div>
-                                    <button 
+                                    <button
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             if (window.confirm(`Delete "${cat.title}" from catalog?`)) {
@@ -1045,7 +1138,7 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
                         <thead>
                             <tr style={{ background: '#eee' }}>
-                                {(data.showTaxColumn !== false 
+                                {(data.showTaxColumn !== false
                                     ? ['Sr.', 'Title', 'Description', 'Qty', 'Unit', 'Rate ₹', 'Tax %', 'Amount ₹', '']
                                     : ['Sr.', 'Title', 'Description', 'Qty', 'Unit', 'Rate ₹', 'Amount ₹', '']
                                 ).map(h => (
@@ -1055,7 +1148,7 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                         </thead>
                         <tbody>
                             {data.items.map((item, idx) => (
-                                <tr key={item.id}>
+                                <tr key={item.id || idx}>
                                     <td style={{ border: '1px solid #ddd', padding: '3px 6px', textAlign: 'center', fontWeight: 'bold' }}>
                                         {idx + 1}
                                     </td>

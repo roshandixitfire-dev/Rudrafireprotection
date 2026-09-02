@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import { fetchNextQuotationNumber } from '@/utils/documentVersioning';
@@ -9,6 +9,8 @@ import QuotationStickyHeader from './QuotationStickyHeader';
 import './quotation.css';
 import { ClientSearchInput } from './ClientSearchInput';
 import { checkClientExists, addClientToCRM, createLeadFromQuotation } from '@/utils/crmHelper';
+import { useFormDraft } from '@/hooks/useFormDraft';
+import DraftNoticeBanner from '@/components/common/DraftNoticeBanner';
 
 const supabase = createClient();
 
@@ -34,7 +36,6 @@ const DEFAULT_AMC_TERMS = [
     'Taxes are extra as shown above. Taxes will be applicable / vary as per Govt. Policy.',
 ];
 
-
 const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -59,6 +60,34 @@ const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
 
     const [clientExists, setClientExists] = useState(true);
     const [addToCRM, setAddToCRM] = useState(false);
+
+    const {
+        hasDraft,
+        draftTime,
+        lastSavedNotice,
+        saveDraft,
+        clearDraft,
+        restoreDraft,
+        discardDraft
+    } = useFormDraft<{ data: AMCQuotation; savedId: string | null }>({
+        storageKey: 'draft_quote_amc',
+        isEditingExisting: !!id,
+        onRestore: (draftObj) => {
+            if (draftObj?.data) {
+                setData(draftObj.data);
+                if (draftObj.savedId) setSavedId(draftObj.savedId);
+            }
+        }
+    });
+
+    useEffect(() => {
+        if (!id && (data.companyName || data.street || data.totalAmount > 0)) {
+            const timer = setTimeout(() => {
+                saveDraft({ data, savedId });
+            }, 800);
+            return () => clearTimeout(timer);
+        }
+    }, [data, savedId, id, saveDraft]);
 
     useEffect(() => {
         if (!data.companyName || data.companyName.trim().length < 2) {
@@ -182,6 +211,7 @@ const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                 packages: data.packages,
                 terms: data.terms,
                 grand_total: data.totalAmount,
+                status: 'Sent',
                 updated_at: new Date().toISOString(),
             };
             let res, error;
@@ -218,6 +248,7 @@ const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
 
             if (res?.id) setSavedId(res.id);
             setSaveStatus('saved');
+            clearDraft();
             router.refresh();
             setTimeout(() => setSaveStatus('idle'), 3000);
         } catch (err: any) {
@@ -257,6 +288,13 @@ const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
 
     return (
         <div className="quotation-container">
+            <DraftNoticeBanner
+                hasDraft={hasDraft}
+                draftTime={draftTime}
+                lastSavedNotice={lastSavedNotice}
+                onRestore={restoreDraft}
+                onDiscard={discardDraft}
+            />
             <QuotationStickyHeader 
                 actions={
                     <>

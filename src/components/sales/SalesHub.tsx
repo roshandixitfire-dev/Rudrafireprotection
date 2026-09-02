@@ -5,12 +5,13 @@ import Link from 'next/link'
 import {
     Plus, Search, FileText, FileDown, Eye, Pencil, Trash2,
     LayoutGrid, List, Filter, TrendingUp, Receipt,
-    ClipboardList, IndianRupee, ChevronDown, X, AlertTriangle, Tag, CreditCard
+    ClipboardList, IndianRupee, ChevronDown, X, AlertTriangle, Tag, CreditCard, Calculator
 } from 'lucide-react'
 import { deleteQuotation, deleteInvoice, updateQuotationStatus, payInvoice } from '@/app/dashboard/sales/actions'
 import { TagQuoteModal } from './TagQuoteModal'
 import { PayInvoiceModal } from './PayInvoiceModal'
 import { SalesBulkImportModal } from './SalesBulkImportModal'
+import CostingModule from './CostingModule'
 
 // ─────────────────────────────────────────────────────────────────
 // Types
@@ -145,7 +146,8 @@ export default function SalesHub({ quotations, invoices, clients, accessLevel }:
 
     // Table state
     const [searchTerm, setSearchTerm] = useState('')
-    const [typeFilter, setTypeFilter] = useState<'all' | 'quotes' | 'invoices'>('all')
+    const [typeFilter, setTypeFilter] = useState<'all' | 'quotes' | 'invoices' | 'costing'>('all')
+    const [mainTab, setMainTab] = useState<'hub' | 'costing'>('hub')
     const [statusFilter, setStatusFilter] = useState('')
     const [viewMode, setViewMode] = useState<ViewMode>('table')
     const [deleteTarget, setDeleteTarget] = useState<SalesRecord | null>(null)
@@ -283,6 +285,16 @@ export default function SalesHub({ quotations, invoices, clients, accessLevel }:
         })
     }
 
+    const handleDirectStatusChange = (record: SalesRecord, newStatus: string) => {
+        setAllRecords(prev => ({
+            quotations: prev.quotations.map(q => String(q.id) === record.id ? { ...q, status: newStatus } : q),
+            invoices: prev.invoices.map(i => String(i.id) === record.id ? { ...i, status: newStatus } : i)
+        }))
+        startTransition(async () => {
+            await updateQuotationStatus(record.id, newStatus)
+        })
+    }
+
     const handlePaySuccess = async (paymentData: any) => {
         if (!selectedInvoice) return
         startTransition(async () => {
@@ -322,7 +334,18 @@ export default function SalesHub({ quotations, invoices, clients, accessLevel }:
                     </div>
                 </div>
                 {canWrite && (
-                    <div id="sales-header-actions" className="flex items-center gap-3">
+                    <div id="sales-header-actions" className="flex flex-wrap items-center gap-3">
+                        <button
+                            onClick={() => setMainTab(mainTab === 'costing' ? 'hub' : 'costing')}
+                            className={`flex items-center gap-2 px-4 h-11 rounded-xl font-bold text-sm transition-all shadow-sm active:scale-95 ${
+                                mainTab === 'costing'
+                                    ? 'bg-violet-600 text-white shadow-violet-600/20'
+                                    : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+                            }`}
+                        >
+                            <Calculator className="w-4 h-4 text-violet-500" />
+                            Costing Estimator
+                        </button>
                         <Link
                             href="/dashboard/quotations/legacy"
                             className="flex items-center gap-2 bg-violet-600 hover:bg-violet-700 text-white px-5 h-11 rounded-xl font-bold text-sm transition-all shadow-sm shadow-violet-600/20 active:scale-95"
@@ -340,6 +363,11 @@ export default function SalesHub({ quotations, invoices, clients, accessLevel }:
                     </div>
                 )}
             </div>
+
+            {mainTab === 'costing' ? (
+                <CostingModule clients={clients} onBackToSales={() => setMainTab('hub')} />
+            ) : (
+                <>
 
             {/* ── Dashboard Cards ───────────────────────────────── */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -409,11 +437,15 @@ export default function SalesHub({ quotations, invoices, clients, accessLevel }:
 
                         {/* Type Filter */}
                         <div className="flex h-9 bg-slate-50 border border-slate-200 rounded-lg overflow-hidden text-xs font-bold">
-                            {(['all', 'quotes', 'invoices'] as const).map(t => (
+                            {(['all', 'quotes', 'invoices', 'costing'] as const).map(t => (
                                 <button
                                     key={t}
-                                    onClick={() => setTypeFilter(t)}
-                                    className={`px-3 capitalize transition-colors ${typeFilter === t ? 'bg-primary text-white' : 'text-slate-500 hover:bg-slate-100'}`}
+                                    onClick={() => {
+                                        setTypeFilter(t)
+                                        if (t === 'costing') setMainTab('costing')
+                                        else setMainTab('hub')
+                                    }}
+                                    className={`px-3 capitalize transition-colors ${(typeFilter === t || (t === 'costing' && (mainTab as string) === 'costing')) ? 'bg-primary text-white' : 'text-slate-500 hover:bg-slate-100'}`}
                                 >
                                     {t}
                                 </button>
@@ -506,9 +538,19 @@ export default function SalesHub({ quotations, invoices, clients, accessLevel }:
                                             {formatCurrency(r.value)}
                                         </td>
                                         <td className="px-5 py-4 text-center">
-                                            <span className={`px-2.5 py-1 text-xs font-bold rounded-lg inline-flex items-center justify-center min-w-[72px] ${getStatusStyle(r.status)}`}>
-                                                {r.status}
-                                            </span>
+                                            <select
+                                                value={r.status}
+                                                onChange={(e) => handleDirectStatusChange(r, e.target.value)}
+                                                className={`px-2 py-1 text-xs font-bold rounded-lg cursor-pointer outline-none transition-all border ${getStatusStyle(r.status)}`}
+                                            >
+                                                <option value="Sent">Sent</option>
+                                                <option value="Draft">Draft</option>
+                                                <option value="Accepted">Accepted</option>
+                                                <option value="Paid">Paid</option>
+                                                <option value="Unpaid">Unpaid</option>
+                                                <option value="Rejected">Rejected</option>
+                                                <option value="Expired">Expired</option>
+                                            </select>
                                         </td>
                                         <td className="px-5 py-4">
                                             <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -650,6 +692,8 @@ export default function SalesHub({ quotations, invoices, clients, accessLevel }:
                 onClose={() => setImportModalOpen(false)}
                 onSuccess={(count) => alert(`Successfully uploaded ${count} bulk rows (Placeholder)`)}
             />
+                </>
+            )}
         </div>
     )
 }

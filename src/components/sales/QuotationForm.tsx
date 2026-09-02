@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { X, Plus, Trash2, FileText, Loader2, Save } from 'lucide-react'
 import { createQuotation, updateQuotation } from '@/app/dashboard/sales/actions'
+import { useFormDraft } from '@/hooks/useFormDraft'
+import DraftNoticeBanner from '@/components/common/DraftNoticeBanner'
 
 interface QuotationFormProps {
     isOpen: boolean
@@ -57,6 +59,41 @@ export default function QuotationForm({ isOpen, onClose, initialData, clients, o
         document.body.style.overflow = 'hidden'
         return () => { document.body.style.overflow = 'unset' }
     }, [isOpen])
+
+    const {
+        hasDraft,
+        draftTime,
+        lastSavedNotice,
+        saveDraft,
+        clearDraft,
+        restoreDraft,
+        discardDraft
+    } = useFormDraft<any>({
+        storageKey: 'draft_quote_modal',
+        isEditingExisting: isEdit,
+        onRestore: (draft) => {
+            if (draft) {
+                if (draft.clientId) setClientId(draft.clientId)
+                if (draft.quoteName) setQuoteName(draft.quoteName)
+                if (draft.quoteCode) setQuoteCode(draft.quoteCode)
+                if (draft.account) setAccount(draft.account)
+                if (draft.deal) setDeal(draft.deal)
+                if (draft.quoteType) setQuoteType(draft.quoteType)
+                if (draft.doorType) setDoorType(draft.doorType)
+                if (draft.notes) setNotes(draft.notes)
+                if (draft.lines && draft.lines.length > 0) setLines(draft.lines)
+            }
+        }
+    })
+
+    useEffect(() => {
+        if (!isEdit && isOpen && (quoteName || clientId || notes || lines.some((l: any) => l.product_description))) {
+            const timer = setTimeout(() => {
+                saveDraft({ clientId, quoteName, quoteCode, account, deal, quoteType, doorType, notes, lines })
+            }, 800)
+            return () => clearTimeout(timer)
+        }
+    }, [clientId, quoteName, quoteCode, account, deal, quoteType, doorType, notes, lines, isEdit, isOpen, saveDraft])
 
     const calculateLineTotal = (qty: number, price: number, taxRate: number) => {
         const base = qty * price
@@ -159,6 +196,7 @@ export default function QuotationForm({ isOpen, onClose, initialData, clients, o
 
             if (!result.success) throw new Error(result.error)
 
+            clearDraft()
             onSuccess({
                 id: isEdit ? initialData.id : (result as any).data?.id,
                 ...payload,
@@ -235,6 +273,16 @@ export default function QuotationForm({ isOpen, onClose, initialData, clients, o
                     <button onClick={onClose} className="p-1.5 sm:p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-colors flex-shrink-0">
                         <X className="w-5 h-5" />
                     </button>
+                </div>
+
+                <div className="px-4 sm:px-6 pt-4">
+                    <DraftNoticeBanner
+                        hasDraft={hasDraft}
+                        draftTime={draftTime}
+                        lastSavedNotice={lastSavedNotice}
+                        onRestore={restoreDraft}
+                        onDiscard={discardDraft}
+                    />
                 </div>
 
                 {/* ── ERROR BANNER ── */}

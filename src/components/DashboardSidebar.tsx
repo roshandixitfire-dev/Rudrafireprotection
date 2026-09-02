@@ -17,7 +17,8 @@ import {
     CreditCard,
     UserCog,
     X,
-    Menu
+    Menu,
+    Store
 } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import * as LucideIcons from 'lucide-react'
@@ -27,6 +28,7 @@ const ALL_MODULES = [
     { key: 'dashboard', name: 'Dashboard', href: '/dashboard', icon: 'LayoutDashboard' },
     { key: 'crm', name: 'CRM', href: '/dashboard/crm', icon: 'Target' },
     { key: 'sales', name: 'Sales', href: '/dashboard/sales', icon: 'CircleDollarSign' },
+    { key: 'vendors', name: 'Vendors & POs', href: '/dashboard/vendors', icon: 'Store' },
     { key: 'services', name: 'Services', href: '/dashboard/services', icon: 'Wrench' },
     { key: 'team', name: 'Team & HR', href: '/dashboard/team', icon: 'Users' },
     { key: 'schedule', name: 'Task Scheduling', href: '/dashboard/team/schedule', icon: 'CalendarDays' },

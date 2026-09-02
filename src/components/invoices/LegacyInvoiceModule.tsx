@@ -1,6 +1,8 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import { createClient } from '@/utils/supabase/client';
+import { useFormDraft } from '@/hooks/useFormDraft';
+import DraftNoticeBanner from '@/components/common/DraftNoticeBanner';
 
 const supabase = createClient();
 
@@ -30,6 +32,18 @@ const CATALOG_ITEMS = [
     { title: 'Transportation', description: 'Transportation and logistics charges for equipment/materials.', unit: 'Job', rate: 1000 },
     { title: 'AMC - Extinguisher (Annual)', description: 'Annual maintenance contract for fire extinguishers including quarterly visits.', unit: 'Nos', rate: 300 },
     { title: 'Labour Charges', description: 'Labour charges for on-site work as agreed.', unit: 'Job', rate: 0 },
+    { title: 'ABC TYPE Extinguisher 4kg', description: 'Supply, Installation, Testing and commissioning of ABC type 4kg fire extinguisher.', unit: 'Nos', rate: 1750 },
+    { title: 'Co2 TYPE Extinguisher 4.5kg', description: 'Supply, Installation, Testing and commissioning of Co2 type 4.5kg fire extinguisher.', unit: 'Nos', rate: 4250 },
+    { title: 'ABC TYPE Extinguisher Refilling 4Kg', description: 'Servicing, Testing, Cleaning, Refilling and Reconditioning of ABC type 4kg fire extinguisher.', unit: 'Nos', rate: 450 },
+    { title: 'PUBLIC ADDRESSABLE FIRE ALARM PANEL', description: 'Providing, fixing & commissioning of microprocessor-based, Public addressable fire alarm control panel with battery backup.', unit: 'Nos', rate: 57839 },
+    { title: 'MANUAL CALLPOINT & HOOTER', description: 'Providing, fixing & commissioning of manual call point and electronic hooter.', unit: 'Nos', rate: 3090 },
+    { title: 'SMOKE DETECTORS', description: 'Installation, testing, and commissioning of smoke detectors.', unit: 'Nos', rate: 2322 },
+    { title: 'ISI Fire Hydrant Valve Replacement', description: 'Supply, Installation, Testing, Commissioning Of ISI Make Fire Hydrant Valve.', unit: 'Nos', rate: 4750 },
+    { title: 'Single ISI Hosebox Installation', description: 'Supply, Installation, Testing & Commissioning of single ISI Hosebox.', unit: 'Nos', rate: 2150 },
+    { title: 'Supply, Installation, Testing & Commissioning of Canvas Hosepipe', description: 'Canvas hose pipe installation.', unit: 'Nos', rate: 3895 },
+    { title: 'Fire Fighting System Control Panel Repair', description: 'Servicing and replacement of parts in control panel.', unit: 'Nos', rate: 18500 },
+    { title: 'Main Submersible Fire Fighting Pump Service', description: 'Servicing of main fire pump.', unit: 'Nos', rate: 19850 },
+    { title: 'Jockey Submersible Fire Fighting Pump Service', description: 'Servicing of jockey fire pump.', unit: 'Nos', rate: 13300 },
 ];
 
 // ─── T&C Presets ────────────────────────────────────────────────────────────────
@@ -409,8 +423,9 @@ const ItemSearchInput: React.FC<{
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
 
-    const results = value.length >= 2
-        ? catalog.filter(c => c.title.toLowerCase().includes(value.toLowerCase())).slice(0, 6)
+    const safeValue = value || '';
+    const results = safeValue.length >= 2
+        ? catalog.filter(c => c.title.toLowerCase().includes(safeValue.toLowerCase())).slice(0, 6)
         : [];
 
     useEffect(() => {
@@ -423,7 +438,7 @@ const ItemSearchInput: React.FC<{
 
     return (
         <div ref={ref} style={{ position: 'relative' }}>
-            <input value={value} onChange={e => { onChange(e.target.value); setOpen(true); }}
+            <input value={safeValue} onChange={e => { onChange(e.target.value); setOpen(true); }}
                 placeholder="Type title..." style={inputS} autoComplete="off" />
             {open && (
                 <div style={{
@@ -513,6 +528,7 @@ const ClientSearchInput: React.FC<{
 // EDITOR MODULE
 // ═══════════════════════════════════════════════════════════════════════════════
 const INV_DRAFT_KEY = 'rudra-legacy-invoice-draft';
+const inputS: React.CSSProperties = { border: '1px solid #ccc', borderRadius: 4, padding: '4px 8px', fontSize: 12, width: '100%', boxSizing: 'border-box' };
 
 const LegacyInvoiceModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
     const [invoiceType, setInvoiceType] = useState<InvoiceType>('tax');
@@ -533,37 +549,41 @@ const LegacyInvoiceModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => 
     });
 
     const [catalog, setCatalog] = useState(CATALOG_ITEMS);
+    const [isCatalogLoaded, setIsCatalogLoaded] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
     const [showCatalog, setShowCatalog] = useState(false);
     const [catalogSearch, setCatalogSearch] = useState('');
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [newItem, setNewItem] = useState({ title: '', description: '', unit: 'Nos', rate: '' });
     const [tcPresetIdx, setTcPresetIdx] = useState(0);
     const [customTcText, setCustomTcText] = useState(TC_PRESETS[3].items.join('\n'));
     const [draftSaved, setDraftSaved] = useState(false);
-    const [dbStatus, setDbStatus] = useState<'idle'|'saving'|'saved'|'error'>('idle');
-    const [savedId, setSavedId] = useState<string|null>(null);
+    const [dbStatus, setDbStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+    const [savedId, setSavedId] = useState<string | null>(null);
 
-    // Single mount effect: restore draft OR fetch new sequence number
+    const {
+        hasDraft,
+        draftTime,
+        lastSavedNotice,
+        saveDraft,
+        clearDraft,
+        restoreDraft,
+        discardDraft
+    } = useFormDraft<{ data: LegacyInvoice; savedId: string | null }>({
+        storageKey: INV_DRAFT_KEY,
+        isEditingExisting: false,
+        onRestore: (draftObj) => {
+            if (draftObj?.data) {
+                setData(draftObj.data);
+                setInvoiceType(draftObj.data.invoiceType || 'tax');
+                if (draftObj.savedId) setSavedId(draftObj.savedId);
+            }
+        }
+    });
+
+    // Single mount effect: fetch new sequence number
     useEffect(() => {
         const today = todayISO();
-        try {
-            const saved = localStorage.getItem(INV_DRAFT_KEY);
-            if (saved) {
-                const parsed = JSON.parse(saved);
-                if (parsed.data) {
-                    // New format with savedId
-                    setData(parsed.data as LegacyInvoice);
-                    setInvoiceType(parsed.data.invoiceType);
-                    if (parsed.savedId) setSavedId(parsed.savedId);
-                    return;
-                } else {
-                    // Old format backward compatibility
-                    setData(parsed as LegacyInvoice);
-                    setInvoiceType((parsed as LegacyInvoice).invoiceType);
-                    return; // draft restored, done
-                }
-            }
-        } catch {}
-        // No draft — set today's date and fetch DB sequence number
         const type: InvoiceType = 'tax';
         const fyLabel = getINVFYLabel();
         const prefix = 'TI';
@@ -574,18 +594,44 @@ const LegacyInvoiceModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => 
                 : genInvoiceNo(type);
             setData(prev => ({ ...prev, date: today, invoiceNo: no }));
         });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // Auto-save draft to localStorage
+    // Load custom catalog from localStorage on mount
     useEffect(() => {
-        const t = setTimeout(() => {
-            localStorage.setItem(INV_DRAFT_KEY, JSON.stringify({ data, savedId }));
-            setDraftSaved(true);
-            setTimeout(() => setDraftSaved(false), 1500);
-        }, 600);
-        return () => clearTimeout(t);
-    }, [data, savedId]);
+        try {
+            const saved = localStorage.getItem('rudra-legacy-catalog');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                const merged = [...parsed];
+                CATALOG_ITEMS.forEach(defaultItem => {
+                    if (!merged.some(item => item.title.toLowerCase() === defaultItem.title.toLowerCase())) {
+                        merged.push(defaultItem);
+                    }
+                });
+                setCatalog(merged);
+            }
+        } catch { }
+        setIsCatalogLoaded(true);
+    }, []);
+
+    // Save catalog to localStorage when it changes
+    useEffect(() => {
+        if (!isCatalogLoaded) return;
+        try {
+            localStorage.setItem('rudra-legacy-catalog', JSON.stringify(catalog));
+        } catch { }
+    }, [catalog, isCatalogLoaded]);
+
+    // Auto-save draft to localStorage via useFormDraft
+    useEffect(() => {
+        if (data.companyName || data.street || (data.items && data.items.length > 0)) {
+            const t = setTimeout(() => {
+                saveDraft({ data, savedId });
+            }, 800);
+            return () => clearTimeout(t);
+        }
+    }, [data, savedId, saveDraft]);
 
     // Sync invoiceType is now handled inside the mount useEffect above
 
@@ -618,7 +664,6 @@ const LegacyInvoiceModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => 
             invoice_no: data.invoiceNo,
             invoice_type: data.invoiceType,
             invoice_date: data.date,
-            status: 'Draft' as const,
             to_title: data.toTitle,
             company_name: data.companyName,
             street: data.street,
@@ -632,14 +677,42 @@ const LegacyInvoiceModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => 
             sgst_amount: sgstAmt,
             cgst_amount: cgstAmt,
             grand_total: baseAmt + sgstAmt + cgstAmt,
+            status: 'Sent',
             raw_json: data as unknown as Record<string, unknown>,
         };
-        const { data: res, error } = savedId
-            ? await supabase.from('legacy_invoices').update(docPayload).eq('id', savedId).select('id').single()
-            : await supabase.from('legacy_invoices').insert(docPayload).select('id').single();
+        let res, error;
+        if (savedId) {
+            const updateRes = await supabase.from('legacy_invoices').update(docPayload).eq('id', savedId).select('id').single();
+            res = updateRes.data;
+            error = updateRes.error;
+        } else {
+            const insertRes = await supabase.from('legacy_invoices').insert(docPayload).select('id').single();
+            res = insertRes.data;
+            error = insertRes.error;
+
+            // Self-healing: if insert fails because of duplicate key, find the existing ID and update it instead
+            if (error && error.code === '23505') {
+                const { data: existing } = await supabase
+                    .from('legacy_invoices')
+                    .select('id')
+                    .eq('invoice_no', docPayload.invoice_no)
+                    .single();
+                if (existing?.id) {
+                    const retryRes = await supabase
+                        .from('legacy_invoices')
+                        .update(docPayload)
+                        .eq('id', existing.id)
+                        .select('id')
+                        .single();
+                    res = retryRes.data;
+                    error = retryRes.error;
+                }
+            }
+        }
+
         if (error) {
             console.error('Invoice save error:', JSON.stringify({ code: error.code, message: error.message, details: error.details, hint: error.hint }));
-            
+
             if (error.code === '23505') {
                 alert(`The invoice number "${data.invoiceNo}" already exists. Please change the invoice number to save as a new invoice.`);
             }
@@ -649,6 +722,7 @@ const LegacyInvoiceModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => 
         } else {
             if (res?.id) setSavedId(res.id);
             setDbStatus('saved');
+            clearDraft();
             setTimeout(() => setDbStatus('idle'), 2500);
         }
     };
@@ -670,6 +744,22 @@ const LegacyInvoiceModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => 
         });
     };
 
+    const handleSaveCatalog = (shouldClose: boolean) => {
+        if (!newItem.title.trim()) return;
+        const rateVal = parseFloat(newItem.rate) || 0;
+        const newCat = {
+            title: newItem.title.trim(),
+            description: newItem.description.trim(),
+            unit: newItem.unit,
+            rate: rateVal
+        };
+        setCatalog(prev => [newCat, ...prev]);
+        setNewItem({ title: '', description: '', unit: 'Nos', rate: '' });
+        if (shouldClose) {
+            setShowAddForm(false);
+        }
+    };
+
     const addToCatalog = (title: string, id: string) => {
         const item = data.items.find(it => it.id === id);
         if (!item) return;
@@ -678,9 +768,9 @@ const LegacyInvoiceModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => 
         setCatalog(prev => [...prev, newCat]);
     };
 
-    const clearDraft = () => {
+    const resetForm = () => {
         setSavedId(null);
-        localStorage.removeItem(INV_DRAFT_KEY);
+        clearDraft();
         const type: InvoiceType = 'tax';
         setInvoiceType(type);
         setData({
@@ -693,7 +783,7 @@ const LegacyInvoiceModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => 
             termsItems: TC_PRESETS[0].items,
             sgstPct: 9, cgstPct: 9,
         });
-        
+
         // Fetch fresh sequence
         const fyLabel = getINVFYLabel();
         const prefix = 'TI';
@@ -772,6 +862,13 @@ const LegacyInvoiceModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => 
 
     return (
         <div style={{ maxWidth: 980, margin: '0 auto', padding: '12px 12px', fontFamily: 'Arial, sans-serif' }}>
+            <DraftNoticeBanner
+                hasDraft={hasDraft}
+                draftTime={draftTime}
+                lastSavedNotice={lastSavedNotice}
+                onRestore={restoreDraft}
+                onDiscard={discardDraft}
+            />
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -779,7 +876,7 @@ const LegacyInvoiceModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => 
                     {draftSaved && <span style={{ fontSize: 10, color: '#22c55e', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 4, padding: '2px 7px' }}>✓ Draft saved</span>}
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
-                    <button onClick={clearDraft} style={{ padding: '7px 14px', background: '#fff', color: '#888', border: '1px solid #ddd', borderRadius: 6, cursor: 'pointer', fontSize: 12 }}>🆕 New Invoice</button>
+                    <button onClick={resetForm} style={{ padding: '7px 14px', background: '#fff', color: '#888', border: '1px solid #ddd', borderRadius: 6, cursor: 'pointer', fontSize: 12 }}>🆕 New Invoice</button>
                     <button onClick={saveToDb} disabled={dbStatus === 'saving'} style={{ padding: '7px 16px', background: dbStatus === 'saved' ? '#16a34a' : dbStatus === 'error' ? '#dc2626' : '#1a73e8', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
                         {dbStatus === 'saving' ? '⏳ Saving...' : dbStatus === 'saved' ? '✓ Saved!' : dbStatus === 'error' ? '✗ Error – Retry' : '💾 Save'}
                     </button>
@@ -931,17 +1028,93 @@ const LegacyInvoiceModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => 
 
                 {showCatalog && (
                     <div style={{ background: '#fff', border: '1px solid #ddd', borderRadius: 6, padding: 12, marginBottom: 12 }}>
-                        <div style={{ fontWeight: 700, fontSize: 12, marginBottom: 8, color: '#1a73e8' }}>📦 Click an item to add it</div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                            <div style={{ fontWeight: 700, fontSize: 12, color: '#1a73e8' }}>📦 Click an item to add it</div>
+                            <button onClick={() => setShowAddForm(v => !v)}
+                                style={{ padding: '5px 12px', background: showAddForm ? '#dc2626' : '#16a34a', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>
+                                {showAddForm ? '✕ Cancel' : '➕ Add Item to Catalog'}
+                            </button>
+                        </div>
+
+                        {showAddForm && (
+                            <form onSubmit={e => e.preventDefault()} style={{ background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: 6, padding: 12, marginBottom: 12 }}>
+                                <div style={{ fontWeight: 700, fontSize: 11, marginBottom: 8, color: '#475569' }}>➕ Add New Catalog Item</div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 8 }}>
+                                    <div>
+                                        <label style={{ fontSize: 9.5, fontWeight: 600, color: '#475569', display: 'block', marginBottom: 2 }}>Item Title</label>
+                                        <input required placeholder="e.g. ABC TYPE Extinguisher Refilling" value={newItem.title}
+                                            onChange={e => setNewItem(prev => ({ ...prev, title: e.target.value }))}
+                                            className="form-input text-xs w-full" style={{ padding: '4px 8px' }} />
+                                    </div>
+                                    <div>
+                                        <label style={{ fontSize: 9.5, fontWeight: 600, color: '#475569', display: 'block', marginBottom: 2 }}>Rate (₹)</label>
+                                        <input required type="number" placeholder="570" value={newItem.rate}
+                                            onChange={e => setNewItem(prev => ({ ...prev, rate: e.target.value }))}
+                                            className="form-input text-xs w-full" style={{ padding: '4px 8px' }} />
+                                    </div>
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 8 }}>
+                                    <div>
+                                        <label style={{ fontSize: 9.5, fontWeight: 600, color: '#475569', display: 'block', marginBottom: 2 }}>Unit</label>
+                                        <select value={newItem.unit} onChange={e => setNewItem(prev => ({ ...prev, unit: e.target.value }))}
+                                            className="form-input text-xs w-full" style={{ padding: '4px 8px' }}>
+                                            <option value="Nos">Nos</option>
+                                            <option value="Mtr">Mtr</option>
+                                            <option value="Lot">Lot</option>
+                                            <option value="Set">Set</option>
+                                            <option value="Sq.Mtr">Sq.Mtr</option>
+                                            <option value="Kg">Kg</option>
+                                            <option value="LS">LS</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label style={{ fontSize: 9.5, fontWeight: 600, color: '#475569', display: 'block', marginBottom: 2 }}>Description (Optional)</label>
+                                        <input placeholder="e.g. Servicing, Testing..." value={newItem.description}
+                                            onChange={e => setNewItem(prev => ({ ...prev, description: e.target.value }))}
+                                            className="form-input text-xs w-full" style={{ padding: '4px 8px' }} />
+                                    </div>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 10 }}>
+                                    <button type="button" onClick={() => handleSaveCatalog(true)}
+                                        style={{ padding: '6px 14px', background: '#16a34a', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 11, fontWeight: 700, width: '100%' }}>
+                                        💾 Save & Close
+                                    </button>
+                                    <button type="button" onClick={() => handleSaveCatalog(false)}
+                                        style={{ padding: '6px 14px', background: '#1e3a8a', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 11, fontWeight: 700, width: '100%' }}>
+                                        ➕ Save & Add New
+                                    </button>
+                                </div>
+                            </form>
+                        )}
+
                         <input placeholder="Search..." value={catalogSearch} onChange={e => setCatalogSearch(e.target.value)}
                             style={{ ...inputS, marginBottom: 10, maxWidth: 300 }} />
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 8, maxHeight: 240, overflowY: 'auto' }}>
                             {filteredCatalog.map((cat, i) => (
-                                <div key={i} onClick={() => addFromCatalog(cat)}
-                                    style={{ border: '1px solid #ddd', borderRadius: 6, padding: '7px 10px', cursor: 'pointer', background: '#f8f8f8' }}
-                                    onMouseEnter={e => (e.currentTarget.style.background = '#e8f0fe')}
-                                    onMouseLeave={e => (e.currentTarget.style.background = '#f8f8f8')}>
-                                    <div style={{ fontWeight: 700, fontSize: 11 }}>{cat.title}</div>
-                                    <div style={{ fontSize: 9.5, color: '#666', marginTop: 2 }}>₹{cat.rate.toLocaleString('en-IN')} / {cat.unit}</div>
+                                <div key={i} style={{ position: 'relative' }}>
+                                    <div onClick={() => addFromCatalog(cat)}
+                                        style={{ border: '1px solid #ddd', borderRadius: 6, padding: '7px 10px', paddingRight: '28px', cursor: 'pointer', background: '#f8f8f8' }}
+                                        onMouseEnter={e => (e.currentTarget.style.background = '#e8f0fe')}
+                                        onMouseLeave={e => (e.currentTarget.style.background = '#f8f8f8')}>
+                                        <div style={{ fontWeight: 700, fontSize: 11 }}>{cat.title}</div>
+                                        <div style={{ fontSize: 9.5, color: '#666', marginTop: 2 }}>₹{cat.rate.toLocaleString('en-IN')} / {cat.unit}</div>
+                                    </div>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (window.confirm(`Delete "${cat.title}" from catalog?`)) {
+                                                setCatalog(prev => prev.filter(item => item.title !== cat.title));
+                                            }
+                                        }}
+                                        style={{
+                                            position: 'absolute', top: 5, right: 5, background: 'transparent', border: 'none',
+                                            color: '#94a3b8', fontSize: 12, cursor: 'pointer', padding: '2px 5px', borderRadius: 4
+                                        }}
+                                        onMouseEnter={e => (e.currentTarget.style.color = '#dc2626')}
+                                        onMouseLeave={e => (e.currentTarget.style.color = '#94a3b8')}
+                                    >
+                                        ✕
+                                    </button>
                                 </div>
                             ))}
                         </div>
@@ -959,7 +1132,7 @@ const LegacyInvoiceModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => 
                         </thead>
                         <tbody>
                             {data.items.map((item, idx) => (
-                                <tr key={item.id}>
+                                <tr key={item.id || idx}>
                                     <td style={{ border: '1px solid #ddd', padding: '3px 6px', textAlign: 'center', fontWeight: 'bold' }}>
                                         {idx + 1}
                                     </td>

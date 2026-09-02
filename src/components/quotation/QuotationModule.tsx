@@ -15,6 +15,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import QuotationStickyHeader from './QuotationStickyHeader';
 import './quotation.css';
 import { checkClientExists, addClientToCRM, createLeadFromQuotation } from '@/utils/crmHelper';
+import { useFormDraft } from '@/hooks/useFormDraft';
+import DraftNoticeBanner from '@/components/common/DraftNoticeBanner';
 
 const supabase = createClient();
 
@@ -406,6 +408,29 @@ const QuotationModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
     const searchParams = useSearchParams();
     const quoteId = searchParams.get('id');
 
+    const {
+        hasDraft,
+        draftTime,
+        lastSavedNotice,
+        saveDraft,
+        clearDraft,
+        restoreDraft,
+        discardDraft
+    } = useFormDraft<Quotation>({
+        storageKey: 'draft_quote_professional',
+        isEditingExisting: !!quoteId,
+        onRestore: (draft) => setQuotation(draft)
+    });
+
+    useEffect(() => {
+        if (!quoteId && (quotation.companyName || quotation.clientName || quotation.projectName || (quotation.sections && quotation.sections.length > 0))) {
+            const timer = setTimeout(() => {
+                saveDraft(quotation);
+            }, 800);
+            return () => clearTimeout(timer);
+        }
+    }, [quotation, quoteId, saveDraft]);
+
     const [clientExists, setClientExists] = useState(true);
     const [addToCRM, setAddToCRM] = useState(false);
 
@@ -505,7 +530,7 @@ const QuotationModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                 grand_total: totals.grandTotal,
                 payment_terms: PAYMENT_OPTIONS[quotation.termsConfig?.paymentOptionIndex ?? 0]?.label,
                 updated_at: new Date().toISOString(),
-                status: 'Draft' as const,
+                status: 'Sent' as const,
                 notes: quotation.subject,
             };
             let res, error;
@@ -541,6 +566,7 @@ const QuotationModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
             });
 
             setSaveStatus('saved');
+            clearDraft();
             router.refresh();
             setTimeout(() => setSaveStatus('idle'), 3000);
         } catch (err: any) {
@@ -570,6 +596,13 @@ const QuotationModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
 
     return (
         <div className="quotation-container">
+            <DraftNoticeBanner
+                hasDraft={hasDraft}
+                draftTime={draftTime}
+                lastSavedNotice={lastSavedNotice}
+                onRestore={restoreDraft}
+                onDiscard={discardDraft}
+            />
 
             <QuotationStickyHeader 
                 actions={

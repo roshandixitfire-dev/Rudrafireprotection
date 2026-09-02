@@ -296,9 +296,13 @@ export async function deleteInvoice(id: string) {
 export async function updateQuotationStatus(id: string, status: string) {
     try {
         const supabase = await createClient()
-        await supabase.from('quotations').update({ status }).eq('id', id)
-        await supabase.from('legacy_quotations').update({ status }).eq('id', id)
-        await supabase.from('amc_quotations').update({ status }).eq('id', id)
+        await Promise.all([
+            supabase.from('quotations').update({ status }).eq('id', id),
+            supabase.from('legacy_quotations').update({ status }).eq('id', id),
+            supabase.from('amc_quotations').update({ status }).eq('id', id),
+            supabase.from('legacy_invoices').update({ status }).eq('id', id),
+            supabase.from('invoices').update({ status }).eq('id', id)
+        ])
         
         revalidatePath('/dashboard/sales')
         return { success: true }

@@ -429,7 +429,7 @@ const BOQPage: React.FC<{ quotation: Quotation; sectionIdx: number; pageNo: numb
 const TermsPage: React.FC<{ quotation: Quotation; pageNo: number }> = ({ quotation, pageNo }) => {
     const tc = quotation.termsConfig;
     const payOpt = PAYMENT_OPTIONS[tc?.paymentOptionIndex ?? 0];
-    
+
     return (
         <PrintPageContainer pageNo={pageNo} quotationNo={quotation.quotationNo}>
             <ProjectInfoHeader
@@ -509,7 +509,7 @@ const TermsPage: React.FC<{ quotation: Quotation; pageNo: number }> = ({ quotati
                 )}
 
             </div>
-            
+
             <div style={{ display: 'flex', border: '1px solid #000', borderTop: 'none' }}>
                 <div style={{ width: '50%', padding: '15px' }}>
                     <div style={{ fontSize: 10, fontWeight: 800, textDecoration: 'underline', marginBottom: 4 }}>BANK DETAILS</div>
@@ -564,7 +564,7 @@ const ApprovedMakesPage: React.FC<{ quotation: Quotation; pageNo: number }> = ({
                 ))}
             </tbody>
         </table>
-        
+
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 20 }}>
             <div style={{ border: '1px solid #000', padding: '10px 15px', height: '110px', width: '250px', position: 'relative' }}>
                 <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 50 }}>For, Rudra Fire Protection</div>
