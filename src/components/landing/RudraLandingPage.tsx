@@ -28,6 +28,8 @@ import {
     Headphones,
     Loader2,
     AlertCircle,
+    FileText,
+    Download,
     ChevronRight as BreadcrumbArrow,
 } from 'lucide-react';
 
@@ -98,146 +100,135 @@ const SYSTEM_PRODUCTS: SystemProduct[] = [
         image: '/images/system-fire-alarm.jpg',
         badge: 'NBC / EN54 / UL Standards',
         specs: [
-            '1 to 8 Loop Addressable Panels with Network Cards',
-            'Photoelectric smoke, optical heat & multi-criteria sensors',
-            'Two-way firefighter talkback handsets & strobe sounders',
-            'Full BMS integration via RS-485 Modbus / BACnet protocol',
+            '1 to 8 Loop Addressable Control Panels',
+            'Optical Smoke, Rate-of-Rise Heat & Multi-Sensors',
+            'FRLS Armored Cabling & Fault Isolation Modules',
         ],
     },
     {
         id: 'hydrant-sprinkler',
         category: 'hydrant',
-        categoryLabel: 'Hydrant & Sprinkler Networks',
+        categoryLabel: 'Hydrant & Sprinklers',
         title: 'Fire Hydrant, Riser & Sprinkler Networks',
-        subtitle: 'High-pressure wet & dry risers, landing valves, hose reels & automatic quartz-bulb sprinkler grid.',
+        subtitle: 'Heavy-duty MS/GI pressurized risers, stainless steel landing valves, hose boxes & UL sprinkler heads.',
         image: '/images/system-hydrant-riser.jpg',
-        badge: 'IS 3844 / IS 15105 / TAC',
+        badge: 'IS 3844 / TAC Approved',
         specs: [
-            'Heavy-gauge MS ' + 'C' + ' class / ERW piping with anti-corrosion coating',
-            'Single & double-headed Gunmetal / SS landing valves & canvas hoses',
-            'Pendent, upright & concealed sidewall sprinklers (68°C / 79°C)',
-            'Alarm check valves, flow switches & drain test assemblies',
+            'Jindal / Zenith C-Class MS & GI Piping Networks',
+            'Single & Double SS Hydrant Landing Valves + Hose Reels',
+            'UL-Listed Upright, Pendent & Sidewall Sprinklers',
         ],
     },
     {
-        id: 'pump-room',
+        id: 'fire-pump-sets',
         category: 'hydrant',
-        categoryLabel: 'Pump Room Engineering',
+        categoryLabel: 'Fire Pumping Systems',
         title: 'Packaged Main, Diesel & Jockey Fire Pump Sets',
-        subtitle: 'Complete pumping stations featuring electric main, engine standby, and pressurized jockey pump setups.',
+        subtitle: 'Automated pressure-maintaining pump house packages engineered for zero-lag water delivery.',
         image: '/images/system-hydrant-pump.jpg',
-        badge: 'IS 12469 / NBC Part-IV',
+        badge: 'Kirloskar / PEW / Auto Panel',
         specs: [
-            'End-suction & split-case pumps (450 to 2850 LPM capacity)',
-            'Auto-start diesel engine with fuel tank & dual 12V battery rack',
-            'Auto-cycling electric jockey pump maintaining 7-10 kg/cm² line pressure',
-            'Custom automated control panel with digital phase monitor & siren',
+            'Main Electric, Standby Diesel & Submersible Jockey Pumps',
+            'Auto-Start Control Panels with Battery Chargers',
+            'Pressure Switches, NRVs & Butterfly Valve Manifolds',
         ],
     },
     {
-        id: 'gas-suppression',
+        id: 'clean-agent-suppression',
         category: 'suppression',
-        categoryLabel: 'Special Hazard Suppression',
+        categoryLabel: 'Fire Suppression Systems',
         title: 'FM-200 Clean Agent & CO₂ Gas Suppression',
-        subtitle: 'Total flooding and localized high-pressure gas discharge for IT server rooms, UPS & HT/LT panels.',
+        subtitle: 'Automatic total-flooding & localized panel suppression designed for data centers & substations.',
         image: '/images/system-suppression.jpg',
-        badge: 'NFPA 2001 / IS 15493',
+        badge: 'NFPA 2001 / Zero Residue',
         specs: [
-            'Zero ozone-depletion Clean Agent (HFC-227ea / FK-5-1-12)',
-            'Seamless high-pressure cylinders with electro-pneumatic actuators',
-            'Cross-zoned aspirated smoke detection ensuring zero false trips',
-            'Pressure relief dampers, abort switches & status indicator signs',
+            'Manifold Pipe-Network & Cabinet-Type Gas Cylinders',
+            'Cross-Zoned Smoke Detection with Abort & Manual Release',
+            'Non-Conductive Protection for Live Server & LT Panels',
         ],
     },
     {
-        id: 'voice-evac',
+        id: 'pa-voice-evacuation',
         category: 'alarm',
-        categoryLabel: 'Public Address & Voice Evac',
-        title: 'Public Address, Voice Evacuation & Talkback',
-        subtitle: 'Zoned emergency audio notification, paging amplifiers, and fire telephone warden stations.',
+        categoryLabel: 'Emergency Communication',
+        title: 'Public Address, Voice Evacuation & Fire Telephone',
+        subtitle: 'Zone-wise emergency voice guidance, two-way firefighter talkback jacks & exit illumination.',
         image: '/images/system-voice-evac.jpg',
-        badge: 'IS 1882 / EN 54-16',
+        badge: 'High-Rise Life Safety',
         specs: [
-            'Dual-redundant 240W / 480W class-D emergency amplifiers',
-            'Ceiling & wall-mount fire-rated loudspeakers with line monitoring',
-            'Pre-recorded multi-lingual phased evacuation voice messages',
-            'Master warden telephone console with duplex zone handsets',
+            'Digital Voice Evacuation Panels & Floor Speakers',
+            'Two-Way Fireman Telephone Jacks per Staircase Core',
+            'Centralized Emergency Exit & Escape Route Luminaires',
         ],
     },
     {
-        id: 'extinguishers',
+        id: 'extinguishers-refilling',
         category: 'equipment',
-        categoryLabel: 'Extinguishers & Safety Gear',
-        title: 'ISI Fire Extinguishers, Refilling & Hydro-Testing',
-        subtitle: 'Portable & trolley-mounted ABC powder, clean agent, mechanical foam, and CO₂ cylinders with quarterly inspection tags.',
+        categoryLabel: 'Fire Fighting Equipment',
+        title: 'ISI Fire Extinguishers, Hydro-Testing & Refilling',
+        subtitle: 'Complete supply, refilling, pressure testing & tagging for ABC Powder, CO₂, Foam & Clean Agent units.',
         image: '/images/system-extinguishers.jpg',
-        badge: 'IS 15683 / IS 2190',
+        badge: 'IS 15683 Certified Units',
         specs: [
-            'ABC dry chemical powder (1kg, 2kg, 4kg, 6kg, 9kg capacities)',
-            'CO₂ fire extinguishers (2kg, 3kg, 4.5kg) with high-pressure discharge horn',
-            'AFFF mechanical foam & water-type for Class A & B risks',
-            'Hydraulic pressure testing up to 35 kg/cm² with statutory certificates',
+            'ABC Stored-Pressure (2kg–9kg), CO₂ (4.5kg–22.5kg) & K-Class',
+            'Certified Nitrogen Charging & Hydrostatic Barrel Testing',
+            'QR Asset Tagging with Live Digital Expiry Tracking',
         ],
     },
-    // Passive Fire Protection (PFP) Systems
     {
         id: 'pfp-seals-barriers',
         category: 'pfp',
-        categoryLabel: 'Passive Fire Protection',
-        title: 'Seals & Barriers: Firestop Sealants, Mortar & Collars',
-        subtitle: 'Intumescent firestop sealants, high-density mortar/panel seals, and plastic pipe crush collars for penetrations.',
+        categoryLabel: 'Passive Fire (PFP)',
+        title: 'Seals & Barriers: Firestop Sealants, Mortar & Pipe Collars',
+        subtitle: 'Fire-rated penetration sealing systems preventing flame, smoke & toxic gas spread across wall and slab openings.',
         image: '/images/system-pfp-seals.jpg',
-        badge: 'UL 1479 / ASTM E814 / BS 476',
+        badge: 'UL 1479 / EN 1366',
         specs: [
-            'Elastomeric & intumescent firestop acrylic sealants (up to 4-hour rating)',
-            'High-strength firestop mortar & coated mineral wool ablative batt panels',
-            'Intumescent pipe collars & wraps crushing combustible PVC/UPVC pipes',
-            'Cable transit frames & flexible fire pillows for frequent cable re-pulls',
+            'Intumescent Acrylic & Silicone Firestop Sealants',
+            'High-Density Firestop Mortar & Coated Mineral Panel Seals',
+            'Tested Intumescent Plastic Pipe Collars & Wraps',
         ],
     },
     {
-        id: 'pfp-autoglow-signages',
+        id: 'pfp-auto-glow-signages',
         category: 'pfp',
-        categoryLabel: 'Passive Fire Protection',
+        categoryLabel: 'Passive Fire (PFP)',
         title: 'Auto Glow Safety Signages & Photoluminescent Wayfinding',
-        subtitle: 'High-luminance photoluminescent evacuation exit signs, directional markers, and fire equipment identification.',
+        subtitle: 'Zero-power glowing emergency escape, exit route, floor-level & fire equipment identification signages for blackout visibility.',
         image: '/images/system-pfp-autoglow.jpg',
-        badge: 'DIN 67510 / ISO 16069 / NBC Part-IV',
+        badge: 'ISO 7010 / NBC Compliant',
         specs: [
-            'Zero-power photoluminescent glow visible in total darkness up to 8+ hours',
-            'Emergency exit door, staircase, and egress route directional arrow boards',
-            'Fire hydrant, extinguisher, manual call point & hose reel locator plates',
-            'Rigid PVC / acrylic / aluminium backing with weather & UV-resistant coating',
+            'Photoluminescent Fire Exit, Direction & Floor Identification Signs',
+            'Fire Extinguisher, Hose Reel & Assembly Point Glow Signage',
+            'High-Luminance PVC / Acrylic Boards & Staircase Nosing Strips',
         ],
     },
     {
-        id: 'pfp-openings-doors',
+        id: 'pfp-openings',
         category: 'pfp',
-        categoryLabel: 'Passive Fire Protection',
-        title: 'Openings: 120-Min Metal Fire-Rated Doors & Partitions',
-        subtitle: 'Galvanized steel fire doors with honeycomb / ceramic insulation, panic exit hardware, and automatic fire curtains.',
+        categoryLabel: 'Passive Fire (PFP)',
+        title: 'Openings: 120-Min Metal Fire-Rated Doors & Curtains',
+        subtitle: 'Certified compartmentalization assemblies for escape staircases, lift lobbies, basements & wide industrial spans.',
         image: '/images/system-pfp-openings.jpg',
-        badge: 'IS 3614 / BS 476 Part 22 / CBRI',
+        badge: '120-Min Fire Rated',
         specs: [
-            '120-minute stability & integrity rated galvanized steel insulated door frames',
-            'Heavy-duty panic crash bars, hydraulic door closers & fire-rated vision glass',
-            'Smoke seals, intumescent perimeter seals & multi-point latch hardware',
-            'Motorized drop-down fire curtains integrated with central fire alarm panel',
+            'IS 3614 / BS 476 120-Min Galvanized Metal Fire Doors',
+            'Fire-Rated Glazed Partitions & Vision Panels',
+            'Automatic Gravity Fail-Safe Roll-Down Fire Curtains',
         ],
     },
     {
-        id: 'pfp-duct-sealing',
+        id: 'pfp-electric-duct-sealing',
         category: 'pfp',
-        categoryLabel: 'Passive Fire Protection',
+        categoryLabel: 'Passive Fire (PFP)',
         title: 'Electric Duct Sealing with Vermiculite Cement',
-        subtitle: 'Lightweight vermiculite-cementitious thermal barriers and firestop bulkheads sealing electrical cable shafts.',
+        subtitle: 'High-integrity shaft and floor-slab fire barriers encapsulating electrical risers, busducts & cable trays.',
         image: '/images/system-pfp-duct-sealing.jpg',
-        badge: 'IS 12458 / BS 476 / CBRI Tested',
+        badge: '2-Hr Shaft Integrity',
         specs: [
-            'Exfoliated vermiculite-cement plaster formulation with exceptional thermal resistance',
-            'Complete smoke & toxic gas barrier between floor slabs in vertical electrical shafts',
-            'Non-combustible Class A1 formulation prevents vertical chimney flame spread',
-            'Seamless pourable & trowel-grade application around dense cable bundles',
+            'Vermiculite-Cement Compound Sealing for Electrical Ducts',
+            'Non-Combustible Floor & Shaft Fire Compartmentalization',
+            'Clean Cable Tray Penetration Barriers for LT/HT Risers',
         ],
     },
 ];
@@ -245,9 +236,9 @@ const SYSTEM_PRODUCTS: SystemProduct[] = [
 const SECTORS = [
     {
         icon: Building2,
-        title: 'Residential Societies & High-Rises',
-        desc: 'Dedicated riser maintenance, wet hydrant pump readiness, bi-annual Form-B compliance & resident drill support.',
-        metrics: 'Hydrants • Sprinklers • Form-B AMC',
+        title: 'Co-Op Housing Societies & High-Rises',
+        desc: 'Complete AMC maintenance, pump servicing, riser pressure testing & bi-annual Form-B MFB certifications across Mumbai & MMR.',
+        metrics: 'Hydrant • Form-B • Quarterly AMC',
     },
     {
         icon: Landmark,
@@ -374,18 +365,18 @@ export default function RudraLandingPage({
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    companyName: inquiryCompany.trim(),
-                    contactPerson: inquiryName.trim() || inquiryCompany.trim(),
+                    company: inquiryCompany.trim(),
+                    name: inquiryName.trim(),
                     phone: phoneValidation.normalized,
-                    location: inquiryLocation.trim() || undefined,
+                    location: inquiryLocation.trim(),
                     service: inquiryService,
-                    notes: inquiryNotes.trim() || undefined,
+                    notes: inquiryNotes.trim(),
                 }),
             });
 
-            const data = await res.json();
-            if (!res.ok || !data.success) {
-                throw new Error(data.error || 'Failed to submit inquiry. Please call +91 77770 88817 directly.');
+            const json = await res.json();
+            if (!res.ok || !json.success) {
+                throw new Error(json.error || 'Could not submit inquiry. Please call us directly.');
             }
 
             setSubmittedLead({
@@ -393,7 +384,7 @@ export default function RudraLandingPage({
                 company: inquiryCompany.trim(),
                 phone: phoneValidation.normalized,
                 service: inquiryService,
-                salesFormNo: data.lead?.sales_form_no,
+                salesFormNo: json.lead?.sales_form_no,
             });
 
             setInquiryName('');
@@ -401,9 +392,11 @@ export default function RudraLandingPage({
             setInquiryPhone('');
             setInquiryLocation('');
             setInquiryNotes('');
+            setPhoneError(null);
         } catch (err: unknown) {
-            const message = err instanceof Error ? err.message : 'An unexpected error occurred. Please contact us directly.';
-            setInquiryError(message);
+            setInquiryError(
+                err instanceof Error ? err.message : 'Unable to submit right now. Please try again or call +91 77770 88817.'
+            );
         } finally {
             setIsSubmitting(false);
         }
@@ -412,38 +405,38 @@ export default function RudraLandingPage({
     const slide = HERO_SLIDES[activeSlide];
 
     return (
-        <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-red-600 selection:text-white">
-            {/* ── 1. TOP UTILITY BAR (Enterprise Sleek Slate Strip) ── */}
-            <div className="bg-slate-900 text-slate-200 text-xs py-2 border-b border-slate-800">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+        <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-[#E3242B] selection:text-white">
+            {/* ── 1. TOP UTILITY BAR (Asenware-Style Corporate Info Strip) ── */}
+            <div className="bg-slate-950 text-slate-300 text-xs border-b border-slate-800">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-9 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-5 overflow-hidden">
-                        <span className="hidden md:inline-flex items-center gap-1.5 text-slate-300 whitespace-nowrap">
-                            <ShieldCheck className="w-3.5 h-3.5 text-red-500" />
+                        <span className="hidden md:inline-flex items-center gap-1.5 text-slate-400 whitespace-nowrap">
+                            <ShieldCheck className="w-3.5 h-3.5 text-[#E3242B]" />
                             Turnkey Fire Safety &amp; MFB Form-B Specialists — Mumbai &amp; MMR
                         </span>
                         <a
                             href="tel:+917777088817"
-                            className="inline-flex items-center gap-1.5 text-slate-100 hover:text-white transition-colors whitespace-nowrap"
+                            className="inline-flex items-center gap-1.5 hover:text-white transition-colors whitespace-nowrap"
                         >
-                            <Phone className="w-3.5 h-3.5 text-red-500" />
-                            <span className="font-semibold">+91 77770 88817</span>
+                            <Phone className="w-3.5 h-3.5 text-[#E3242B]" />
+                            <span className="font-semibold text-white">+91 77770 88817</span>
                         </a>
                         <a
                             href="mailto:info@rudrafireprotection.com"
-                            className="hidden sm:inline-flex items-center gap-1.5 text-slate-300 hover:text-white transition-colors whitespace-nowrap"
+                            className="hidden sm:inline-flex items-center gap-1.5 hover:text-white transition-colors whitespace-nowrap"
                         >
-                            <Mail className="w-3.5 h-3.5 text-red-500" />
+                            <Mail className="w-3.5 h-3.5 text-[#E3242B]" />
                             info@rudrafireprotection.com
                         </a>
                     </div>
                     <div className="flex items-center gap-4 shrink-0">
-                        <span className="inline-flex items-center gap-1.5 text-emerald-400 font-semibold text-[11px] sm:text-xs">
-                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                        <span className="hidden lg:inline-flex items-center gap-1.5 text-emerald-400 font-semibold">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                             24/7 Breakdown Desk
                         </span>
                         <Link
                             href={portalHref}
-                            className="text-slate-200 hover:text-white font-semibold transition-colors whitespace-nowrap text-[11px] sm:text-xs"
+                            className="text-white/90 hover:text-[#E3242B] font-semibold transition-colors whitespace-nowrap"
                         >
                             {portalLabel} →
                         </Link>
@@ -451,320 +444,280 @@ export default function RudraLandingPage({
                 </div>
             </div>
 
-            {/* ── 2. STICKY MAIN NAVBAR (Daylight Glassmorphic Header) ── */}
-            <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-4">
+            {/* ── 2. STICKY MAIN HEADER / NAVIGATION ── */}
+            <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-3 sm:gap-4">
                     {/* Brand */}
-                    <a href="#top" className="flex items-center gap-3 shrink-0 group">
+                    <a href="#top" className="flex items-center gap-2.5 sm:gap-3 shrink-0 group">
                         <Image
                             src="/logo.png"
                             alt="Rudra Fire Protection"
                             width={140}
                             height={56}
                             priority
-                            className="h-10 sm:h-12 w-auto object-contain shrink-0"
+                            className="h-10 sm:h-14 w-auto object-contain shrink-0"
                         />
                         <div className="leading-tight shrink-0">
-                            <div className="text-sm sm:text-base xl:text-lg font-black tracking-tight text-slate-900 group-hover:text-red-600 transition-colors whitespace-nowrap">
+                            <div className="text-sm sm:text-base xl:text-lg font-extrabold tracking-tight text-slate-900 group-hover:text-[#E3242B] transition-colors whitespace-nowrap">
                                 RUDRA FIRE PROTECTION
                             </div>
-                            <div className="text-[10px] sm:text-[11px] font-semibold italic text-red-600 tracking-wide whitespace-nowrap hidden sm:block">
+                            <div className="text-[10px] sm:text-[11px] font-semibold italic text-[#E3242B] tracking-wide whitespace-nowrap hidden sm:block">
                                 Fire Prevention Is Better Than Fire Fighting.
                             </div>
                         </div>
                     </a>
 
-                    {/* Desktop Navigation Links */}
-                    <nav className="hidden lg:flex items-center gap-5 xl:gap-7 text-xs xl:text-sm font-semibold text-slate-700">
-                        <a href="#top" className="hover:text-red-600 transition-colors whitespace-nowrap py-1 relative after:absolute after:bottom-0 after:left-0 after:w-0 hover:after:w-full after:h-0.5 after:bg-red-600 after:transition-all">
+                    {/* Desktop Nav */}
+                    <nav className="hidden lg:flex items-center gap-4 xl:gap-6 text-[13px] xl:text-sm font-semibold text-slate-700">
+                        <a href="#top" className="hover:text-[#E3242B] transition-colors whitespace-nowrap">
                             Home
                         </a>
-                        <a href="#systems" className="hover:text-red-600 transition-colors whitespace-nowrap py-1 relative after:absolute after:bottom-0 after:left-0 after:w-0 hover:after:w-full after:h-0.5 after:bg-red-600 after:transition-all">
+                        <a href="#systems" className="hover:text-[#E3242B] transition-colors whitespace-nowrap">
                             Systems &amp; Products
                         </a>
-                        <a href="#amc-compliance" className="hover:text-red-600 transition-colors whitespace-nowrap py-1 relative after:absolute after:bottom-0 after:left-0 after:w-0 hover:after:w-full after:h-0.5 after:bg-red-600 after:transition-all">
+                        <a href="#amc-compliance" className="hover:text-[#E3242B] transition-colors whitespace-nowrap">
                             AMC &amp; Form-B
                         </a>
-                        <a href="#sectors" className="hover:text-red-600 transition-colors whitespace-nowrap py-1 relative after:absolute after:bottom-0 after:left-0 after:w-0 hover:after:w-full after:h-0.5 after:bg-red-600 after:transition-all">
+                        <a href="#sectors" className="hover:text-[#E3242B] transition-colors whitespace-nowrap">
                             Projects &amp; Sectors
                         </a>
-                        <a href="#standards" className="hover:text-red-600 transition-colors whitespace-nowrap py-1 relative after:absolute after:bottom-0 after:left-0 after:w-0 hover:after:w-full after:h-0.5 after:bg-red-600 after:transition-all">
+                        <a href="#standards" className="hover:text-[#E3242B] transition-colors whitespace-nowrap">
                             Quality &amp; Makes
                         </a>
-                        <a href="#quote-request" className="hover:text-red-600 transition-colors whitespace-nowrap py-1 relative after:absolute after:bottom-0 after:left-0 after:w-0 hover:after:w-full after:h-0.5 after:bg-red-600 after:transition-all">
+                        <a href="#quote-request" className="hover:text-[#E3242B] transition-colors whitespace-nowrap">
                             Contact
                         </a>
                     </nav>
 
                     {/* Action Buttons */}
-                    <div className="hidden md:flex items-center gap-3 shrink-0">
+                    <div className="hidden md:flex items-center gap-2.5 xl:gap-3 shrink-0">
                         <Link
                             href={portalHref}
-                            className="px-3.5 py-2 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg border border-slate-200/80 transition-colors whitespace-nowrap"
+                            className="px-3 xl:px-4 py-2 xl:py-2.5 text-xs xl:text-sm font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-md border border-slate-200 transition-colors whitespace-nowrap"
                         >
                             {portalLabel}
                         </Link>
                         <a
                             href="#quote-request"
-                            className="px-4 py-2 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-sm shadow-red-600/20 transition-all inline-flex items-center gap-1.5 whitespace-nowrap"
+                            className="px-3.5 xl:px-5 py-2 xl:py-2.5 text-xs xl:text-sm font-bold text-white bg-[#E3242B] hover:bg-[#c51c22] rounded-md shadow-sm shadow-red-600/25 transition-all inline-flex items-center gap-1.5 whitespace-nowrap"
                         >
                             Get A Quote
-                            <ArrowRight className="w-3.5 h-3.5" />
+                            <ArrowRight className="w-4 h-4" />
                         </a>
                     </div>
 
-                    {/* Mobile Hamburger Button */}
+                    {/* Mobile Hamburger */}
                     <button
                         type="button"
                         suppressHydrationWarning
                         onClick={() => setMobileMenuOpen((v) => !v)}
-                        className="lg:hidden p-2 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-100 min-h-[44px] min-w-[44px] flex items-center justify-center"
-                        aria-label="Toggle navigation menu"
+                        className="lg:hidden p-2 rounded-md border border-slate-200 text-slate-700 hover:bg-slate-100"
+                        aria-label="Toggle menu"
                     >
                         {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                     </button>
                 </div>
 
-                {/* Mobile Drawer */}
+                {/* Mobile Nav Drawer */}
                 {mobileMenuOpen && (
-                    <div className="lg:hidden bg-white border-t border-slate-200 px-4 py-4 space-y-2 shadow-xl animate-in slide-in-from-top-2 duration-150">
-                        <a
-                            href="#top"
-                            onClick={() => setMobileMenuOpen(false)}
-                            className="flex items-center h-12 px-3 text-sm font-semibold text-slate-800 hover:bg-slate-50 rounded-lg"
-                        >
+                    <div className="lg:hidden bg-white border-t border-slate-200 px-4 py-4 space-y-3 shadow-lg">
+                        <a href="#top" onClick={() => setMobileMenuOpen(false)} className="block py-1.5 text-sm font-semibold text-slate-800">
                             Home
                         </a>
-                        <a
-                            href="#systems"
-                            onClick={() => setMobileMenuOpen(false)}
-                            className="flex items-center h-12 px-3 text-sm font-semibold text-slate-800 hover:bg-slate-50 rounded-lg"
-                        >
+                        <a href="#systems" onClick={() => setMobileMenuOpen(false)} className="block py-1.5 text-sm font-semibold text-slate-800">
                             Systems &amp; Products
                         </a>
-                        <a
-                            href="#amc-compliance"
-                            onClick={() => setMobileMenuOpen(false)}
-                            className="flex items-center h-12 px-3 text-sm font-semibold text-slate-800 hover:bg-slate-50 rounded-lg"
-                        >
-                            AMC &amp; Form-B Compliance
+                        <a href="#amc-compliance" onClick={() => setMobileMenuOpen(false)} className="block py-1.5 text-sm font-semibold text-slate-800">
+                            AMC &amp; Form-B
                         </a>
-                        <a
-                            href="#sectors"
-                            onClick={() => setMobileMenuOpen(false)}
-                            className="flex items-center h-12 px-3 text-sm font-semibold text-slate-800 hover:bg-slate-50 rounded-lg"
-                        >
+                        <a href="#sectors" onClick={() => setMobileMenuOpen(false)} className="block py-1.5 text-sm font-semibold text-slate-800">
                             Projects &amp; Sectors
                         </a>
-                        <a
-                            href="#standards"
-                            onClick={() => setMobileMenuOpen(false)}
-                            className="flex items-center h-12 px-3 text-sm font-semibold text-slate-800 hover:bg-slate-50 rounded-lg"
-                        >
+                        <a href="#standards" onClick={() => setMobileMenuOpen(false)} className="block py-1.5 text-sm font-semibold text-slate-800">
                             Quality &amp; Makes
                         </a>
-                        <a
-                            href="#quote-request"
-                            onClick={() => setMobileMenuOpen(false)}
-                            className="flex items-center h-12 px-3 text-sm font-semibold text-slate-800 hover:bg-slate-50 rounded-lg"
-                        >
+                        <a href="#quote-request" onClick={() => setMobileMenuOpen(false)} className="block py-1.5 text-sm font-semibold text-slate-800">
                             Contact Us
                         </a>
-                        <div className="pt-3 border-t border-slate-100 flex flex-col gap-2.5">
-                            <a
-                                href="tel:+917777088817"
-                                className="w-full h-12 flex items-center justify-center text-sm font-bold text-slate-800 bg-slate-100 rounded-xl"
+                        <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
+                            <Link
+                                href={portalHref}
+                                className="w-full text-center py-2.5 text-sm font-bold text-slate-800 bg-slate-100 rounded-md"
                             >
-                                <Phone className="w-4 h-4 mr-2 text-red-600" />
-                                Call Desk: +91 77770 88817
-                            </a>
+                                {portalLabel}
+                            </Link>
                             <a
                                 href="#quote-request"
                                 onClick={() => setMobileMenuOpen(false)}
-                                className="w-full h-12 flex items-center justify-center text-sm font-bold text-white bg-red-600 rounded-xl shadow-sm shadow-red-600/25"
+                                className="w-full text-center py-2.5 text-sm font-bold text-white bg-[#E3242B] rounded-md"
                             >
-                                Get A Quote &amp; Survey
-                                <ArrowRight className="w-4 h-4 ml-2" />
+                                Request Free Quote
                             </a>
                         </div>
                     </div>
                 )}
             </header>
 
-            {/* ── 3. BRIGHT SPLIT-SCREEN HERO CAROUSEL ── */}
-            <section id="top" className="relative bg-gradient-to-b from-white via-slate-50 to-red-50/20 border-b border-slate-200/70 overflow-hidden">
-                {/* Engineering Blueprint Grid Pattern Background */}
-                <div
-                    className="absolute inset-0 opacity-[0.035] pointer-events-none"
-                    style={{
-                        backgroundImage:
-                            'linear-gradient(to right, #0f172a 1px, transparent 1px), linear-gradient(to bottom, #0f172a 1px, transparent 1px)',
-                        backgroundSize: '40px 40px',
-                    }}
-                />
+            {/* ── 3. FULL-WIDTH INDUSTRIAL HERO SLIDER ── */}
+            <section id="top" className="relative bg-slate-950 text-white overflow-hidden">
+                {/* Background image stack with smooth cross-fade & dark engineering scrim */}
+                <div className="absolute inset-0">
+                    {HERO_SLIDES.map((s, idx) => (
+                        <Image
+                            key={s.image}
+                            src={s.image}
+                            alt={s.title}
+                            fill
+                            priority={idx === 0}
+                            sizes="100vw"
+                            className={`object-cover transition-opacity duration-700 ${
+                                idx === activeSlide ? 'opacity-45' : 'opacity-0 pointer-events-none'
+                            }`}
+                        />
+                    ))}
+                    <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/85 to-slate-950/35" />
+                    <div
+                        className="absolute inset-0 opacity-15"
+                        style={{
+                            backgroundImage:
+                                'linear-gradient(to right, rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.08) 1px, transparent 1px)',
+                            backgroundSize: '48px 48px',
+                        }}
+                    />
+                </div>
 
-                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-                        {/* Left 7 Columns: Content */}
-                        <div className="lg:col-span-7">
-                            {/* Category Pill Badge */}
-                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-50 text-red-700 border border-red-200/80 text-xs font-bold tracking-wider uppercase mb-5">
-                                <Flame className="w-3.5 h-3.5 text-red-600" />
-                                {slide.eyebrow}
-                            </div>
-
-                            <h1 className="text-3xl sm:text-5xl lg:text-[46px] font-extrabold tracking-tight leading-[1.12] text-slate-900 mb-5">
-                                {slide.title}
-                            </h1>
-
-                            <p className="text-base sm:text-lg text-slate-600 leading-relaxed mb-7 max-w-2xl">
-                                {slide.subtitle}
-                            </p>
-
-                            {/* Compliance Feature Pills */}
-                            <div className="flex flex-wrap gap-2.5 mb-8">
-                                {slide.highlights.map((h) => (
-                                    <span
-                                        key={h}
-                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 shadow-xs"
-                                    >
-                                        <CheckCircle2 className="w-3.5 h-3.5 text-red-600" />
-                                        {h}
-                                    </span>
-                                ))}
-                            </div>
-
-                            {/* Dual CTAs */}
-                            <div className="flex flex-wrap items-center gap-3.5">
-                                <a
-                                    href={slide.primaryHref}
-                                    className="px-6 sm:px-7 py-3.5 bg-red-600 hover:bg-red-700 text-white font-bold text-sm rounded-xl shadow-md shadow-red-600/25 transition-all inline-flex items-center gap-2"
-                                >
-                                    {slide.primaryCta}
-                                    <ArrowRight className="w-4 h-4" />
-                                </a>
-                                <a
-                                    href={slide.secondaryHref}
-                                    className="px-6 sm:px-7 py-3.5 bg-white hover:bg-slate-100 text-slate-800 font-bold text-sm rounded-xl border border-slate-300 shadow-xs transition-all"
-                                >
-                                    {slide.secondaryCta}
-                                </a>
-                            </div>
+                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-32">
+                    <div className="max-w-3xl">
+                        {/* Eyebrow badge */}
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm bg-[#E3242B]/15 border border-[#E3242B]/40 text-red-300 text-xs font-bold tracking-widest uppercase mb-5">
+                            <Flame className="w-3.5 h-3.5 text-[#E3242B]" />
+                            {slide.eyebrow}
                         </div>
 
-                        {/* Right 5 Columns: Elevated Architectural Image Showcase */}
-                        <div className="lg:col-span-5">
-                            <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200/80 aspect-[4/3] sm:aspect-[16/11] lg:aspect-[4/3] bg-slate-100 group">
-                                {HERO_SLIDES.map((s, idx) => (
-                                    <Image
-                                        key={s.image}
-                                        src={s.image}
-                                        alt={s.title}
-                                        fill
-                                        priority={idx === 0}
-                                        sizes="(max-width: 1024px) 100vw, 40vw"
-                                        className={`object-cover transition-opacity duration-700 ${
-                                            idx === activeSlide ? 'opacity-100' : 'opacity-0 pointer-events-none'
-                                        }`}
-                                    />
-                                ))}
+                        <h1 className="text-3xl sm:text-5xl lg:text-[54px] font-black tracking-tight leading-[1.1] text-white mb-6">
+                            {slide.title}
+                        </h1>
 
-                                {/* Floating Glass Badge with Slide Counter & Controls */}
-                                <div className="absolute bottom-4 right-4 bg-white/95 backdrop-blur-md border border-slate-200/80 rounded-full px-3 py-1.5 text-xs font-mono font-bold text-slate-800 shadow-md flex items-center gap-2.5">
-                                    <span>
-                                        0{activeSlide + 1} / 0{HERO_SLIDES.length}
-                                    </span>
-                                    <div className="h-3.5 w-px bg-slate-300" />
-                                    <div className="flex items-center gap-1">
-                                        <button
-                                            type="button"
-                                            suppressHydrationWarning
-                                            onClick={() =>
-                                                setActiveSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length)
-                                            }
-                                            className="p-1 rounded-full hover:bg-slate-200 text-slate-700 transition-colors"
-                                            aria-label="Previous slide"
-                                        >
-                                            <ChevronLeft className="w-3.5 h-3.5" />
-                                        </button>
-                                        <button
-                                            type="button"
-                                            suppressHydrationWarning
-                                            onClick={() => setActiveSlide((prev) => (prev + 1) % HERO_SLIDES.length)}
-                                            className="p-1 rounded-full hover:bg-slate-200 text-slate-700 transition-colors"
-                                            aria-label="Next slide"
-                                        >
-                                            <ChevronRight className="w-3.5 h-3.5" />
-                                        </button>
-                                    </div>
-                                </div>
+                        <p className="text-base sm:text-lg text-slate-300 leading-relaxed mb-8 max-w-2xl">
+                            {slide.subtitle}
+                        </p>
+
+                        {/* Highlights */}
+                        <div className="flex flex-wrap gap-3 mb-9">
+                            {slide.highlights.map((h) => (
+                                <span
+                                    key={h}
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/10 backdrop-blur-xs border border-white/15 rounded text-xs font-semibold text-slate-100"
+                                >
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-[#E3242B]" />
+                                    {h}
+                                </span>
+                            ))}
+                        </div>
+
+                        {/* Hero CTAs */}
+                        <div className="flex flex-wrap items-center gap-4">
+                            <a
+                                href={slide.primaryHref}
+                                className="px-7 py-3.5 bg-[#E3242B] hover:bg-[#c51c22] text-white font-bold text-sm rounded-md shadow-lg shadow-red-600/30 transition-all inline-flex items-center gap-2"
+                            >
+                                {slide.primaryCta}
+                                <ArrowRight className="w-4 h-4" />
+                            </a>
+                            <a
+                                href={slide.secondaryHref}
+                                className="px-7 py-3.5 bg-white/10 hover:bg-white/20 text-white font-bold text-sm rounded-md border border-white/25 backdrop-blur-xs transition-all"
+                            >
+                                {slide.secondaryCta}
+                            </a>
+                        </div>
+                    </div>
+
+                    {/* Slide controls */}
+                    <div className="mt-12 pt-8 border-t border-white/10 flex flex-wrap items-center justify-between gap-4">
+                        <div className="flex items-center gap-2.5">
+                            {HERO_SLIDES.map((s, idx) => (
+                                <button
+                                    key={s.eyebrow}
+                                    type="button"
+                                    suppressHydrationWarning
+                                    onClick={() => setActiveSlide(idx)}
+                                    className={`h-2 rounded-full transition-all ${
+                                        idx === activeSlide
+                                            ? 'w-10 bg-[#E3242B]'
+                                            : 'w-4 bg-white/30 hover:bg-white/50'
+                                    }`}
+                                    aria-label={`Slide ${idx + 1}`}
+                                />
+                            ))}
+                            <span className="ml-2 text-xs font-mono text-slate-400">
+                                0{activeSlide + 1} / 0{HERO_SLIDES.length}
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <button
+                                type="button"
+                                suppressHydrationWarning
+                                onClick={() =>
+                                    setActiveSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length)
+                                }
+                                className="p-2 rounded border border-white/20 hover:bg-white/10 text-white transition-colors"
+                                aria-label="Previous slide"
+                            >
+                                <ChevronLeft className="w-4 h-4" />
+                            </button>
+                            <button
+                                type="button"
+                                suppressHydrationWarning
+                                onClick={() => setActiveSlide((prev) => (prev + 1) % HERO_SLIDES.length)}
+                                className="p-2 rounded border border-white/20 hover:bg-white/10 text-white transition-colors"
+                                aria-label="Next slide"
+                            >
+                                <ChevronRight className="w-4 h-4" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* ── 4. AUTHORITY METRICS & ENGINEERING BAR ── */}
+            <section className="bg-[#E3242B] text-white">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:divide-x divide-white/20">
+                        <div className="py-1 lg:py-0 lg:pr-6">
+                            <div className="text-2xl sm:text-3xl font-black tracking-tight">360°</div>
+                            <div className="text-xs sm:text-sm font-semibold text-red-100 mt-0.5">
+                                Turnkey Design, Supply &amp; Commissioning
+                            </div>
+                        </div>
+                        <div className="py-1 lg:py-0 lg:px-6">
+                            <div className="text-2xl sm:text-3xl font-black tracking-tight">Jan &amp; Jul</div>
+                            <div className="text-xs sm:text-sm font-semibold text-red-100 mt-0.5">
+                                Bi-Annual Form-B MFB Certification
+                            </div>
+                        </div>
+                        <div className="py-1 lg:py-0 lg:px-6">
+                            <div className="text-2xl sm:text-3xl font-black tracking-tight">4 Visits / Yr</div>
+                            <div className="text-xs sm:text-sm font-semibold text-red-100 mt-0.5">
+                                Scheduled Preventive AMC + Breakdowns
+                            </div>
+                        </div>
+                        <div className="py-1 lg:py-0 lg:pl-6">
+                            <div className="text-2xl sm:text-3xl font-black tracking-tight">NBC • NFPA • IS</div>
+                            <div className="text-xs sm:text-sm font-semibold text-red-100 mt-0.5">
+                                UL / LPCB / ISI Approved Components
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* ── 4. AUTHORITY METRICS: ELEVATED WHITE BENTO BAR ── */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-8 relative z-20">
-                <div className="bg-white rounded-2xl shadow-lg border border-slate-200/80 p-5 sm:p-7">
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:divide-x divide-slate-100">
-                        <div className="flex items-start gap-3.5 py-1 lg:py-0 lg:pr-6">
-                            <div className="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center shrink-0">
-                                <ShieldCheck className="w-5 h-5" />
-                            </div>
-                            <div>
-                                <div className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">360°</div>
-                                <div className="text-xs sm:text-sm font-semibold text-slate-600 mt-0.5">
-                                    Turnkey Design, Supply &amp; Commissioning
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="flex items-start gap-3.5 py-1 lg:py-0 lg:px-6">
-                            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                                <FileCheck2 className="w-5 h-5" />
-                            </div>
-                            <div>
-                                <div className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Jan &amp; Jul</div>
-                                <div className="text-xs sm:text-sm font-semibold text-slate-600 mt-0.5">
-                                    Bi-Annual Form-B MFB Certification
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="flex items-start gap-3.5 py-1 lg:py-0 lg:px-6">
-                            <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
-                                <Wrench className="w-5 h-5" />
-                            </div>
-                            <div>
-                                <div className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">4 Visits / Yr</div>
-                                <div className="text-xs sm:text-sm font-semibold text-slate-600 mt-0.5">
-                                    Scheduled Preventive AMC + Breakdowns
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="flex items-start gap-3.5 py-1 lg:py-0 lg:pl-6">
-                            <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-800 flex items-center justify-center shrink-0">
-                                <Award className="w-5 h-5" />
-                            </div>
-                            <div>
-                                <div className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">NBC • NFPA • IS</div>
-                                <div className="text-xs sm:text-sm font-semibold text-slate-600 mt-0.5">
-                                    UL / LPCB / ISI Approved Components
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* ── 5. CORE SYSTEMS & PRODUCT CATALOG (Daylight B2B Grid) ── */}
-            <section id="systems" className="py-16 sm:py-24 bg-slate-50/70 border-b border-slate-200">
+            {/* ── 5. CORE SYSTEMS & PRODUCT CATALOG (Filterable B2B Grid) ── */}
+            <section id="systems" className="py-20 bg-slate-50 border-b border-slate-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
                         <div>
-                            <div className="text-xs font-bold uppercase tracking-widest text-red-600 mb-2">
+                            <div className="text-xs font-bold uppercase tracking-widest text-[#E3242B] mb-2">
                                 Complete Fire Safety Portfolio
                             </div>
                             <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
@@ -775,8 +728,8 @@ export default function RudraLandingPage({
                             </p>
                         </div>
 
-                        {/* Horizontally scrollable pill bar on mobile, centered/aligned on desktop */}
-                        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-2 -mx-2 px-2 sm:mx-0">
+                        {/* Interactive Filter Tabs */}
+                        <div className="flex flex-wrap gap-2">
                             {(
                                 [
                                     { key: 'all', label: 'All Systems' },
@@ -792,10 +745,10 @@ export default function RudraLandingPage({
                                     type="button"
                                     suppressHydrationWarning
                                     onClick={() => setActiveCategory(tab.key)}
-                                    className={`px-4 py-2 text-xs font-bold rounded-xl border transition-all cursor-pointer whitespace-nowrap min-h-[40px] ${
+                                    className={`px-4 py-2 text-xs font-bold rounded border transition-all cursor-pointer ${
                                         activeCategory === tab.key
-                                            ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
-                                            : 'bg-white text-slate-600 border-slate-200 hover:border-red-600 hover:text-red-600'
+                                            ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
+                                            : 'bg-white text-slate-700 border-slate-200 hover:border-[#E3242B] hover:text-[#E3242B]'
                                     }`}
                                 >
                                     {tab.label}
@@ -806,61 +759,59 @@ export default function RudraLandingPage({
 
                     {/* Active Fire Product / System Cards */}
                     {activeSystems.length > 0 && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
                             {activeSystems.map((item) => (
                                 <div
                                     key={item.id}
-                                    className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-md hover:border-red-200 transition-all duration-200 flex flex-col justify-between group"
+                                    className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-xs hover:shadow-xl hover:border-red-200 transition-all duration-300 flex flex-col group"
                                 >
-                                    <div>
-                                        <div className="relative aspect-[16/10] bg-slate-100 overflow-hidden">
-                                            <Image
-                                                src={item.image}
-                                                alt={item.title}
-                                                fill
-                                                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                                                className="object-cover group-hover:scale-105 transition-transform duration-500"
-                                            />
-                                            <span className="absolute top-3 left-3 px-2.5 py-1 bg-white/95 backdrop-blur-xs text-slate-900 text-[11px] font-bold uppercase tracking-wider rounded-md shadow-xs border border-slate-200/50">
-                                                {item.categoryLabel}
-                                            </span>
-                                            <span className="absolute top-3 right-3 px-2.5 py-1 bg-slate-900/85 backdrop-blur-xs text-white text-[11px] font-bold rounded-md shadow-xs">
-                                                {item.badge}
-                                            </span>
-                                        </div>
-
-                                        <div className="p-6">
-                                            <h3 className="text-lg font-bold text-slate-900 group-hover:text-red-600 transition-colors">
-                                                {item.title}
-                                            </h3>
-                                            <p className="text-sm text-slate-600 mt-2 leading-relaxed">
-                                                {item.subtitle}
-                                            </p>
-
-                                            <ul className="mt-4 pt-4 border-t border-slate-100 space-y-2 text-xs text-slate-700">
-                                                {item.specs.map((spec) => (
-                                                    <li key={spec} className="flex items-start gap-2">
-                                                        <CheckCircle2 className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
-                                                        <span>{spec}</span>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
+                                    <div className="relative aspect-[16/10] bg-slate-100 overflow-hidden">
+                                        <Image
+                                            src={item.image}
+                                            alt={item.title}
+                                            fill
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                            className="object-cover group-hover:scale-105 transition-transform duration-500"
+                                        />
+                                        <span className="absolute top-3 left-3 px-2.5 py-1 bg-slate-950/85 backdrop-blur-xs text-white text-[11px] font-bold uppercase tracking-wider rounded-sm">
+                                            {item.categoryLabel}
+                                        </span>
+                                        <span className="absolute bottom-3 right-3 px-2.5 py-1 bg-[#E3242B] text-white text-[11px] font-bold rounded-sm shadow-xs">
+                                            {item.badge}
+                                        </span>
                                     </div>
 
-                                    <div className="border-t border-slate-100 bg-slate-50/50 px-6 py-4 flex items-center justify-between">
-                                        <span className="text-[11px] font-mono font-bold text-slate-400 uppercase tracking-wider">
-                                            Supply &amp; Install
-                                        </span>
-                                        <button
-                                            type="button"
-                                            suppressHydrationWarning
-                                            onClick={() => handleRequestQuoteForSystem(item.title)}
-                                            className="inline-flex items-center gap-1.5 text-sm font-bold text-red-600 hover:text-slate-900 transition-colors cursor-pointer"
-                                        >
-                                            Request BOQ / Quote
-                                            <ArrowRight className="w-4 h-4" />
-                                        </button>
+                                    <div className="p-6 flex-1 flex flex-col">
+                                        <h3 className="text-lg font-extrabold text-slate-900 group-hover:text-[#E3242B] transition-colors">
+                                            {item.title}
+                                        </h3>
+                                        <p className="text-sm text-slate-600 mt-2 leading-relaxed">
+                                            {item.subtitle}
+                                        </p>
+
+                                        <ul className="mt-4 pt-4 border-t border-slate-100 space-y-2 text-xs text-slate-700 flex-1">
+                                            {item.specs.map((spec) => (
+                                                <li key={spec} className="flex items-start gap-2">
+                                                    <CheckCircle2 className="w-4 h-4 text-[#E3242B] shrink-0 mt-0.5" />
+                                                    <span>{spec}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+
+                                        <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+                                            <button
+                                                type="button"
+                                                suppressHydrationWarning
+                                                onClick={() => handleRequestQuoteForSystem(item.title)}
+                                                className="inline-flex items-center gap-1.5 text-sm font-bold text-[#E3242B] hover:text-slate-900 transition-colors cursor-pointer"
+                                            >
+                                                Request BOQ / Quote
+                                                <ArrowRight className="w-4 h-4" />
+                                            </button>
+                                            <span className="text-[11px] font-mono text-slate-400 uppercase">
+                                                Supply &amp; Install
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
@@ -871,7 +822,7 @@ export default function RudraLandingPage({
                     {passiveSystems.length > 0 && (
                         <div className={activeSystems.length > 0 ? 'mt-16 pt-14 border-t border-slate-200' : ''}>
                             <div className="mb-8">
-                                <div className="text-xs font-bold uppercase tracking-widest text-red-600 mb-2">
+                                <div className="text-xs font-bold uppercase tracking-widest text-[#E3242B] mb-2">
                                     Compartmentalization &amp; Structural Containment
                                 </div>
                                 <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
@@ -886,57 +837,55 @@ export default function RudraLandingPage({
                                 {passiveSystems.map((item) => (
                                     <div
                                         key={item.id}
-                                        className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-md hover:border-red-200 transition-all duration-200 flex flex-col justify-between group"
+                                        className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-xs hover:shadow-xl hover:border-red-200 transition-all duration-300 flex flex-col group"
                                     >
-                                        <div>
-                                            <div className="relative aspect-[16/10] bg-slate-100 overflow-hidden">
-                                                <Image
-                                                    src={item.image}
-                                                    alt={item.title}
-                                                    fill
-                                                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                                                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                                                />
-                                                <span className="absolute top-3 left-3 px-2 py-0.5 bg-white/95 backdrop-blur-xs text-slate-900 text-[10px] font-bold uppercase tracking-wider rounded-md shadow-xs border border-slate-200/50">
-                                                    {item.categoryLabel}
-                                                </span>
-                                                <span className="absolute top-3 right-3 px-2 py-0.5 bg-slate-900/85 backdrop-blur-xs text-white text-[10px] font-bold rounded-md shadow-xs">
-                                                    {item.badge}
-                                                </span>
-                                            </div>
-
-                                            <div className="p-5">
-                                                <h4 className="text-base font-bold text-slate-900 group-hover:text-red-600 transition-colors">
-                                                    {item.title}
-                                                </h4>
-                                                <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                                                    {item.subtitle}
-                                                </p>
-
-                                                <ul className="mt-4 pt-4 border-t border-slate-100 space-y-2 text-xs text-slate-700">
-                                                    {item.specs.map((spec) => (
-                                                        <li key={spec} className="flex items-start gap-2">
-                                                            <CheckCircle2 className="w-3.5 h-3.5 text-red-600 shrink-0 mt-0.5" />
-                                                            <span>{spec}</span>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
+                                        <div className="relative aspect-[16/10] bg-slate-100 overflow-hidden">
+                                            <Image
+                                                src={item.image}
+                                                alt={item.title}
+                                                fill
+                                                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                                                className="object-cover group-hover:scale-105 transition-transform duration-500"
+                                            />
+                                            <span className="absolute top-3 left-3 px-2.5 py-1 bg-slate-950/85 backdrop-blur-xs text-white text-[11px] font-bold uppercase tracking-wider rounded-sm">
+                                                {item.categoryLabel}
+                                            </span>
+                                            <span className="absolute bottom-3 right-3 px-2.5 py-1 bg-[#E3242B] text-white text-[11px] font-bold rounded-sm shadow-xs">
+                                                {item.badge}
+                                            </span>
                                         </div>
 
-                                        <div className="border-t border-slate-100 bg-slate-50/50 px-5 py-3.5 flex items-center justify-between">
-                                            <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider">
-                                                Supply &amp; Install
-                                            </span>
-                                            <button
-                                                type="button"
-                                                suppressHydrationWarning
-                                                onClick={() => handleRequestQuoteForSystem(item.title)}
-                                                className="inline-flex items-center gap-1 text-xs font-bold text-red-600 hover:text-slate-900 transition-colors cursor-pointer"
-                                            >
-                                                Request BOQ
-                                                <ArrowRight className="w-3.5 h-3.5" />
-                                            </button>
+                                        <div className="p-5 flex-1 flex flex-col">
+                                            <h4 className="text-base font-extrabold text-slate-900 group-hover:text-[#E3242B] transition-colors">
+                                                {item.title}
+                                            </h4>
+                                            <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
+                                                {item.subtitle}
+                                            </p>
+
+                                            <ul className="mt-4 pt-4 border-t border-slate-100 space-y-2 text-xs text-slate-700 flex-1">
+                                                {item.specs.map((spec) => (
+                                                    <li key={spec} className="flex items-start gap-2">
+                                                        <CheckCircle2 className="w-4 h-4 text-[#E3242B] shrink-0 mt-0.5" />
+                                                        <span>{spec}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+
+                                            <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between">
+                                                <button
+                                                    type="button"
+                                                    suppressHydrationWarning
+                                                    onClick={() => handleRequestQuoteForSystem(item.title)}
+                                                    className="inline-flex items-center gap-1.5 text-sm font-bold text-[#E3242B] hover:text-slate-900 transition-colors cursor-pointer"
+                                                >
+                                                    Request BOQ / Quote
+                                                    <ArrowRight className="w-4 h-4" />
+                                                </button>
+                                                <span className="text-[11px] font-mono text-slate-400 uppercase">
+                                                    Supply &amp; Install
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -946,13 +895,12 @@ export default function RudraLandingPage({
                 </div>
             </section>
 
-            {/* ── 6. AMC & FORM-B COMPLIANCE SECTION ── */}
-            <section id="amc-compliance" className="py-16 sm:py-24 bg-slate-100/70 border-b border-slate-200">
+            {/* ── 6. TURNKEY AMC, FORM-B COMPLIANCE & DIGITAL PORTAL SPOTLIGHT ── */}
+            <section id="amc-compliance" className="py-20 bg-white border-b border-slate-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-                        {/* Left narrative */}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
                         <div className="lg:col-span-6">
-                            <div className="text-xs font-bold uppercase tracking-widest text-red-600 mb-2">
+                            <div className="text-xs font-bold uppercase tracking-widest text-[#E3242B] mb-2">
                                 Statutory Compliance &amp; Preventive Maintenance
                             </div>
                             <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight leading-tight">
@@ -962,29 +910,9 @@ export default function RudraLandingPage({
                                 Keeping life-safety equipment operational is both a legal mandate and a critical responsibility. Rudra Fire Protection executes systematic preventive maintenance across Mumbai, Thane &amp; Navi Mumbai—backed by live digital asset &amp; certificate tracking in our Client Portal.
                             </p>
 
-                            <div className="mt-8 flex flex-wrap gap-3.5">
-                                <a
-                                    href="#quote-request"
-                                    onClick={() => setInquiryService('Annual Maintenance Contract (AMC) + Form B')}
-                                    className="px-6 py-3.5 bg-red-600 hover:bg-red-700 text-white font-bold text-sm rounded-xl shadow-md shadow-red-600/20 transition-all inline-flex items-center gap-2"
-                                >
-                                    Get AMC Renewal Proposal
-                                    <ArrowRight className="w-4 h-4" />
-                                </a>
-                                <Link
-                                    href={portalHref}
-                                    className="px-6 py-3.5 bg-white hover:bg-slate-50 text-slate-800 font-bold text-sm rounded-xl border border-slate-300 shadow-xs transition-colors"
-                                >
-                                    Access Client Portal
-                                </Link>
-                            </div>
-                        </div>
-
-                        {/* Right: 2x2 Feature Cards Grid */}
-                        <div className="lg:col-span-6">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all">
-                                    <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
+                                <div className="p-4 rounded-lg bg-slate-50 border border-slate-200">
+                                    <div className="w-9 h-9 rounded bg-red-100 text-[#E3242B] flex items-center justify-center mb-3">
                                         <FileCheck2 className="w-5 h-5" />
                                     </div>
                                     <h3 className="font-bold text-slate-900 text-sm">Bi-Annual Form-B Filing</h3>
@@ -993,8 +921,8 @@ export default function RudraLandingPage({
                                     </p>
                                 </div>
 
-                                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all">
-                                    <div className="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center mb-3">
+                                <div className="p-4 rounded-lg bg-slate-50 border border-slate-200">
+                                    <div className="w-9 h-9 rounded bg-red-100 text-[#E3242B] flex items-center justify-center mb-3">
                                         <Wrench className="w-5 h-5" />
                                     </div>
                                     <h3 className="font-bold text-slate-900 text-sm">Quarterly System Servicing</h3>
@@ -1003,8 +931,8 @@ export default function RudraLandingPage({
                                     </p>
                                 </div>
 
-                                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all">
-                                    <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-3">
+                                <div className="p-4 rounded-lg bg-slate-50 border border-slate-200">
+                                    <div className="w-9 h-9 rounded bg-red-100 text-[#E3242B] flex items-center justify-center mb-3">
                                         <Clock className="w-5 h-5" />
                                     </div>
                                     <h3 className="font-bold text-slate-900 text-sm">Multi-Year AMC Discounts</h3>
@@ -1013,8 +941,8 @@ export default function RudraLandingPage({
                                     </p>
                                 </div>
 
-                                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all">
-                                    <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-3">
+                                <div className="p-4 rounded-lg bg-slate-50 border border-slate-200">
+                                    <div className="w-9 h-9 rounded bg-red-100 text-[#E3242B] flex items-center justify-center mb-3">
                                         <Gauge className="w-5 h-5" />
                                     </div>
                                     <h3 className="font-bold text-slate-900 text-sm">Live Client Portal Access</h3>
@@ -1023,76 +951,83 @@ export default function RudraLandingPage({
                                     </p>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
 
-            {/* ── 7. 4-STEP EXECUTION METHODOLOGY ── */}
-            <section className="py-16 sm:py-24 bg-white border-b border-slate-200">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center max-w-2xl mx-auto mb-14">
-                        <div className="text-xs font-bold uppercase tracking-widest text-red-600 mb-2">
-                            Engineering Rigor &amp; Timeline
+                            <div className="mt-8 flex flex-wrap gap-3">
+                                <a
+                                    href="#quote-request"
+                                    onClick={() => setInquiryService('Annual Maintenance Contract (AMC) + Form B')}
+                                    className="px-6 py-3 bg-[#E3242B] hover:bg-[#c51c22] text-white font-bold text-sm rounded-md transition-colors inline-flex items-center gap-2"
+                                >
+                                    Get AMC Renewal Proposal
+                                    <ArrowRight className="w-4 h-4" />
+                                </a>
+                                <Link
+                                    href={portalHref}
+                                    className="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm rounded-md transition-colors"
+                                >
+                                    Access Client Portal
+                                </Link>
+                            </div>
                         </div>
-                        <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-                            Our 4-Step Execution Methodology
-                        </h2>
-                        <p className="text-slate-600 mt-3 text-sm sm:text-base">
-                            From initial site inspection to final Fire NOC, commissioning, and scheduled statutory compliance.
-                        </p>
-                    </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {[
-                            {
-                                step: '01',
-                                title: 'Site Risk Audit & System Design',
-                                text: 'Detailed NBC Part-IV & MFB compliance inspection, hydraulic pressure calculations & transparent itemized BOQ.',
-                            },
-                            {
-                                step: '02',
-                                title: 'Turnkey Supply & Installation',
-                                text: 'Certified installation of MS/GI hydrant risers, fire pumps, addressable panels, sprinklers & clean-agent suppression.',
-                            },
-                            {
-                                step: '03',
-                                title: 'Hydro-Testing & Commissioning',
-                                text: 'Line pressure integrity checks, alarm loop calibration, staff mock drills & handover documentation.',
-                            },
-                            {
-                                step: '04',
-                                title: 'Quarterly AMC & Form-B Compliance',
-                                text: 'Dedicated maintenance engineers ensuring zero-downtime readiness and timely bi-annual MFB certifications.',
-                            },
-                        ].map((item) => (
-                            <div
-                                key={item.step}
-                                className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm relative overflow-hidden group hover:border-red-200 hover:shadow-md transition-all flex flex-col justify-between"
-                            >
-                                <span className="absolute -right-2 -bottom-2 text-6xl font-black text-red-600/10 select-none pointer-events-none font-mono">
-                                    {item.step}
-                                </span>
-                                <div>
-                                    <div className="w-10 h-10 rounded-xl bg-red-50 text-red-600 font-mono font-black text-sm flex items-center justify-center mb-4 border border-red-100">
-                                        {item.step}
-                                    </div>
-                                    <h4 className="font-bold text-slate-900 text-base mb-2">{item.title}</h4>
-                                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                                        {item.text}
-                                    </p>
+                        {/* Right: Structured Engineering Process Panel */}
+                        <div className="lg:col-span-6">
+                            <div className="bg-slate-950 text-white rounded-xl p-8 sm:p-10 border border-slate-800 shadow-2xl relative overflow-hidden">
+                                <div className="absolute -right-12 -top-12 w-48 h-48 rounded-full bg-[#E3242B]/15 blur-2xl pointer-events-none" />
+                                <div className="text-xs font-bold uppercase tracking-widest text-[#E3242B] mb-2">
+                                    Our Execution Methodology
+                                </div>
+                                <h3 className="text-2xl font-extrabold mb-6">
+                                    From Site Audit to Fire NOC &amp; Ongoing Protection
+                                </h3>
+
+                                <div className="space-y-6">
+                                    {[
+                                        {
+                                            step: '01',
+                                            title: 'Site Risk Audit & System Design',
+                                            text: 'Detailed NBC Part-IV & MFB compliance inspection, hydraulic pressure calculations & transparent itemized BOQ.',
+                                        },
+                                        {
+                                            step: '02',
+                                            title: 'Turnkey Supply & Installation',
+                                            text: 'Certified installation of MS/GI hydrant risers, fire pumps, addressable panels, sprinklers & clean-agent suppression.',
+                                        },
+                                        {
+                                            step: '03',
+                                            title: 'Hydro-Testing & Commissioning',
+                                            text: 'Line pressure integrity checks, alarm loop calibration, staff mock drills & handover documentation.',
+                                        },
+                                        {
+                                            step: '04',
+                                            title: 'Quarterly AMC & Form-B Compliance',
+                                            text: 'Dedicated maintenance engineers ensuring zero-downtime readiness and timely bi-annual MFB certifications.',
+                                        },
+                                    ].map((item) => (
+                                        <div key={item.step} className="flex gap-4 items-start">
+                                            <div className="w-10 h-10 rounded bg-[#E3242B] text-white font-mono font-black text-sm flex items-center justify-center shrink-0">
+                                                {item.step}
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold text-white text-base">{item.title}</h4>
+                                                <p className="text-xs sm:text-sm text-slate-400 mt-1 leading-relaxed">
+                                                    {item.text}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
-                        ))}
+                        </div>
                     </div>
                 </div>
             </section>
 
-            {/* ── 8. SECTORS & APPLICATIONS ── */}
-            <section id="sectors" className="py-16 sm:py-24 bg-slate-50/70 border-b border-slate-200">
+            {/* ── 7. SECTORS & APPLICATIONS ── */}
+            <section id="sectors" className="py-20 bg-slate-50 border-b border-slate-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center max-w-2xl mx-auto mb-12">
-                        <div className="text-xs font-bold uppercase tracking-widest text-red-600 mb-2">
+                        <div className="text-xs font-bold uppercase tracking-widest text-[#E3242B] mb-2">
                             Industry Applications
                         </div>
                         <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
@@ -1109,18 +1044,16 @@ export default function RudraLandingPage({
                             return (
                                 <div
                                     key={sec.title}
-                                    className="bg-white rounded-2xl p-6 border border-slate-200 hover:border-red-300 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+                                    className="bg-white rounded-lg p-6 border border-slate-200 hover:border-[#E3242B] hover:shadow-md transition-all flex flex-col"
                                 >
-                                    <div>
-                                        <div className="w-12 h-12 rounded-xl bg-slate-900 text-white flex items-center justify-center mb-5">
-                                            <Icon className="w-6 h-6 text-red-500" />
-                                        </div>
-                                        <h3 className="text-base font-extrabold text-slate-900 mb-2">{sec.title}</h3>
-                                        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                                            {sec.desc}
-                                        </p>
+                                    <div className="w-12 h-12 rounded-md bg-slate-900 text-white flex items-center justify-center mb-5">
+                                        <Icon className="w-6 h-6 text-[#E3242B]" />
                                     </div>
-                                    <div className="mt-5 pt-3 border-t border-slate-100 text-[11px] font-mono font-bold text-red-600 tracking-wide uppercase">
+                                    <h3 className="text-base font-extrabold text-slate-900 mb-2">{sec.title}</h3>
+                                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed flex-1">
+                                        {sec.desc}
+                                    </p>
+                                    <div className="mt-5 pt-3 border-t border-slate-100 text-[11px] font-bold text-[#E3242B] tracking-wide uppercase">
                                         {sec.metrics}
                                     </div>
                                 </div>
@@ -1130,12 +1063,12 @@ export default function RudraLandingPage({
                 </div>
             </section>
 
-            {/* ── 9. QUALITY STANDARDS & APPROVED MAKES STRIP ── */}
+            {/* ── 8. QUALITY STANDARDS & APPROVED MAKES STRIP ── */}
             <section id="standards" className="py-16 bg-slate-900 text-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 pb-10 border-b border-slate-800">
                         <div>
-                            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-red-500 mb-2">
+                            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#E3242B] mb-2">
                                 <Award className="w-4 h-4" />
                                 Quality Assurance &amp; Engineering Standards
                             </div>
@@ -1143,12 +1076,12 @@ export default function RudraLandingPage({
                                 Built Exclusively With Certified Components &amp; Approved Makes
                             </h2>
                         </div>
-                        <div className="flex flex-wrap gap-2.5 shrink-0">
+                        <div className="flex flex-wrap gap-3 shrink-0">
                             {['NBC PART IV', 'UL LISTED', 'ISI CERTIFIED', 'MFB FORM-B', 'NFPA STANDARDS'].map(
                                 (badge) => (
                                     <span
                                         key={badge}
-                                        className="px-3.5 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-xs font-bold tracking-wider text-slate-200"
+                                        className="px-4 py-2 bg-slate-800 border border-slate-700 rounded text-xs font-extrabold tracking-wider text-slate-100"
                                     >
                                         {badge}
                                     </span>
@@ -1165,7 +1098,7 @@ export default function RudraLandingPage({
                             {APPROVED_MAKES.map((make) => (
                                 <div
                                     key={make}
-                                    className="px-3 py-3 rounded-xl bg-slate-950/60 border border-slate-800 text-center text-xs font-semibold text-slate-200 flex items-center justify-center min-h-[44px]"
+                                    className="px-3 py-3 rounded bg-slate-950/60 border border-slate-800 text-center text-xs font-semibold text-slate-200 flex items-center justify-center"
                                 >
                                     {make}
                                 </div>
@@ -1175,82 +1108,72 @@ export default function RudraLandingPage({
                 </div>
             </section>
 
-            {/* ── 10. QUOTE REQUEST / CONTACT SECTION (Dual Anchor Contrast) ── */}
-            <section id="quote-request" className="scroll-mt-16 sm:scroll-mt-20 py-16 sm:py-24 bg-white border-b border-slate-200">
+            {/* ── 9. QUOTE REQUEST / CONTACT SECTION ── */}
+            <section id="quote-request" className="scroll-mt-16 sm:scroll-mt-20 py-16 sm:py-20 lg:py-24 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-                        {/* Left Side: Refined Slate-900 Direct Contact Panel */}
-                        <div className="lg:col-span-5 bg-slate-900 text-white rounded-2xl p-7 sm:p-9 shadow-lg relative overflow-hidden flex flex-col justify-between">
-                            <div className="space-y-6">
-                                <div>
-                                    <div className="text-xs font-bold uppercase tracking-widest text-red-500 mb-2">
-                                        Direct Engineering Desk
-                                    </div>
-                                    <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-tight">
-                                        Schedule a Site Survey or Request a Custom BOQ
-                                    </h2>
-                                    <p className="text-slate-300 mt-3 text-xs sm:text-sm leading-relaxed">
-                                        Share your building type, society name, or equipment requirements. Our engineering team provides fast, transparent quotations for new installations, retrofits, refilling, and Annual Maintenance Contracts.
-                                    </p>
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+                        {/* Left Info */}
+                        <div className="lg:col-span-5 space-y-6">
+                            <div>
+                                <div className="text-xs font-bold uppercase tracking-widest text-[#E3242B] mb-2">
+                                    Request Technical Proposal
                                 </div>
-
-                                <div className="space-y-4 pt-2">
-                                    <div className="flex items-start gap-4 p-4 rounded-xl bg-slate-800/80 border border-slate-700/80">
-                                        <Phone className="w-5 h-5 text-red-500 mt-0.5 shrink-0" />
-                                        <div>
-                                            <div className="text-[11px] font-bold uppercase text-slate-400">
-                                                Direct Line &amp; Breakdown Desk
-                                            </div>
-                                            <a
-                                                href="tel:+917777088817"
-                                                className="text-base font-extrabold text-white hover:text-red-400 transition-colors"
-                                            >
-                                                +91 77770 88817
-                                            </a>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-start gap-4 p-4 rounded-xl bg-slate-800/80 border border-slate-700/80">
-                                        <Mail className="w-5 h-5 text-red-500 mt-0.5 shrink-0" />
-                                        <div>
-                                            <div className="text-[11px] font-bold uppercase text-slate-400">
-                                                Email Quotations &amp; Tenders
-                                            </div>
-                                            <a
-                                                href="mailto:info@rudrafireprotection.com"
-                                                className="text-sm font-extrabold text-white hover:text-red-400 transition-colors"
-                                            >
-                                                info@rudrafireprotection.com
-                                            </a>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-start gap-4 p-4 rounded-xl bg-slate-800/80 border border-slate-700/80">
-                                        <MapPin className="w-5 h-5 text-red-500 mt-0.5 shrink-0" />
-                                        <div>
-                                            <div className="text-[11px] font-bold uppercase text-slate-400">
-                                                Head Office — Mumbai
-                                            </div>
-                                            <div className="text-xs font-semibold text-slate-300 mt-0.5 leading-relaxed">
-                                                17 Navjeevan Vikas Society, Motilal Nagar, Goregaon West, Mumbai 400104
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                                    Schedule a Site Survey or Request a Custom BOQ
+                                </h2>
+                                <p className="text-slate-600 mt-3 text-sm sm:text-base leading-relaxed">
+                                    Share your building type, society name, or equipment requirements. Our engineering team provides fast, transparent quotations for new installations, retrofits, refilling, and Annual Maintenance Contracts.
+                                </p>
                             </div>
 
-                            <div className="mt-8 pt-6 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-                                <span className="inline-flex items-center gap-1.5 text-emerald-400 font-semibold">
-                                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                                    Mumbai &amp; MMR Coverage
-                                </span>
-                                <span>MFB Licensed</span>
+                            <div className="space-y-4 pt-2">
+                                <div className="flex items-start gap-4 p-4 rounded-lg bg-slate-50 border border-slate-200">
+                                    <Phone className="w-5 h-5 text-[#E3242B] mt-0.5 shrink-0" />
+                                    <div>
+                                        <div className="text-xs font-bold uppercase text-slate-500">
+                                            Direct Engineering &amp; Emergency Line
+                                        </div>
+                                        <a
+                                            href="tel:+917777088817"
+                                            className="text-base font-extrabold text-slate-900 hover:text-[#E3242B]"
+                                        >
+                                            +91 77770 88817
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-start gap-4 p-4 rounded-lg bg-slate-50 border border-slate-200">
+                                    <Mail className="w-5 h-5 text-[#E3242B] mt-0.5 shrink-0" />
+                                    <div>
+                                        <div className="text-xs font-bold uppercase text-slate-500">
+                                            Email Quotations &amp; Tenders
+                                        </div>
+                                        <a
+                                            href="mailto:info@rudrafireprotection.com"
+                                            className="text-base font-extrabold text-slate-900 hover:text-[#E3242B]"
+                                        >
+                                            info@rudrafireprotection.com
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-start gap-4 p-4 rounded-lg bg-slate-50 border border-slate-200">
+                                    <MapPin className="w-5 h-5 text-[#E3242B] mt-0.5 shrink-0" />
+                                    <div>
+                                        <div className="text-xs font-bold uppercase text-slate-500">
+                                            Head Office — Mumbai
+                                        </div>
+                                        <div className="text-sm font-semibold text-slate-800 mt-0.5 leading-relaxed">
+                                            17 Navjeevan Vikas Society, Motilal Nagar, Goregaon West, Mumbai 400104
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Right Side: Bright Spacious White Form */}
+                        {/* Right Form */}
                         <div className="lg:col-span-7">
-                            <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-9 shadow-sm">
+                            <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 sm:p-8 shadow-sm">
                                 {submittedLead ? (
                                     <div className="py-10 text-center space-y-4">
                                         <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
@@ -1260,13 +1183,13 @@ export default function RudraLandingPage({
                                             Inquiry Saved to Our CRM
                                         </h3>
                                         {submittedLead.salesFormNo && (
-                                            <div className="inline-block px-3 py-1 rounded-lg bg-slate-100 text-slate-800 font-mono text-xs font-bold border border-slate-200">
+                                            <div className="inline-block px-3 py-1 rounded bg-slate-200/80 text-slate-800 font-mono text-xs font-bold">
                                                 Reference: {submittedLead.salesFormNo}
                                             </div>
                                         )}
                                         <p className="text-sm text-slate-600 max-w-md mx-auto">
                                             Thank you, <span className="font-bold text-slate-900">{submittedLead.name || 'Partner'}</span>. Your request for{' '}
-                                            <span className="font-bold text-red-600">{submittedLead.service}</span> at{' '}
+                                            <span className="font-bold text-[#E3242B]">{submittedLead.service}</span> at{' '}
                                             <span className="font-bold text-slate-900">{submittedLead.company}</span> has been logged. Our Mumbai engineering desk will call{' '}
                                             <span className="font-bold">{submittedLead.phone}</span> shortly.
                                         </p>
@@ -1274,14 +1197,14 @@ export default function RudraLandingPage({
                                             type="button"
                                             suppressHydrationWarning
                                             onClick={() => setSubmittedLead(null)}
-                                            className="px-5 py-2.5 text-xs font-bold bg-slate-900 text-white rounded-xl hover:bg-slate-800 cursor-pointer min-h-[44px]"
+                                            className="px-5 py-2.5 text-xs font-bold bg-slate-900 text-white rounded hover:bg-slate-800 cursor-pointer"
                                         >
                                             Send Another Inquiry
                                         </button>
                                     </div>
                                 ) : (
-                                    <form onSubmit={handleInquirySubmit} className="space-y-4">
-                                        <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                                    <form onSubmit={handleInquirySubmit} className="space-y-5">
+                                        <div className="flex items-center justify-between border-b border-slate-200 pb-4">
                                             <div>
                                                 <h3 className="text-lg font-extrabold text-slate-900">
                                                     Fast Quotation Request
@@ -1290,11 +1213,11 @@ export default function RudraLandingPage({
                                                     Response within 2 business hours across Mumbai &amp; MMR
                                                 </p>
                                             </div>
-                                            <Headphones className="w-6 h-6 text-red-600" />
+                                            <Headphones className="w-6 h-6 text-[#E3242B]" />
                                         </div>
 
                                         {inquiryError && (
-                                            <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold">
+                                            <div className="flex items-start gap-2.5 p-3.5 rounded-md bg-red-50 border border-red-200 text-red-700 text-xs font-semibold">
                                                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                                                 <span>{inquiryError}</span>
                                             </div>
@@ -1312,7 +1235,7 @@ export default function RudraLandingPage({
                                                     value={inquiryCompany}
                                                     onChange={(e) => setInquiryCompany(e.target.value)}
                                                     placeholder="e.g. Valentine Apartment D Wing"
-                                                    className="w-full px-4 py-3 min-h-[48px] text-base sm:text-sm bg-slate-50/50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-500/20 transition-all"
+                                                    className="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-md focus:outline-none focus:border-[#E3242B]"
                                                 />
                                             </div>
                                             <div>
@@ -1325,7 +1248,7 @@ export default function RudraLandingPage({
                                                     value={inquiryName}
                                                     onChange={(e) => setInquiryName(e.target.value)}
                                                     placeholder="Your name / designation"
-                                                    className="w-full px-4 py-3 min-h-[48px] text-base sm:text-sm bg-slate-50/50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-500/20 transition-all"
+                                                    className="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-md focus:outline-none focus:border-[#E3242B]"
                                                 />
                                             </div>
                                             <div>
@@ -1355,10 +1278,10 @@ export default function RudraLandingPage({
                                                         }
                                                     }}
                                                     placeholder="+91 98XXXXXXXX"
-                                                    className={`w-full px-4 py-3 min-h-[48px] text-base sm:text-sm bg-slate-50/50 border rounded-xl focus:bg-white focus:outline-none transition-all ${
+                                                    className={`w-full px-3.5 py-2.5 text-base sm:text-sm bg-white border rounded-md focus:outline-none transition-colors ${
                                                         phoneError
-                                                            ? 'border-red-500 focus:border-red-500 ring-2 ring-red-500/20'
-                                                            : 'border-slate-200 focus:border-red-600 focus:ring-2 focus:ring-red-500/20'
+                                                            ? 'border-red-500 focus:border-red-500 ring-1 ring-red-500'
+                                                            : 'border-slate-300 focus:border-[#E3242B]'
                                                     }`}
                                                 />
                                                 {phoneError && (
@@ -1378,7 +1301,7 @@ export default function RudraLandingPage({
                                                     value={inquiryLocation}
                                                     onChange={(e) => setInquiryLocation(e.target.value)}
                                                     placeholder="e.g. Malad West, Goregaon, Andheri"
-                                                    className="w-full px-4 py-3 min-h-[48px] text-base sm:text-sm bg-slate-50/50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-500/20 transition-all"
+                                                    className="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-md focus:outline-none focus:border-[#E3242B]"
                                                 />
                                             </div>
                                         </div>
@@ -1391,7 +1314,7 @@ export default function RudraLandingPage({
                                                 suppressHydrationWarning
                                                 value={inquiryService}
                                                 onChange={(e) => setInquiryService(e.target.value)}
-                                                className="w-full px-4 py-3 min-h-[48px] text-base sm:text-sm bg-slate-50/50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-500/20 transition-all"
+                                                className="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-md focus:outline-none focus:border-[#E3242B]"
                                             >
                                                 <option>Annual Maintenance Contract (AMC) + Form B</option>
                                                 <option>Addressable &amp; Conventional Fire Alarm Systems</option>
@@ -1418,7 +1341,7 @@ export default function RudraLandingPage({
                                                 value={inquiryNotes}
                                                 onChange={(e) => setInquiryNotes(e.target.value)}
                                                 placeholder="Number of wings/floors, existing panel/pump condition, or audit timeline..."
-                                                className="w-full px-4 py-3 text-base sm:text-sm bg-slate-50/50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-500/20 transition-all"
+                                                className="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-md focus:outline-none focus:border-[#E3242B]"
                                             />
                                         </div>
 
@@ -1426,7 +1349,7 @@ export default function RudraLandingPage({
                                             type="submit"
                                             disabled={isSubmitting}
                                             suppressHydrationWarning
-                                            className="w-full min-h-[48px] py-3.5 px-6 bg-red-600 hover:bg-red-700 disabled:opacity-65 disabled:cursor-not-allowed text-white font-bold text-sm sm:text-base rounded-xl shadow-md shadow-red-600/20 transition-all inline-flex items-center justify-center gap-2 cursor-pointer"
+                                            className="w-full py-3.5 px-6 bg-[#E3242B] hover:bg-[#c51c22] disabled:opacity-65 disabled:cursor-not-allowed text-white font-bold text-sm rounded-md shadow-md shadow-red-600/20 transition-all inline-flex items-center justify-center gap-2 cursor-pointer"
                                         >
                                             {isSubmitting ? (
                                                 <>
@@ -1448,14 +1371,14 @@ export default function RudraLandingPage({
                 </div>
             </section>
 
-            {/* ── 11. CORPORATE HIGH-TRUST FOOTER ── */}
+            {/* ── 10. INDUSTRIAL DARK CORPORATE FOOTER (Asenware-Style) ── */}
             <footer className="bg-slate-950 text-slate-300 border-t border-slate-800">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-28 sm:pt-16 sm:pb-32">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-28 sm:pt-14 sm:pb-32">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10">
                         {/* Col 1 */}
                         <div>
                             <div className="flex items-center gap-3 mb-4">
-                                <div className="bg-white rounded-lg p-1.5">
+                                <div className="bg-white rounded p-1.5">
                                     <Image
                                         src="/logo.png"
                                         alt="Rudra Fire Protection"
@@ -1468,14 +1391,17 @@ export default function RudraLandingPage({
                                     <div className="text-sm font-extrabold text-white tracking-wide">
                                         RUDRA FIRE PROTECTION
                                     </div>
-                                    <div className="text-[11px] text-red-500 italic font-semibold">
+                                    <div className="text-[11px] text-[#E3242B] italic font-semibold">
                                         Safety Engineering Partner
                                     </div>
                                 </div>
                             </div>
-                            <p className="text-xs text-slate-400 leading-relaxed">
-                                End-to-end fire detection, hydrant, sprinkler, gas suppression, and statutory AMC maintenance specialist protecting residential, commercial and industrial properties across Mumbai &amp; MMR.
+                            <p className="text-xs text-slate-400 leading-relaxed mb-4">
+                                End-to-end fire detection, hydrant, sprinkler, gas suppression, and statutory AMC maintenance specialist protecting residential, commercial and industrial properties.
                             </p>
+                            <div className="text-xs font-mono text-slate-500">
+                                GSTIN: 27CECPD2175P1Z9
+                            </div>
                         </div>
 
                         {/* Col 2 */}
@@ -1497,7 +1423,7 @@ export default function RudraLandingPage({
                                             href="#systems"
                                             className="inline-flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors"
                                         >
-                                            <BreadcrumbArrow className="w-3 h-3 text-red-500" />
+                                            <BreadcrumbArrow className="w-3 h-3 text-[#E3242B]" />
                                             {item}
                                         </a>
                                     </li>
@@ -1531,6 +1457,20 @@ export default function RudraLandingPage({
                                         {portalLabel} →
                                     </Link>
                                 </li>
+                                <li className="pt-1.5">
+                                    <a
+                                        href="/rudra-fire-company-profile.pdf"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        download="Rudra_Fire_Company_Profile_2025.pdf"
+                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#E3242B]/15 hover:bg-[#E3242B]/25 text-red-400 hover:text-white border border-[#E3242B]/35 hover:border-[#E3242B] font-semibold transition-all text-xs group shadow-xs cursor-pointer"
+                                        title="Download Company Profile (PDF)"
+                                    >
+                                        <FileText className="w-3.5 h-3.5 text-[#E3242B] group-hover:scale-110 transition-transform shrink-0" />
+                                        <span>Company Profile</span>
+                                        <Download className="w-3 h-3 text-slate-400 group-hover:text-white transition-colors shrink-0" />
+                                    </a>
+                                </li>
                             </ul>
                         </div>
 
@@ -1545,13 +1485,13 @@ export default function RudraLandingPage({
                                 </p>
                                 <p>
                                     Phone:{' '}
-                                    <a href="tel:+917777088817" className="text-white font-semibold hover:text-red-400">
+                                    <a href="tel:+917777088817" className="text-white font-semibold hover:text-[#E3242B]">
                                         +91 77770 88817
                                     </a>
                                 </p>
                                 <p>
                                     Email:{' '}
-                                    <a href="mailto:info@rudrafireprotection.com" className="text-white font-semibold hover:text-red-400">
+                                    <a href="mailto:info@rudrafireprotection.com" className="text-white font-semibold hover:text-[#E3242B]">
                                         info@rudrafireprotection.com
                                     </a>
                                 </p>
@@ -1569,42 +1509,13 @@ export default function RudraLandingPage({
                 </div>
             </footer>
 
-            {/* ── 12. MOBILE STICKY ACTION BAR (Visible only on mobile <768px) ── */}
-            <div className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur-md border-t border-slate-200 p-2.5 flex items-center gap-2 shadow-lg">
-                <a
-                    href="tel:+917777088817"
-                    className="flex-1 py-2.5 px-2 text-xs font-bold text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl inline-flex items-center justify-center gap-1.5 transition-colors min-h-[42px]"
-                >
-                    <Phone className="w-3.5 h-3.5 text-red-600" />
-                    Call Desk
-                </a>
-                <a
-                    href="https://wa.me/917777088817?text=Hi%20Rudra%20Fire%20Protection%2C%20I%20would%20like%20to%20inquire%20about%20Fire%20Safety%20%2F%20Form-B%20AMC."
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 py-2.5 px-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl inline-flex items-center justify-center gap-1.5 transition-colors min-h-[42px]"
-                >
-                    <svg viewBox="0 0 32 32" className="w-3.5 h-3.5 fill-current shrink-0" aria-hidden="true">
-                        <path d="M16.004 2.667C8.64 2.667 2.667 8.64 2.667 16c0 2.353.615 4.651 1.784 6.678L2.56 29.333l6.829-1.79A13.277 13.277 0 0 0 16.004 29.333c7.363 0 13.33-5.973 13.33-13.333 0-7.36-5.967-13.333-13.33-13.333Zm7.788 18.886c-.329.927-1.622 1.694-2.664 1.918-.711.15-1.639.27-4.763-1.023-3.997-1.656-6.571-5.716-6.771-5.979-.192-.262-1.615-2.15-1.615-4.101 0-1.951 1.015-2.909 1.383-3.307.367-.397.801-.496 1.068-.496.267 0 .535.002.768.014.246.013.576-.094.901.688.329.794 1.124 2.742 1.224 2.942.1.2.167.433.033.696-.134.262-.2.426-.4.658-.2.231-.42.517-.6.694-.2.199-.408.414-.175.812.233.398 1.036 1.709 2.225 2.769 1.529 1.364 2.818 1.787 3.218 1.986.4.2.634.167.868-.1.233-.268.999-1.166 1.266-1.566.266-.4.533-.334.9-.2.367.133 2.333 1.1 2.733 1.3.4.2.667.3.767.466.1.167.1.964-.229 1.891Z" />
-                    </svg>
-                    WhatsApp
-                </a>
-                <a
-                    href="#quote-request"
-                    className="flex-1 py-2.5 px-2 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl inline-flex items-center justify-center gap-1.5 transition-colors min-h-[42px]"
-                >
-                    Get Quote
-                    <ArrowRight className="w-3.5 h-3.5" />
-                </a>
-            </div>
-
-            {/* ── 13. FLOATING WHATSAPP BUTTON (Shifted upward on mobile to clear bottom sticky bar) ── */}
+            {/* ── 11. FLOATING WHATSAPP QUICK-CHAT BUTTON ── */}
             <a
                 href="https://wa.me/917777088817?text=Hi%20Rudra%20Fire%20Protection%2C%20I%20would%20like%20to%20inquire%20about%20Fire%20Safety%20%2F%20Form-B%20AMC."
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Chat on WhatsApp with Rudra Fire Protection"
-                className="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-40 group flex items-center gap-2.5 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-bold text-xs sm:text-sm p-3.5 sm:pl-3.5 sm:pr-4 sm:py-3 rounded-full shadow-2xl shadow-emerald-950/30 ring-4 ring-[#25D366]/20 transition-all hover:scale-105 active:scale-95"
+                className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-40 group flex items-center gap-2.5 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-bold text-xs sm:text-sm p-3.5 sm:pl-3.5 sm:pr-4 sm:py-3 rounded-full shadow-2xl shadow-emerald-950/30 ring-4 ring-[#25D366]/20 transition-all hover:scale-105 active:scale-95"
             >
                 <svg
                     viewBox="0 0 32 32"
