@@ -57,7 +57,8 @@ const AMCInvoicePreview: React.FC<{ data: AMCInvoiceData }> = ({ data }) => {
         <div id="amc-print-page" style={{
             width: '210mm', minHeight: '297mm', background: '#fff',
             fontFamily: 'Arial, sans-serif', boxSizing: 'border-box',
-            margin: '0 auto', position: 'relative'
+            margin: '0 auto', position: 'relative',
+            display: 'flex', flexDirection: 'column', justifyContent: 'space-between'
         }}>
             <style>{`
                 @media print {
@@ -102,6 +103,19 @@ const AMCInvoicePreview: React.FC<{ data: AMCInvoiceData }> = ({ data }) => {
                     #amc-print-page { 
                         box-shadow: 0 0 10px rgba(0,0,0,0.15); 
                         position: relative;
+                        display: flex !important;
+                        flex-direction: column !important;
+                        justify-content: space-between !important;
+                        min-height: 297mm !important;
+                    }
+                    #amc-print-page > table {
+                        flex: 1 0 auto;
+                    }
+                    #amc-print-page .visual-footer {
+                        margin-top: auto !important;
+                        position: relative !important;
+                        width: 100% !important;
+                        background: #fff !important;
                     }
                     .watermark { display: none; }
                 }
@@ -273,7 +287,7 @@ const AMCInvoicePreview: React.FC<{ data: AMCInvoiceData }> = ({ data }) => {
             </table>
 
             {/* ─── VISUAL FOOTER (Fixed at absolute bottom of every page) ─── */}
-            <div className="visual-footer" style={{ padding: '10px 10mm 15px 10mm', borderTop: '1px solid #999' }}>
+            <div className="visual-footer" style={{ padding: '10px 10mm 15px 10mm', borderTop: '1px solid #999', marginTop: 'auto', width: '100%' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', fontSize: '10px', color: '#374151' }}>
                     <div>17 Navjeevan Vikas Society, Motilal Nagar, Goregaon West, Mumbai 400104 ☎ 7777088817</div>
                     <div style={{ color: '#6b7280' }}>Page 1 / 1</div>

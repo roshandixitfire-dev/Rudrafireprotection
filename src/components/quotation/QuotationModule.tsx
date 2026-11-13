@@ -1,4 +1,5 @@
 'use client';
+import { exportProfessionalQuoteToDoc } from '@/utils/exportDoc';
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { fetchNextQuotationNumber } from '@/utils/documentVersioning';
@@ -397,6 +398,8 @@ const PageToggle: React.FC<{ pages: PrintPages; onChange: (p: PrintPages) => voi
 // ─── Main QuotationModule ─────────────────────────────────────────────────────
 const QuotationModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
     const router = useRouter();
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => { setMounted(true); }, []);
     const [quotation, setQuotation] = useState<Quotation>(defaultQuotation());
     const [selectorOpen, setSelectorOpen] = useState(true);
     const [makesSectionOpen, setMakesSectionOpen] = useState(false);
@@ -594,8 +597,12 @@ const QuotationModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
         </div>
     );
 
+    if (!mounted) {
+        return <div className="p-8 text-center text-gray-500 animate-pulse">Loading quotation builder...</div>;
+    }
+
     return (
-        <div className="quotation-container">
+        <div className="quotation-container" suppressHydrationWarning>
             <DraftNoticeBanner
                 hasDraft={hasDraft}
                 draftTime={draftTime}

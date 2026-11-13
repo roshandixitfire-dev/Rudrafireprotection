@@ -273,6 +273,137 @@ export async function deleteQuotation(id: string) {
     }
 }
 
+const getFYLabel = (): string => {
+    const d = new Date()
+    const month = d.getMonth()
+    const year = d.getFullYear()
+    const startYear = month >= 3 ? year : year - 1
+    const endYear = startYear + 1
+    return `${String(startYear).slice(2)}-${String(endYear).slice(2)}`
+}
+
+/**
+ * Duplicate a quotation by ID (supports legacy, professional, amc).
+ */
+export async function duplicateQuotation(id: string, recordType?: string) {
+    try {
+        const supabase = await createClient()
+        const fyLabel = getFYLabel()
+        const today = new Date().toISOString().split('T')[0]
+
+        // 1. Try legacy_quotations
+        if (recordType === 'legacy' || !recordType) {
+            const { data: legQuote } = await supabase.from('legacy_quotations').select('*').eq('id', id).maybeSingle()
+            if (legQuote) {
+                const { data: seq } = await supabase.rpc('next_doc_sequence', { p_key: `quote-${fyLabel}` })
+                const num = seq || Math.floor(1000 + Math.random() * 9000)
+                const newQuoteNo = `RFP/${fyLabel}/${String(num).padStart(5, '0')}`
+
+                const raw = JSON.parse(JSON.stringify(legQuote.raw_json || {}))
+                raw.quoteNo = newQuoteNo
+                raw.date = today
+                if (Array.isArray(raw.items)) {
+                    raw.items = raw.items.map((it: any, idx: number) => ({
+                        ...it,
+                        id: `${Date.now()}-${idx}-${Math.random().toString(36).substr(2, 6)}`
+                    }))
+                }
+
+                const { data: newQuote, error: insertError } = await supabase.from('legacy_quotations').insert([{
+                    quote_no: newQuoteNo,
+                    quote_date: today,
+                    status: 'Draft',
+                    client_id: legQuote.client_id,
+                    to_title: legQuote.to_title,
+                    company_name: legQuote.company_name,
+                    street: legQuote.street,
+                    location: legQuote.location,
+                    city: legQuote.city,
+                    state: legQuote.state,
+                    pin: legQuote.pin,
+                    subtotal: legQuote.subtotal,
+                    sgst_pct: legQuote.sgst_pct,
+                    cgst_pct: legQuote.cgst_pct,
+                    sgst_amount: legQuote.sgst_amount,
+                    cgst_amount: legQuote.cgst_amount,
+                    grand_total: legQuote.grand_total,
+                    raw_json: raw,
+                    created_by: legQuote.created_by
+                }]).select().single()
+
+                if (insertError) throw insertError
+                revalidatePath('/dashboard/sales')
+                return { success: true, data: { ...newQuote, recordType: 'legacy' } }
+            }
+        }
+
+        // 2. Try professional quotations
+        if (recordType === 'professional' || !recordType) {
+            const { data: proQuote } = await supabase.from('quotations').select('*').eq('id', id).maybeSingle()
+            if (proQuote) {
+                const { data: seq } = await supabase.rpc('next_doc_sequence', { p_key: `qtn-prof-${fyLabel}` })
+                const num = seq || Math.floor(1000 + Math.random() * 9000)
+                const newQuoteNo = `Rudra/QTN/${fyLabel}/${String(num).padStart(4, '0')}`
+
+                const raw = JSON.parse(JSON.stringify(proQuote.raw_json || {}))
+                raw.quotationNo = newQuoteNo
+                raw.date = today
+
+                const { id: _oldId, created_at: _c, updated_at: _u, ...rest } = proQuote
+                const { data: newQuote, error: insertError } = await supabase.from('quotations').insert([{
+                    ...rest,
+                    quotation_number: newQuoteNo,
+                    quotation_date: today,
+                    status: 'Draft',
+                    raw_json: raw
+                }]).select().single()
+
+                if (insertError) throw insertError
+
+                const { data: items } = await supabase.from('quotation_items').select('*').eq('quotation_id', id)
+                if (items && items.length > 0) {
+                    await supabase.from('quotation_items').insert(
+                        items.map((it: any) => {
+                            const { id: _itemId, ...itemRest } = it
+                            return { ...itemRest, quotation_id: newQuote.id }
+                        })
+                    )
+                }
+
+                revalidatePath('/dashboard/sales')
+                return { success: true, data: { ...newQuote, recordType: 'professional' } }
+            }
+        }
+
+        // 3. Try AMC quotations
+        if (recordType === 'amc' || !recordType) {
+            const { data: amcQuote } = await supabase.from('amc_quotations').select('*').eq('id', id).maybeSingle()
+            if (amcQuote) {
+                const { data: seq } = await supabase.rpc('next_doc_sequence', { p_key: `qtn-amc-${fyLabel}` })
+                const num = seq || Math.floor(1000 + Math.random() * 9000)
+                const newQuoteNo = `AMC/${fyLabel}/${String(num).padStart(4, '0')}`
+
+                const { id: _oldId, created_at: _c, updated_at: _u, ...rest } = amcQuote
+                const { data: newQuote, error: insertError } = await supabase.from('amc_quotations').insert([{
+                    ...rest,
+                    quotation_number: newQuoteNo,
+                    quotation_date: today,
+                    status: 'Draft'
+                }]).select().single()
+
+                if (insertError) throw insertError
+                revalidatePath('/dashboard/sales')
+                return { success: true, data: { ...newQuote, recordType: 'amc' } }
+            }
+        }
+
+        return { success: false, error: 'Quotation not found' }
+    } catch (error: any) {
+        console.error('Error duplicating quotation:', error)
+        return { success: false, error: error.message || 'Failed to duplicate quotation' }
+    }
+}
+
 /**
  * Delete an invoice by ID.
  */

@@ -66,6 +66,8 @@ export default function PurchaseOrderFormModal({ initialData, vendors, onClose, 
     const [taxRate, setTaxRate] = useState(18); // Default 18% GST
     const [shippingCost, setShippingCost] = useState(0);
     const [otherCost, setOtherCost] = useState(0);
+    const [isCustomSubtotal, setIsCustomSubtotal] = useState(false);
+    const [customSubtotal, setCustomSubtotal] = useState<number | null>(null);
     const [comments, setComments] = useState('');
     const [saving, setSaving] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
@@ -152,6 +154,17 @@ export default function PurchaseOrderFormModal({ initialData, vendors, onClose, 
             setTaxRate(initialData.raw_json?.taxRate !== undefined ? initialData.raw_json.taxRate : 18);
             setShippingCost(Number(initialData.shipping_total) || 0);
             setOtherCost(Number(initialData.other_total) || 0);
+            if (initialData.raw_json?.isCustomSubtotal !== undefined) {
+                setIsCustomSubtotal(Boolean(initialData.raw_json.isCustomSubtotal));
+                setCustomSubtotal(initialData.raw_json.customSubtotal !== null ? Number(initialData.raw_json.customSubtotal) : null);
+            } else if (initialData.subtotal !== undefined && initialData.subtotal !== null) {
+                const itemsList = initialData.raw_json?.items || initialData.items || [];
+                const itemsSum = itemsList.reduce((sum: number, it: any) => sum + (Number(it.total) || Number(it.total_price) || 0), 0);
+                if (Number(initialData.subtotal) !== itemsSum && Number(initialData.subtotal) > 0) {
+                    setIsCustomSubtotal(true);
+                    setCustomSubtotal(Number(initialData.subtotal));
+                }
+            }
             setComments(initialData.comments || '');
         } else {
             // Auto generate PO Number
@@ -206,7 +219,8 @@ export default function PurchaseOrderFormModal({ initialData, vendors, onClose, 
     };
 
     // Calculate totals
-    const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+    const calculatedItemsSubtotal = items.reduce((sum, item) => sum + item.total, 0);
+    const subtotal = isCustomSubtotal && customSubtotal !== null ? customSubtotal : calculatedItemsSubtotal;
     const taxAmount = (subtotal * taxRate) / 100;
     const grandTotal = subtotal + taxAmount + shippingCost + otherCost;
 
@@ -227,7 +241,9 @@ export default function PurchaseOrderFormModal({ initialData, vendors, onClose, 
                 items,
                 taxRate,
                 shippingCost,
-                otherCost
+                otherCost,
+                isCustomSubtotal,
+                customSubtotal
             };
 
             const payload = {
@@ -396,10 +412,12 @@ export default function PurchaseOrderFormModal({ initialData, vendors, onClose, 
             {/* Content Body */}
             <div className="flex-1 overflow-y-auto">
                 {/* ─── PRINT PREVIEW MODE (Rudra Corporate Letterhead + Watermark + GimBooks Table Layout) ─── */}
-                <div id="po-print-page" className={`${showPreview ? 'block' : 'hidden print:block'} max-w-[800px] mx-auto my-6 bg-white shadow-lg border border-slate-200 print:shadow-none print:border-none print:my-0`} style={{
+                <div id="po-print-page" className={`${showPreview ? 'flex' : 'hidden print:block'} max-w-[800px] mx-auto my-6 bg-white shadow-lg border border-slate-200 print:shadow-none print:border-none print:my-0`} style={{
                     width: '210mm', minHeight: '297mm', background: '#fff',
                     fontFamily: 'Arial, sans-serif', boxSizing: 'border-box',
-                    position: 'relative'
+                    position: 'relative',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between'
                 }}>
                     <style>{`
                         @media print {
@@ -446,6 +464,22 @@ export default function PurchaseOrderFormModal({ initialData, vendors, onClose, 
                             #po-print-page { 
                                 box-shadow: 0 0 10px rgba(0,0,0,0.15); 
                                 position: relative;
+                                display: flex !important;
+                                flex-direction: column !important;
+                                justify-content: space-between !important;
+                                min-height: 297mm !important;
+                            }
+                            #po-print-page > table {
+                                flex: 1 0 auto;
+                            }
+                            #po-print-page .footer-spacer {
+                                height: 10mm;
+                            }
+                            #po-print-page .visual-footer {
+                                margin-top: auto !important;
+                                position: relative !important;
+                                width: 100% !important;
+                                background: #fff !important;
                             }
                             .watermark { display: none; }
                         }
@@ -622,7 +656,40 @@ export default function PurchaseOrderFormModal({ initialData, vendors, onClose, 
                                                 <tbody>
                                                     <tr style={{ borderBottom: '1px solid #eee' }}>
                                                         <td style={{ paddingTop: '3px', paddingBottom: '3px', fontWeight: 'bold', color: '#666', textTransform: 'uppercase', fontSize: '8px' }}>SUBTOTAL</td>
-                                                        <td style={{ paddingTop: '3px', paddingBottom: '3px', textAlign: 'right', fontFamily: 'monospace', fontWeight: '600' }}>₹{subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                                        <td style={{ paddingTop: '3px', paddingBottom: '3px', textAlign: 'right', fontFamily: 'monospace', fontWeight: '600' }}>
+                                                            <span className="hidden print:inline">
+                                                                ₹{subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                            </span>
+                                                            <span className="inline-flex items-center justify-end gap-1 print:hidden">
+                                                                <span>₹</span>
+                                                                <input
+                                                                    type="number"
+                                                                    step="any"
+                                                                    value={isCustomSubtotal ? (customSubtotal ?? '') : (subtotal > 0 ? subtotal : '')}
+                                                                    onChange={e => {
+                                                                        const val = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                                                                        setIsCustomSubtotal(true);
+                                                                        setCustomSubtotal(val);
+                                                                    }}
+                                                                    placeholder="0.00"
+                                                                    className="w-20 text-right font-mono font-bold text-[9px] p-0.5 border border-dashed border-slate-400 hover:border-blue-500 focus:border-blue-600 rounded bg-amber-50/70 focus:bg-white focus:outline-none transition"
+                                                                    title="Direct Subtotal: Click to put amount directly"
+                                                                />
+                                                                {isCustomSubtotal && (
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => {
+                                                                            setIsCustomSubtotal(false);
+                                                                            setCustomSubtotal(null);
+                                                                        }}
+                                                                        className="text-[8px] text-blue-600 hover:text-blue-800 ml-0.5 underline font-sans"
+                                                                        title="Reset to calculate automatically from items"
+                                                                    >
+                                                                        ↻
+                                                                    </button>
+                                                                )}
+                                                            </span>
+                                                        </td>
                                                     </tr>
                                                     <tr style={{ borderBottom: '1px solid #eee' }}>
                                                         <td style={{ paddingTop: '3px', paddingBottom: '3px', fontWeight: 'bold', color: '#666', textTransform: 'uppercase', fontSize: '8px' }}>TAX ({taxRate}%)</td>
@@ -658,7 +725,7 @@ export default function PurchaseOrderFormModal({ initialData, vendors, onClose, 
                     </table>
 
                     {/* Visual Footer (repeats at absolute bottom of page) */}
-                    <div className="visual-footer" style={{ padding: '10px 10mm 15px 10mm', borderTop: '1px solid #999' }}>
+                    <div className="visual-footer" style={{ padding: '10px 10mm 15px 10mm', borderTop: '1px solid #999', marginTop: 'auto', width: '100%' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', fontSize: '9px', color: '#555' }}>
                             <div>17 Navjeevan Vikas Society, Motilal Nagar, Goregaon West, Mumbai 400104 ☎ 7777088817</div>
                             <div style={{ color: '#999' }}>Page 1 / 1</div>
@@ -900,9 +967,39 @@ export default function PurchaseOrderFormModal({ initialData, vendors, onClose, 
                             {/* Summary Inputs */}
                             <div className="bg-slate-50 rounded-xl p-4 border border-slate-150 space-y-3">
                                 <h3 className="text-xs font-black text-slate-500 uppercase tracking-wider border-b border-slate-200 pb-1.5">💵 Total Summary</h3>
-                                <div className="grid grid-cols-2 gap-2 text-xs">
-                                    <span className="font-semibold text-slate-600 py-1">Subtotal</span>
-                                    <span className="text-right font-mono font-bold py-1">₹{subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                                <div className="flex justify-between items-center gap-2 text-xs">
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="font-semibold text-slate-600">Subtotal</span>
+                                        {isCustomSubtotal && (
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setIsCustomSubtotal(false);
+                                                    setCustomSubtotal(null);
+                                                }}
+                                                className="text-[9px] text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-0.5 bg-blue-50 border border-blue-200 px-1 py-0.2 rounded"
+                                                title="Reset to calculate automatically from items"
+                                            >
+                                                ↻ Auto
+                                            </button>
+                                        )}
+                                    </div>
+                                    <div className="flex items-center gap-1 ml-auto">
+                                        <span className="font-mono text-slate-400 text-xs">₹</span>
+                                        <input
+                                            type="number"
+                                            step="any"
+                                            value={isCustomSubtotal ? (customSubtotal ?? '') : (subtotal > 0 ? subtotal : '')}
+                                            onChange={e => {
+                                                const val = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                                                setIsCustomSubtotal(true);
+                                                setCustomSubtotal(val);
+                                            }}
+                                            placeholder="0.00"
+                                            className="py-1 px-2 border border-slate-200 rounded focus:outline-none w-28 text-right font-mono font-bold text-slate-800 bg-white"
+                                            title="Enter subtotal amount directly"
+                                        />
+                                    </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-2 text-xs items-center">
                                     <span className="font-semibold text-slate-600">Tax Rate (GST %)</span>

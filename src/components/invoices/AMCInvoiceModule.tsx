@@ -1,4 +1,5 @@
 'use client';
+import { exportAMCInvoiceToDoc } from '@/utils/exportDoc';
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { AMCInvoiceData, AMCInvoiceItem, AMCPackage } from './AMCInvoicePreview';
@@ -192,6 +193,7 @@ const AMCInvoiceModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                 }}>
                     <button onClick={() => setShowPreview(false)} style={{ padding: '6px 14px', background: '#555', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}>← Edit</button>
                     <button onClick={() => window.print()} style={{ padding: '6px 14px', background: '#E3242B', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}>🖨 Print / PDF</button>
+                    <button onClick={() => exportAMCInvoiceToDoc(data)} style={{ padding: '6px 14px', background: '#2563EB', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>📄 Save as Word (.doc)</button>
                     <span style={{ color: '#aaa', fontSize: 11, marginLeft: 'auto' }}>AMC Preview Mode</span>
                 </div>
                 <div style={{ flex: 1, overflow: 'auto', padding: '20px 0' }}>
@@ -212,6 +214,7 @@ const AMCInvoiceModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                         style={{ padding: '8px 18px', background: saveStatus === 'saved' ? '#4caf50' : '#333', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
                         {saveStatus === 'saving' ? 'Saving...' : saveStatus === 'saved' ? 'Saved ✓' : 'Save'}
                     </button>
+                    <button onClick={() => exportAMCInvoiceToDoc(data)} style={{ padding: '8px 18px', background: '#2563EB', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>📄 Word (.doc)</button>
                     <button onClick={() => setShowPreview(true)} style={{ padding: '8px 18px', background: '#E3242B', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>Preview / Print →</button>
                 </div>
             </div>

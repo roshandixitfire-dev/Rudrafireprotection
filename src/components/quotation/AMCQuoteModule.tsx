@@ -1,8 +1,9 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import { exportAMCQuoteToDoc } from '@/utils/exportDoc';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
-import { fetchNextQuotationNumber } from '@/utils/documentVersioning';
+import { fetchNextQuotationNumber, getFYLabel } from '@/utils/documentVersioning';
 import { AMCQuotation, AMCItem, AMCPackage } from './types';
 import AMCQuotePreview from './AMCQuotePreview';
 import QuotationStickyHeader from './QuotationStickyHeader';
@@ -13,6 +14,27 @@ import { useFormDraft } from '@/hooks/useFormDraft';
 import DraftNoticeBanner from '@/components/common/DraftNoticeBanner';
 
 const supabase = createClient();
+
+const formatSupabaseError = (err: unknown): string => {
+    if (!err) return 'Unknown error';
+    if (typeof err === 'string') return err;
+    if (err instanceof Error) return err.message || err.name;
+    if (typeof err === 'object') {
+        const e = err as Record<string, any>;
+        const parts = [
+            e.code ? `[${e.code}]` : '',
+            e.message,
+            e.details,
+            e.hint ? `Hint: ${e.hint}` : '',
+        ].filter(Boolean);
+        if (parts.length > 0) return parts.join(' - ');
+        try {
+            const json = JSON.stringify(err, Object.getOwnPropertyNames(err));
+            if (json && json !== '{}') return json;
+        } catch { }
+    }
+    return String(err);
+};
 
 const DEFAULT_AMC_ITEMS: AMCItem[] = [
     { id: '1', srNo: '1', title: 'Non- Comprehensive Annual Maintenance Contract for Fire Hydrant/Sprinkler System', description: '', qty: '4', unit: 'Visit', rate: 0, amount: 0, rowSpan: 2 },
@@ -60,6 +82,51 @@ const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
 
     const [clientExists, setClientExists] = useState(true);
     const [addToCRM, setAddToCRM] = useState(false);
+    const hasUserEditedRef = useRef(false);
+    const isFetchingQuoteNoRef = useRef(false);
+
+    const getNextAvailableAMCQuoteNo = async (): Promise<string> => {
+        const fyLabel = getFYLabel();
+        const prefix = `AMC/${fyLabel}/`;
+
+        const { data: existingRows, error: existingErr } = await supabase
+            .from('amc_quotations')
+            .select('quotation_number')
+            .ilike('quotation_number', `${prefix}%`);
+
+        const existingSet = new Set(
+            (existingRows || []).map((r: any) => String(r.quotation_number || '').trim())
+        );
+
+        let lastFallback = '';
+        for (let attempt = 0; attempt < 5; attempt++) {
+            const candidate = await fetchNextQuotationNumber('amc');
+            if (!candidate || candidate.includes('(ERR)')) {
+                lastFallback = candidate;
+                break;
+            }
+            if (!existingSet.has(candidate)) {
+                return candidate;
+            }
+        }
+
+        if (!existingErr) {
+            let maxNum = 0;
+            for (const qNo of existingSet) {
+                const suffix = qNo.slice(prefix.length);
+                if (/^\d+$/.test(suffix)) {
+                    maxNum = Math.max(maxNum, parseInt(suffix, 10));
+                }
+            }
+            let nextNum = maxNum + 1;
+            while (existingSet.has(`${prefix}${String(nextNum).padStart(4, '0')}`)) {
+                nextNum++;
+            }
+            return `${prefix}${String(nextNum).padStart(4, '0')}`;
+        }
+
+        return lastFallback || `${prefix}${Math.floor(1000 + Math.random() * 9000)}`;
+    };
 
     const {
         hasDraft,
@@ -74,16 +141,19 @@ const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
         isEditingExisting: !!id,
         onRestore: (draftObj) => {
             if (draftObj?.data) {
+                hasUserEditedRef.current = false;
                 setData(draftObj.data);
-                if (draftObj.savedId) setSavedId(draftObj.savedId);
+                setSavedId(draftObj.savedId || null);
             }
         }
     });
 
     useEffect(() => {
-        if (!id && (data.companyName || data.street || data.totalAmount > 0)) {
+        if (!id && hasUserEditedRef.current) {
             const timer = setTimeout(() => {
-                saveDraft({ data, savedId });
+                if (hasUserEditedRef.current) {
+                    saveDraft({ data, savedId });
+                }
             }, 800);
             return () => clearTimeout(timer);
         }
@@ -106,6 +176,7 @@ const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
     }, [data.companyName]);
 
     const onClientSelect = (c: any) => {
+        hasUserEditedRef.current = true;
         setData(prev => ({
             ...prev,
             companyName: c.name,
@@ -128,9 +199,10 @@ const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                 .single()
                 .then(({ data: dbQuote, error }) => {
                     if (dbQuote) {
+                        hasUserEditedRef.current = false;
                         setData({
-                            quoteNo: dbQuote.quotation_number,
-                            date: dbQuote.quotation_date,
+                            quoteNo: dbQuote.quotation_number || '',
+                            date: dbQuote.quotation_date || new Date().toISOString().split('T')[0],
                             toTitle: dbQuote.to_title || 'The Hon Chairman/ Hon Secretary,',
                             companyName: dbQuote.company_name || '',
                             street: dbQuote.street || '',
@@ -143,26 +215,36 @@ const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                             items: dbQuote.items || DEFAULT_AMC_ITEMS,
                             packages: dbQuote.packages || DEFAULT_AMC_PACKAGES,
                             terms: dbQuote.terms || DEFAULT_AMC_TERMS,
-                            totalAmount: dbQuote.grand_total || 0,
+                            totalAmount: dbQuote.grand_total ?? 0,
+                            includeSignature: true,
                         });
                         setSavedId(dbQuote.id);
                     } else if (error) {
-                        console.error('Error loading AMC quote:', error);
+                        console.error('Error loading AMC quote:', formatSupabaseError(error));
                     }
                 });
             return;
         }
 
-        if (!data.quoteNo) {
-            fetchNextQuotationNumber('amc').then(no => setData(prev => ({ ...prev, quoteNo: no })));
+        if (!data.quoteNo && !isFetchingQuoteNoRef.current) {
+            isFetchingQuoteNoRef.current = true;
+            getNextAvailableAMCQuoteNo()
+                .then(no => {
+                    setData(prev => (prev.quoteNo ? prev : { ...prev, quoteNo: no }));
+                })
+                .finally(() => {
+                    isFetchingQuoteNoRef.current = false;
+                });
         }
     }, [id]);
 
     const updateField = (field: keyof AMCQuotation, value: any) => {
+        hasUserEditedRef.current = true;
         setData(prev => ({ ...prev, [field]: value }));
     };
 
     const updateItem = (id: string, field: keyof AMCItem, value: any) => {
+        hasUserEditedRef.current = true;
         setData(prev => ({
             ...prev,
             items: prev.items.map(it => it.id === id ? { ...it, [field]: value } : it)
@@ -170,6 +252,7 @@ const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
     };
 
     const updatePackage = (index: number, field: keyof AMCPackage, value: any) => {
+        hasUserEditedRef.current = true;
         setData(prev => {
             const pkgs = [...prev.packages];
             pkgs[index] = { ...pkgs[index], [field]: value };
@@ -178,6 +261,7 @@ const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
     };
 
     const saveAMCQuotation = async () => {
+        if (saveStatus === 'saving') return;
         setSaveStatus('saving');
         try {
             if (addToCRM && !clientExists && data.companyName.trim()) {
@@ -195,46 +279,121 @@ const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                 setAddToCRM(false);
             }
 
+            let activeQuoteNo = (data.quoteNo || '').trim();
+            if (!savedId && (!activeQuoteNo || activeQuoteNo.includes('(ERR)'))) {
+                activeQuoteNo = await getNextAvailableAMCQuoteNo();
+                setData(prev => ({ ...prev, quoteNo: activeQuoteNo }));
+            }
+
+            const safeDate = data.date && data.date.trim()
+                ? data.date.trim()
+                : new Date().toISOString().split('T')[0];
+            if (!data.date || !data.date.trim()) {
+                setData(prev => ({ ...prev, date: safeDate }));
+            }
+
+            const safeTotal = Number.isFinite(Number(data.totalAmount)) ? Number(data.totalAmount) : 0;
+            const safePackages = (data.packages || []).map(pkg => ({
+                ...pkg,
+                amount: Number.isFinite(Number(pkg.amount)) ? Number(pkg.amount) : 0,
+            }));
+
             const payload: any = {
-                quotation_number: data.quoteNo,
-                quotation_date: data.date,
-                to_title: data.toTitle,
-                company_name: data.companyName,
-                street: data.street,
-                location: data.location,
-                city: data.city,
-                state: data.state,
-                pin: data.pin,
-                contact_person: data.contactPerson,
-                contact_number: data.contactNumber,
-                items: data.items,
-                packages: data.packages,
-                terms: data.terms,
-                grand_total: data.totalAmount,
+                quotation_number: activeQuoteNo,
+                quotation_date: safeDate,
+                to_title: data.toTitle || '',
+                company_name: data.companyName || '',
+                street: data.street || '',
+                location: data.location || '',
+                city: data.city || '',
+                state: data.state || '',
+                pin: data.pin || '',
+                contact_person: data.contactPerson || '',
+                contact_number: data.contactNumber || '',
+                items: data.items || [],
+                packages: safePackages,
+                terms: data.terms || [],
+                grand_total: safeTotal,
                 status: 'Sent',
                 updated_at: new Date().toISOString(),
             };
-            let res, error;
+
+            const performInsert = async (): Promise<{ data: { id: string } | null; error: any }> => {
+                const { data: insertData, error: insertError } = await supabase
+                    .from('amc_quotations')
+                    .insert(payload)
+                    .select('id')
+                    .single();
+
+                if (!insertError || insertError.code !== '23505') {
+                    return { data: insertData, error: insertError };
+                }
+
+                // Recover from duplicate quotation_number (e.g. restored draft without savedId, or sequence collision)
+                const { data: existing, error: lookupError } = await supabase
+                    .from('amc_quotations')
+                    .select('id, company_name')
+                    .eq('quotation_number', payload.quotation_number)
+                    .maybeSingle();
+
+                if (!lookupError && existing?.id) {
+                    const existingCo = (existing.company_name || '').trim().toLowerCase();
+                    const currentCo = (data.companyName || '').trim().toLowerCase();
+                    const isSameQuote = payload.quotation_number !== '' && currentCo !== '' && existingCo === currentCo;
+
+                    if (isSameQuote) {
+                        const retryRes = await supabase
+                            .from('amc_quotations')
+                            .update(payload)
+                            .eq('id', existing.id)
+                            .select('id')
+                            .single();
+                        return { data: retryRes.data, error: retryRes.error };
+                    }
+                }
+
+                const nextNo = await getNextAvailableAMCQuoteNo();
+                if (nextNo && nextNo !== payload.quotation_number) {
+                    payload.quotation_number = nextNo;
+                    activeQuoteNo = nextNo;
+                    setData(prev => ({ ...prev, quoteNo: nextNo }));
+                    const retryRes = await supabase
+                        .from('amc_quotations')
+                        .insert(payload)
+                        .select('id')
+                        .single();
+                    return { data: retryRes.data, error: retryRes.error };
+                }
+
+                return { data: insertData, error: insertError };
+            };
+
+            let res: { id: string } | null = null;
+            let error: any = null;
+
             if (savedId) {
-                const { data: updateData, error: updateError } = await supabase.from('amc_quotations')
+                const { data: updateData, error: updateError } = await supabase
+                    .from('amc_quotations')
                     .update(payload)
                     .eq('id', savedId)
                     .select('id')
                     .single();
                 res = updateData;
                 error = updateError;
+
+                if (error && error.code === 'PGRST116') {
+                    const insertAttempt = await performInsert();
+                    res = insertAttempt.data;
+                    error = insertAttempt.error;
+                }
             } else {
-                const { data: insertData, error: insertError } = await supabase.from('amc_quotations')
-                    .insert(payload)
-                    .select('id')
-                    .single();
-                res = insertData;
-                error = insertError;
+                const insertAttempt = await performInsert();
+                res = insertAttempt.data;
+                error = insertAttempt.error;
             }
 
             if (error) {
-                console.error('Supabase error:', error);
-                throw new Error(error.message || JSON.stringify(error));
+                throw new Error(formatSupabaseError(error));
             }
 
             await createLeadFromQuotation({
@@ -243,17 +402,19 @@ const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                 location: [data.street, data.location].filter(Boolean).join(', '),
                 contactPerson: data.contactPerson,
                 mobile: data.contactNumber,
-                remarks: `Automatically created from AMC Quotation ${data.quoteNo}`,
+                remarks: `Automatically created from AMC Quotation ${activeQuoteNo}`,
             });
 
+            hasUserEditedRef.current = false;
             if (res?.id) setSavedId(res.id);
             setSaveStatus('saved');
             clearDraft();
             router.refresh();
             setTimeout(() => setSaveStatus('idle'), 3000);
         } catch (err: any) {
-            console.error('Error saving AMC quotation:', err);
-            alert(`Error saving AMC quotation: ${err.message || 'Unknown error'}`);
+            const errMsg = formatSupabaseError(err);
+            console.error('Error saving AMC quotation:', errMsg);
+            alert(`Error saving AMC quotation: ${errMsg}`);
             setSaveStatus('error');
             setTimeout(() => setSaveStatus('idle'), 3000);
         }
@@ -275,6 +436,7 @@ const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                         window.print();
                         setTimeout(() => { document.title = originalTitle; }, 1000);
                     }} style={{ padding: '6px 14px', background: '#E3242B', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}>🖨 Print / PDF</button>
+                    <button onClick={() => exportAMCQuoteToDoc(data)} style={{ padding: '6px 14px', background: '#2563EB', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>📄 Save as Word (.doc)</button>
                     <span style={{ color: '#aaa', fontSize: 11, marginLeft: 'auto' }}>AMC Preview Mode</span>
                 </div>
                 <div style={{ flex: 1, overflow: 'auto', padding: '20px 0' }}>
@@ -293,13 +455,19 @@ const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                 draftTime={draftTime}
                 lastSavedNotice={lastSavedNotice}
                 onRestore={restoreDraft}
-                onDiscard={discardDraft}
+                onDiscard={() => {
+                    hasUserEditedRef.current = false;
+                    discardDraft();
+                }}
             />
             <QuotationStickyHeader 
                 actions={
                     <>
                         <button onClick={saveAMCQuotation} disabled={saveStatus === 'saving'} style={{ padding: '7px 16px', background: saveStatus === 'saved' ? '#16a34a' : saveStatus === 'error' ? '#dc2626' : '#1a73e8', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
                             {saveStatus === 'saving' ? '⏳ Saving...' : saveStatus === 'saved' ? '✓ Saved!' : saveStatus === 'error' ? '✗ Error – Retry' : '💾 Save'}
+                        </button>
+                        <button onClick={() => exportAMCQuoteToDoc(data)} style={{ padding: '7px 16px', background: '#2563EB', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
+                            📄 Word (.doc)
                         </button>
                         <button onClick={() => setShowPreview(true)} style={{ padding: '8px 18px', background: '#E3242B', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
                             Preview / Print →
@@ -426,6 +594,7 @@ const AMCQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                         className="form-input text-xs"
                         value={isNaN(data.totalAmount) ? '' : data.totalAmount}
                         onChange={e => {
+                            hasUserEditedRef.current = true;
                             const val = e.target.value === '' ? 0 : parseFloat(e.target.value);
                             setData(prev => {
                                 const updatedPackages = prev.packages.map(pkg => {

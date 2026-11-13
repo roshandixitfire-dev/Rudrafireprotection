@@ -1,13 +1,28 @@
 'use client';
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
+import React, { useState, useEffect, Suspense } from 'react';
+import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
-import LegacyQuoteModule from '@/components/quotation/LegacyQuotePreview';
-import AMCQuoteModule from '@/components/quotation/AMCQuoteModule';
 import QuotationTabs from '@/components/quotation/QuotationTabs';
 
-export default function LegacyQuotationPage() {
+const LegacyQuoteModule = dynamic(() => import('@/components/quotation/LegacyQuotePreview'), {
+    ssr: false,
+    loading: () => (
+        <div className="p-12 text-center text-gray-400 font-medium animate-pulse">
+            Loading quotation editor...
+        </div>
+    )
+});
+
+const AMCQuoteModule = dynamic(() => import('@/components/quotation/AMCQuoteModule'), {
+    ssr: false,
+    loading: () => (
+        <div className="p-12 text-center text-gray-400 font-medium animate-pulse">
+            Loading AMC quotation editor...
+        </div>
+    )
+});
+
+function LegacyQuotationContent() {
     const searchParams = useSearchParams();
     const defaultTab = searchParams.get('tab') === 'amc' ? 'amc' : 'legacy';
     const [activeTab, setActiveTab] = useState<'legacy' | 'amc'>(defaultTab);
@@ -18,26 +33,16 @@ export default function LegacyQuotationPage() {
         else setActiveTab('legacy');
     }, [searchParams]);
 
-    const Tabs = (
-        <div className="flex gap-2 overflow-x-auto pb-1 sm:pb-0 w-full">
-            <Link href="/dashboard/quotations/new" className="px-4 py-2 rounded-t-lg font-bold text-sm text-gray-500 bg-gray-100 hover:bg-white hover:text-red-600 transition-colors border-b-2 border-transparent whitespace-nowrap">
-                📋 Professional Quote
-            </Link>
-            <button
-                onClick={() => setActiveTab('legacy')}
-                className={`px-4 py-2 rounded-t-lg font-bold text-sm transition-colors whitespace-nowrap border-b-2 ${activeTab === 'legacy' ? 'border-red-600 text-red-700 bg-white shadow-sm cursor-default' : 'border-transparent text-gray-500 bg-gray-100 hover:bg-white hover:text-red-600'}`}>
-                🔴 Legacy Quote
-            </button>
-            <button
-                onClick={() => setActiveTab('amc')}
-                className={`px-4 py-2 rounded-t-lg font-bold text-sm transition-colors whitespace-nowrap border-b-2 ${activeTab === 'amc' ? 'border-red-600 text-red-700 bg-white shadow-sm cursor-default' : 'border-transparent text-gray-500 bg-gray-100 hover:bg-white hover:text-red-600'}`}>
-                🛡️ AMC Quote
-            </button>
+    return (
+        <div className="max-w-7xl mx-auto px-3 sm:px-6">
+            {activeTab === 'legacy' ? <LegacyQuoteModule tabs={<QuotationTabs />} /> : <AMCQuoteModule tabs={<QuotationTabs />} />}
         </div>
     );
+}
 
+export default function LegacyQuotationPage() {
     return (
-        <div className="min-h-screen bg-gray-50 pb-20 overflow-x-hidden">
+        <div className="min-h-screen bg-gray-50 pb-20 overflow-x-hidden" suppressHydrationWarning>
             {/* Print CSS: hide nav/header during print */}
             <style>{`
                 @media print {
@@ -47,11 +52,9 @@ export default function LegacyQuotationPage() {
                 }
             `}</style>
 
-            <div className="max-w-7xl mx-auto px-3 sm:px-6">
-                
-                {/* Content */}
-                {activeTab === 'legacy' ? <LegacyQuoteModule tabs={<QuotationTabs />} /> : <AMCQuoteModule tabs={<QuotationTabs />} />}
-            </div>
+            <Suspense fallback={<div className="p-12 text-center text-gray-400 font-medium animate-pulse">Loading...</div>}>
+                <LegacyQuotationContent />
+            </Suspense>
         </div>
     );
 }

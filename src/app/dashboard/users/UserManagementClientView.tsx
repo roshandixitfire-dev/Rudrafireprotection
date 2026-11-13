@@ -7,10 +7,9 @@ import type { DemoUser } from '@/utils/supabase/demo-users'
 
 interface Props {
     users: DemoUser[]
-    passwords: Record<string, string>
 }
 
-export default function UserManagementClientView({ users, passwords }: Props) {
+export default function UserManagementClientView({ users }: Props) {
     const [activeTab, setActiveTab] = useState<'employees' | 'clients'>('employees')
     const [searchTerm, setSearchTerm] = useState('')
     const [viewMode, setViewMode] = useState<'list' | 'grid'>('list')
@@ -115,7 +114,7 @@ export default function UserManagementClientView({ users, passwords }: Props) {
                         <Search className="w-8 h-8 text-slate-300" />
                     </div>
                     <h3 className="text-lg font-bold text-slate-900 mb-1">No users found</h3>
-                    <p className="text-slate-500 max-w-sm mb-6">We couldn't find any {activeTab} matching your current search criteria.</p>
+                    <p className="text-slate-500 max-w-sm mb-6">We couldn&apos;t find any {activeTab} matching your current search criteria.</p>
                 </div>
             ) : viewMode === 'list' ? (
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
@@ -124,7 +123,7 @@ export default function UserManagementClientView({ users, passwords }: Props) {
                             <thead className="bg-slate-50 uppercase text-[10px] font-extrabold text-slate-500 tracking-wider">
                                 <tr>
                                     <th className="px-6 py-4">Name & Role</th>
-                                    <th className="px-6 py-4">Credentials</th>
+                                    <th className="px-6 py-4">Account / Email</th>
                                     <th className="px-6 py-4">{activeTab === 'employees' ? 'Permissions' : 'Company'}</th>
                                     <th className="px-6 py-4 text-right">Actions</th>
                                 </tr>
@@ -149,14 +148,17 @@ export default function UserManagementClientView({ users, passwords }: Props) {
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="space-y-1">
-                                                <div className="flex items-center gap-1.5 text-slate-600">
+                                                <div className="flex items-center gap-1.5 text-slate-700">
                                                     <Mail className="w-3.5 h-3.5 text-slate-400" />
                                                     <span className="font-medium text-[13px]">{user.email}</span>
                                                 </div>
-                                                <div className="flex items-center gap-1.5 text-slate-500">
-                                                    <KeyRound className="w-3.5 h-3.5 text-slate-400" />
-                                                    <span className="font-mono text-[11px] tracking-wide">{passwords[user.email] || 'No password set'}</span>
-                                                </div>
+                                                <Link
+                                                    href={`/dashboard/users/create?email=${encodeURIComponent(user.email)}&role=${user.role}`}
+                                                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline"
+                                                >
+                                                    <KeyRound className="w-3 h-3" />
+                                                    Reset Password
+                                                </Link>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
@@ -224,18 +226,16 @@ export default function UserManagementClientView({ users, passwords }: Props) {
                             <div className="space-y-3 mb-5 flex-1 bg-slate-50/50 p-4 rounded-xl border border-slate-100">
                                 <div className="flex items-start gap-2.5">
                                     <Mail className="w-4 h-4 text-slate-400 mt-0.5" />
-                                    <div>
+                                    <div className="min-w-0 flex-1">
                                         <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Username (Email)</div>
                                         <div className="text-sm font-medium text-slate-700 break-all">{user.email}</div>
-                                    </div>
-                                </div>
-                                <div className="flex items-start gap-2.5">
-                                    <KeyRound className="w-4 h-4 text-slate-400 mt-0.5" />
-                                    <div>
-                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Password</div>
-                                        <div className="text-xs font-mono bg-white px-2 py-1 rounded border border-slate-200 text-slate-600 inline-block">
-                                            {passwords[user.email] || 'No password set'}
-                                        </div>
+                                        <Link
+                                            href={`/dashboard/users/create?email=${encodeURIComponent(user.email)}&role=${user.role}`}
+                                            className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline mt-1.5"
+                                        >
+                                            <KeyRound className="w-3 h-3" />
+                                            Reset Password
+                                        </Link>
                                     </div>
                                 </div>
                                 {activeTab === 'clients' && user.company && (

@@ -1,9 +1,18 @@
 'use client';
 import React, { useState } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { ArrowLeft } from 'lucide-react';
-import LegacyInvoiceModule from '@/components/invoices/LegacyInvoiceModule';
-import AMCInvoiceModule from '@/components/invoices/AMCInvoiceModule';
+
+const LegacyInvoiceModule = dynamic(() => import('@/components/invoices/LegacyInvoiceModule'), {
+    ssr: false,
+    loading: () => <div className="p-12 text-center text-gray-400 font-medium animate-pulse">Loading invoice editor...</div>
+});
+
+const AMCInvoiceModule = dynamic(() => import('@/components/invoices/AMCInvoiceModule'), {
+    ssr: false,
+    loading: () => <div className="p-12 text-center text-gray-400 font-medium animate-pulse">Loading AMC invoice editor...</div>
+});
 
 export default function LegacyInvoicePage() {
     const [activeTab, setActiveTab] = useState<'legacy' | 'amc'>('legacy');
@@ -30,7 +39,7 @@ export default function LegacyInvoicePage() {
     );
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-20 overflow-x-hidden">
+        <div className="min-h-screen bg-gray-50 pb-20 overflow-x-hidden" suppressHydrationWarning>
             {/* Print CSS: hide nav/header during print */}
             <style>{`
                 @media print {

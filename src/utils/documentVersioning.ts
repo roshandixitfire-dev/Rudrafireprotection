@@ -54,9 +54,10 @@ export const fetchNextQuotationNumber = async (type: 'professional' | 'legacy' |
         if (!error && data) {
             return `${prefix}${String(data).padStart(padding, '0')}`;
         }
-        console.error(`Error fetching sequence for ${type}:`, error);
-    } catch (err) {
-        console.error(`Exception fetching sequence for ${type}:`, err);
+        const errMsg = error?.message || error?.details || (error ? JSON.stringify(error) : 'No sequence returned');
+        console.error(`Error fetching sequence for ${type}: ${errMsg}`);
+    } catch (err: any) {
+        console.error(`Exception fetching sequence for ${type}:`, err?.message || String(err));
     }
 
     // Fallback: This should ideally not happen if the RPC is set up

@@ -19,7 +19,8 @@ const AMCQuotePreview: React.FC<{ data: AMCQuotation }> = ({ data }) => {
         <div id="amc-print-page" style={{
             width: '210mm', minHeight: '297mm', background: '#fff',
             fontFamily: 'Arial, sans-serif', boxSizing: 'border-box',
-            margin: '0 auto', position: 'relative'
+            margin: '0 auto', position: 'relative',
+            display: 'flex', flexDirection: 'column', justifyContent: 'space-between'
         }}>
             <style>{`
                 @media print {
@@ -64,6 +65,19 @@ const AMCQuotePreview: React.FC<{ data: AMCQuotation }> = ({ data }) => {
                     #amc-print-page { 
                         box-shadow: 0 0 10px rgba(0,0,0,0.15); 
                         position: relative;
+                        display: flex !important;
+                        flex-direction: column !important;
+                        justify-content: space-between !important;
+                        min-height: 297mm !important;
+                    }
+                    #amc-print-page > table {
+                        flex: 1 0 auto;
+                    }
+                    #amc-print-page .visual-footer {
+                        margin-top: auto !important;
+                        position: relative !important;
+                        width: 100% !important;
+                        background: #fff !important;
                     }
                     .watermark { display: none; }
                 }
@@ -205,11 +219,17 @@ const AMCQuotePreview: React.FC<{ data: AMCQuotation }> = ({ data }) => {
 
                                 <div style={{ marginTop: 15 }}>
                                     <div style={{ fontSize: 10, fontWeight: 800, textDecoration: 'underline', marginBottom: 10 }}>Terms &amp; Conditions:-</div>
-                                    <ol style={{ margin: 0, paddingLeft: 14, fontSize: 10.5, color: '#333' }}>
-                                        {data.terms.map((t, i) => (
-                                            <li key={i} style={{ marginBottom: 4 }}>{t}</li>
-                                        ))}
-                                    </ol>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 10.5, color: '#333' }}>
+                                        {data.terms.map((t, i) => {
+                                            const cleanText = t.replace(/^\d+[\.\)\-]\s*/, '');
+                                            return (
+                                                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 6 }}>
+                                                    <span style={{ fontWeight: 700, minWidth: 16 }}>{i + 1}.</span>
+                                                    <span style={{ flex: 1, whiteSpace: 'pre-line' }}>{cleanText}</span>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
 
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: 20 }}>
@@ -222,13 +242,13 @@ const AMCQuotePreview: React.FC<{ data: AMCQuotation }> = ({ data }) => {
                                             <div>IFSC Code : SBIN0016719</div>
                                         </div>
                                     </div>
-                                    <div style={{ border: '1px solid #000', padding: '10px 15px', height: '110px', width: '250px', position: 'relative' }}>
-                                        <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 50 }}>For, Rudra Fire Protection</div>
-                                        {data.includeSignature !== false && (
-                                            <div style={{ position: 'absolute', bottom: '25px', left: '25px', height: '38px', pointerEvents: 'none' }}>
-                                                <img src="/signature.png" alt="Signature" style={{ height: '100%', width: 'auto', mixBlendMode: 'multiply' }} />
-                                            </div>
-                                        )}
+                                    <div style={{ padding: '10px 15px', minHeight: '105px', width: '250px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                                        <div style={{ fontSize: 10, fontWeight: 700, marginBottom: '6px' }}>For, Rudra Fire Protection</div>
+                                        <div style={{ height: '42px', display: 'flex', alignItems: 'center', margin: '4px 0' }}>
+                                            {data.includeSignature !== false && (
+                                                <img src="/signature.png" alt="Signature" style={{ height: '38px', width: 'auto', mixBlendMode: 'multiply', display: 'block' }} />
+                                            )}
+                                        </div>
                                         <div style={{ fontSize: 10, fontWeight: 800 }}>Authorised Signatory</div>
                                     </div>
                                 </div>
@@ -247,7 +267,7 @@ const AMCQuotePreview: React.FC<{ data: AMCQuotation }> = ({ data }) => {
             </table>
 
             {/* ─── VISUAL FOOTER (Fixed at absolute bottom of every page) ─── */}
-            <div className="visual-footer" style={{ padding: '10px 10mm 15px 10mm', borderTop: '1px solid #999' }}>
+            <div className="visual-footer" style={{ padding: '10px 10mm 15px 10mm', borderTop: '1px solid #999', marginTop: 'auto', width: '100%' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', fontSize: '10px', color: '#374151' }}>
                     <div>17 Navjeevan Vikas Society, Motilal Nagar, Goregaon West, Mumbai 400104 ☎ 7777088817</div>
                     <div style={{ color: '#6b7280' }}>Page 1 / 1</div>

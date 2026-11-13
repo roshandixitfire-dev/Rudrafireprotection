@@ -9,6 +9,7 @@ import { ClientSearchInput, ClientRec } from './ClientSearchInput';
 import { checkClientExists, addClientToCRM, createLeadFromQuotation } from '@/utils/crmHelper';
 import { useFormDraft } from '@/hooks/useFormDraft';
 import DraftNoticeBanner from '@/components/common/DraftNoticeBanner';
+import { exportLegacyQuoteToDoc } from '@/utils/exportDoc';
 
 const supabase = createClient();
 
@@ -176,7 +177,8 @@ const LegacyQuotePreview: React.FC<{ data: LegacyQuotation }> = ({ data }) => {
         <div id="legacy-print-page" style={{
             width: '210mm', minHeight: '297mm', background: '#fff',
             fontFamily: 'Arial, sans-serif', boxSizing: 'border-box',
-            margin: '0 auto', position: 'relative'
+            margin: '0 auto', position: 'relative',
+            display: 'flex', flexDirection: 'column', justifyContent: 'space-between'
         }}>
             <style>{`
                 @media print {
@@ -223,6 +225,19 @@ const LegacyQuotePreview: React.FC<{ data: LegacyQuotation }> = ({ data }) => {
                     #legacy-print-page { 
                         box-shadow: 0 0 10px rgba(0,0,0,0.15); 
                         position: relative;
+                        display: flex !important;
+                        flex-direction: column !important;
+                        justify-content: space-between !important;
+                        min-height: 297mm !important;
+                    }
+                    #legacy-print-page > table {
+                        flex: 1 0 auto;
+                    }
+                    #legacy-print-page .visual-footer {
+                        margin-top: auto !important;
+                        position: relative !important;
+                        width: 100% !important;
+                        background: #fff !important;
                     }
                     /* Page Break Indicators */
                     .page-break-line {
@@ -390,13 +405,13 @@ const LegacyQuotePreview: React.FC<{ data: LegacyQuotation }> = ({ data }) => {
                                 </div>
 
                                 {/* Signature Block */}
-                                <div style={{ border: '1px solid #000', marginTop: '-1px', padding: '10px 15px', height: '110px', position: 'relative' }}>
-                                    <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 50 }}>For, Rudra Fire Protection</div>
-                                    {data.includeSignature !== false && (
-                                        <div style={{ position: 'absolute', bottom: '25px', left: '25px', height: '38px', pointerEvents: 'none' }}>
-                                            <img src="/signature.png" alt="Signature" style={{ height: '100%', width: 'auto', mixBlendMode: 'multiply' }} />
-                                        </div>
-                                    )}
+                                <div style={{ border: '1px solid #000', marginTop: '-1px', padding: '10px 15px', minHeight: '105px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                                    <div style={{ fontSize: 10, fontWeight: 700, marginBottom: '6px' }}>For, Rudra Fire Protection</div>
+                                    <div style={{ height: '42px', display: 'flex', alignItems: 'center', margin: '4px 0' }}>
+                                        {data.includeSignature !== false && (
+                                            <img src="/signature.png" alt="Signature" style={{ height: '38px', width: 'auto', mixBlendMode: 'multiply', display: 'block' }} />
+                                        )}
+                                    </div>
                                     <div style={{ fontSize: 10, fontWeight: 800 }}>Authorised Signatory</div>
                                 </div>
 
@@ -415,7 +430,7 @@ const LegacyQuotePreview: React.FC<{ data: LegacyQuotation }> = ({ data }) => {
             </table>
 
             {/* ─── VISUAL FOOTER (Fixed at absolute bottom of every page) ─── */}
-            <div className="visual-footer" style={{ padding: '10px 10mm 15px 10mm', borderTop: '1px solid #999' }}>
+            <div className="visual-footer" style={{ padding: '10px 10mm 15px 10mm', borderTop: '1px solid #999', marginTop: 'auto', width: '100%' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', fontSize: '10px', color: '#374151' }}>
                     <div>17 Navjeevan Vikas Society, Motilal Nagar, Goregaon West, Mumbai 400104 ☎ 7777088817</div>
                     <div style={{ color: '#6b7280' }}>Page 1 / 1</div>
@@ -779,6 +794,25 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
         setData({ ...defaultData, quoteNo: newQuoteNo });
     };
 
+    const handleDuplicateCurrent = async () => {
+        if (!window.confirm(`Duplicate quotation ${data.quoteNo}? A new draft with the next sequence number will be created.`)) return;
+        const newQuoteNo = await fetchNextQuotationNumber('legacy');
+        clearDraft();
+        setSavedId(null);
+        setData(prev => ({
+            ...prev,
+            quoteNo: newQuoteNo,
+            date: todayISO(),
+            items: prev.items.map((it, idx) => ({
+                ...it,
+                id: `${Date.now()}-${idx}-${Math.random().toString(36).substr(2, 6)}`
+            }))
+        }));
+        setDbStatus('idle');
+        router.push('/dashboard/quotations/legacy');
+        alert(`Quotation duplicated as ${newQuoteNo}! You can edit details and click Save.`);
+    };
+
     const addEmptyRow = () => setData(prev => ({ ...prev, items: [...prev.items, makeDefaultItem()] }));
     const removeItem = (id: string) => setData(prev => ({ ...prev, items: prev.items.filter(it => it.id !== id) }));
 
@@ -825,7 +859,7 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                 {/* Print action bar */}
                 <div className="no-print flex flex-wrap items-center gap-2 p-3 sm:px-4 sm:py-2 bg-[#1a1a1a] border-b border-[#333] shrink-0">
                     <button onClick={() => setShowPreview(false)} style={{ padding: '6px 14px', background: '#555', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}>← Edit</button>
-                    <button onClick={saveToDb} disabled={dbStatus === 'saving'} style={{ padding: '6px 14px', background: dbStatus === 'saved' ? '#16a34a' : dbStatus === 'error' ? '#dc2626' : '#1a73e8', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}>
+                    <button onClick={saveToDb} suppressHydrationWarning disabled={dbStatus === 'saving'} style={{ padding: '6px 14px', background: dbStatus === 'saved' ? '#16a34a' : dbStatus === 'error' ? '#dc2626' : '#1a73e8', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}>
                         {dbStatus === 'saving' ? '⏳ Saving...' : dbStatus === 'saved' ? '✓ Saved!' : dbStatus === 'error' ? '✗ Error' : '💾 Save'}
                     </button>
                     <button onClick={() => {
@@ -836,6 +870,7 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                         window.print();
                         setTimeout(() => { document.title = originalTitle; }, 1000);
                     }} style={{ padding: '6px 14px', background: '#E3242B', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}>🖨 Print / PDF</button>
+                    <button onClick={() => exportLegacyQuoteToDoc(data)} style={{ padding: '6px 14px', background: '#2563EB', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>📄 Save as Word (.doc)</button>
                     <span className="ml-auto text-[#aaa] text-[11px] w-full sm:w-auto text-right mt-2 sm:mt-0">A4 Preview Mode</span>
                 </div>
                 <div style={{ flex: 1, overflow: 'auto', padding: '20px 0' }}>
@@ -848,7 +883,7 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
     }
 
     return (
-        <div className="quotation-container">
+        <div className="quotation-container" suppressHydrationWarning>
             <DraftNoticeBanner
                 hasDraft={hasDraft}
                 draftTime={draftTime}
@@ -860,10 +895,12 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
             <QuotationStickyHeader
                 actions={
                     <>
-                        <button onClick={handleNewQuote} style={{ padding: '7px 14px', background: '#fff', color: '#888', border: '1px solid #ddd', borderRadius: 6, cursor: 'pointer', fontSize: 12 }}>🆕 New Quote</button>
+                        <button onClick={handleNewQuote} suppressHydrationWarning style={{ padding: '7px 14px', background: '#fff', color: '#888', border: '1px solid #ddd', borderRadius: 6, cursor: 'pointer', fontSize: 12 }}>🆕 New Quote</button>
+                        <button onClick={handleDuplicateCurrent} suppressHydrationWarning style={{ padding: '7px 14px', background: '#fff', color: '#b45309', border: '1px solid #fde68a', borderRadius: 6, cursor: 'pointer', fontWeight: 600, fontSize: 12 }}>📋 Duplicate</button>
                         <button onClick={saveToDb} disabled={dbStatus === 'saving'} style={{ padding: '7px 16px', background: dbStatus === 'saved' ? '#16a34a' : dbStatus === 'error' ? '#dc2626' : '#1a73e8', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
                             {dbStatus === 'saving' ? '⏳ Saving...' : dbStatus === 'saved' ? '✓ Saved!' : dbStatus === 'error' ? '✗ Error – Retry' : '💾 Save'}
                         </button>
+                        <button onClick={() => exportLegacyQuoteToDoc(data)} style={{ padding: '7px 16px', background: '#2563EB', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>📄 Word (.doc)</button>
                         <button onClick={() => setShowPreview(true)} style={{ padding: '8px 18px', background: '#E3242B', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>Preview / Print →</button>
                     </>
                 }
@@ -1218,6 +1255,10 @@ const LegacyQuoteModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => {
                     }}
                         style={{ padding: '10px 30px', background: '#E3242B', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 700, fontSize: 14 }}>
                         🖨️ Print / Download PDF
+                    </button>
+                    <button onClick={() => exportLegacyQuoteToDoc(data)}
+                        style={{ padding: '10px 30px', background: '#2563EB', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 700, fontSize: 14 }}>
+                        📄 Save as Word (.doc)
                     </button>
                     <button onClick={() => setShowPreview(false)}
                         style={{ padding: '10px 30px', background: '#555', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 700, fontSize: 14 }}>

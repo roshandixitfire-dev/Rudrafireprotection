@@ -1,13 +1,14 @@
-'use client'
+'use client';
+import { exportLegacyQuoteToDoc, exportLegacyInvoiceToDoc, exportAMCQuoteToDoc, exportProfessionalQuoteToDoc } from '@/utils/exportDoc';
 
 import { useState, useTransition, useMemo, useEffect } from 'react'
 import Link from 'next/link'
 import {
     Plus, Search, FileText, FileDown, Eye, Pencil, Trash2,
     LayoutGrid, List, Filter, TrendingUp, Receipt,
-    ClipboardList, IndianRupee, ChevronDown, X, AlertTriangle, Tag, CreditCard, Calculator
+    ClipboardList, IndianRupee, ChevronDown, X, AlertTriangle, Tag, CreditCard, Calculator, Copy
 } from 'lucide-react'
-import { deleteQuotation, deleteInvoice, updateQuotationStatus, payInvoice } from '@/app/dashboard/sales/actions'
+import { deleteQuotation, deleteInvoice, updateQuotationStatus, payInvoice, duplicateQuotation } from '@/app/dashboard/sales/actions'
 import { TagQuoteModal } from './TagQuoteModal'
 import { PayInvoiceModal } from './PayInvoiceModal'
 import { SalesBulkImportModal } from './SalesBulkImportModal'
@@ -53,6 +54,20 @@ function formatCurrency(val: number | null | undefined) {
     return '₹' + val.toLocaleString('en-IN')
 }
 
+function formatCompactIndian(val: number | null | undefined): string {
+    if (val == null || isNaN(val)) return '—'
+    const absVal = Math.abs(val)
+    if (absVal >= 10000000) {
+        const cr = val / 10000000
+        return '₹' + (Number.isInteger(cr) ? cr.toString() : cr.toFixed(2).replace(/\.?0+$/, '')) + ' Cr'
+    }
+    if (absVal >= 100000) {
+        const lakh = val / 100000
+        return '₹' + (Number.isInteger(lakh) ? lakh.toString() : lakh.toFixed(2).replace(/\.?0+$/, '')) + ' L'
+    }
+    return '₹' + val.toLocaleString('en-IN')
+}
+
 function getStatusStyle(status: string) {
     switch (status?.toLowerCase()) {
         case 'draft': return 'bg-slate-100 text-slate-600 border border-slate-200'
@@ -83,18 +98,23 @@ function getTypeBadge(type: RecordType) {
 // ─────────────────────────────────────────────────────────────────
 // Dashboard Stat Card
 // ─────────────────────────────────────────────────────────────────
-function StatCard({ icon: Icon, label, value, sub, color }: {
-    icon: any; label: string; value: string | number; sub?: string; color: string
+function StatCard({ icon: Icon, label, value, tooltip, sub, color }: {
+    icon: React.ComponentType<{ className?: string }>; label: string; value: string | number; tooltip?: string; sub?: string; color: string
 }) {
     return (
-        <div className={`bg-white rounded-2xl border border-slate-100 shadow-sm p-5 flex items-center gap-4 hover:shadow-md transition-shadow group`}>
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${color}`}>
-                <Icon className="w-6 h-6" />
+        <div
+            title={tooltip || (typeof value === 'string' ? value : undefined)}
+            className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 sm:p-5 flex items-center gap-3 sm:gap-4 hover:shadow-md transition-shadow group min-w-0"
+        >
+            <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${color}`}>
+                <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
-            <div className="min-w-0">
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-0.5">{label}</p>
-                <p className="text-2xl font-black text-slate-900 leading-none">{value}</p>
-                {sub && <p className="text-xs text-slate-400 mt-1">{sub}</p>}
+            <div className="min-w-0 flex-1">
+                <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-400 mb-0.5">{label}</p>
+                <p className="text-lg sm:text-xl xl:text-2xl font-black text-slate-900 leading-tight tracking-tight cursor-default whitespace-nowrap overflow-visible">
+                    {value}
+                </p>
+                {sub && <p className="text-[11px] sm:text-xs text-slate-400 mt-1 truncate" title={sub}>{sub}</p>}
             </div>
         </div>
     )
@@ -244,6 +264,34 @@ export default function SalesHub({ quotations, invoices, clients, accessLevel }:
     }, [records, typeFilter, statusFilter, searchTerm])
 
     // ── Actions ──────────────────────────────────────────────────
+    const handleExportDoc = async (r: SalesRecord) => {
+        try {
+            if (r.recordType === 'legacy') {
+                const data = r.raw.data || r.raw;
+                await exportLegacyQuoteToDoc(data);
+            } else if (r.recordType === 'invoice') {
+                const data = r.raw.data || r.raw;
+                await exportLegacyInvoiceToDoc(data);
+            } else if (r.recordType === 'amc') {
+                const data = r.raw.data || r.raw;
+                await exportAMCQuoteToDoc(data);
+            } else if (r.recordType === 'professional') {
+                const data = r.raw.data || r.raw;
+                const sections = data.sections || [];
+                const totals = {
+                    subtotal: r.value,
+                    tax: data.tax_total || 0,
+                    grandTotal: r.value,
+                    sectionTotals: sections.map((s: any) => ({ name: s.name, total: (s.items || []).reduce((sum: number, it: any) => sum + ((it.qty || 1) * (it.rate || 0)), 0) }))
+                };
+                await exportProfessionalQuoteToDoc(data, totals);
+            }
+        } catch (e) {
+            console.error('Error exporting doc:', e);
+            handleEdit(r);
+        }
+    };
+
     const handleEdit = (r: SalesRecord) => {
         if (r.recordType === 'invoice') {
             window.location.href = `/dashboard/invoices/legacy`
@@ -254,6 +302,34 @@ export default function SalesHub({ quotations, invoices, clients, accessLevel }:
         } else {
             window.location.href = `/dashboard/quotations/legacy?id=${r.id}`
         }
+    }
+
+    const handleDuplicate = (r: SalesRecord) => {
+        if (!confirm(`Duplicate quotation "${r.number}"? A new quotation with the next sequence number will be created.`)) return
+        startTransition(async () => {
+            const res = await duplicateQuotation(r.id, r.recordType)
+            if (res.success && res.data) {
+                const newRec = res.data
+                const formattedRec: SalesRecord = {
+                    id: String(newRec.id),
+                    recordType: (newRec.recordType || r.recordType) as any,
+                    number: newRec.quote_no || newRec.quotation_number,
+                    client: newRec.company_name || newRec.clients?.name || r.client,
+                    date: newRec.quote_date || newRec.quotation_date || new Date().toISOString(),
+                    validUntil: undefined,
+                    value: Number(newRec.grand_total || 0),
+                    status: 'Draft',
+                    raw: newRec
+                }
+                setAllRecords(prev => ({
+                    ...prev,
+                    quotations: [formattedRec, ...prev.quotations]
+                }))
+                alert(`Quotation duplicated successfully as ${formattedRec.number}!`)
+            } else {
+                alert(res.error || 'Failed to duplicate quotation')
+            }
+        })
     }
 
     const handleDeleteConfirm = () => {
@@ -381,8 +457,9 @@ export default function SalesHub({ quotations, invoices, clients, accessLevel }:
                 <StatCard
                     icon={IndianRupee}
                     label="Quote Value"
-                    value={formatCurrency(quoteValue)}
-                    sub="Combined total"
+                    value={formatCompactIndian(quoteValue)}
+                    tooltip={`Exact Quote Value: ${formatCurrency(quoteValue)}`}
+                    sub={quoteValue >= 100000 ? formatCurrency(quoteValue) : "Combined total"}
                     color="bg-violet-100 text-violet-700"
                 />
                 <StatCard
@@ -395,8 +472,9 @@ export default function SalesHub({ quotations, invoices, clients, accessLevel }:
                 <StatCard
                     icon={TrendingUp}
                     label="Invoice Value"
-                    value={formatCurrency(invoiceValue)}
-                    sub="Combined total"
+                    value={formatCompactIndian(invoiceValue)}
+                    tooltip={`Exact Invoice Value: ${formatCurrency(invoiceValue)}`}
+                    sub={invoiceValue >= 100000 ? formatCurrency(invoiceValue) : "Combined total"}
                     color="bg-orange-100 text-orange-600"
                 />
             </div>
@@ -572,12 +650,28 @@ export default function SalesHub({ quotations, invoices, clients, accessLevel }:
                                                     </button>
                                                 )}
                                                 <button
+                                                    onClick={() => handleExportDoc(r)}
+                                                    className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors border border-transparent hover:border-blue-100"
+                                                    title="Save as Word (.doc)"
+                                                >
+                                                    <FileText className="w-4 h-4" />
+                                                </button>
+                                                <button
                                                     onClick={() => handleEdit(r)}
                                                     className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors border border-transparent hover:border-blue-100"
                                                     title="Edit"
                                                 >
                                                     <Pencil className="w-4 h-4" />
                                                 </button>
+                                                {r.recordType !== 'invoice' && (
+                                                    <button
+                                                        onClick={() => handleDuplicate(r)}
+                                                        className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors border border-transparent hover:border-amber-100"
+                                                        title="Duplicate Quote"
+                                                    >
+                                                        <Copy className="w-4 h-4" />
+                                                    </button>
+                                                )}
                                                 <button
                                                     onClick={() => alert('Activity log coming soon')}
                                                     className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors border border-transparent hover:border-slate-200"
@@ -641,9 +735,17 @@ export default function SalesHub({ quotations, invoices, clients, accessLevel }:
                                                 <CreditCard className="w-3.5 h-3.5" />
                                             </button>
                                         )}
+                                        <button onClick={() => handleExportDoc(r)} className="p-1.5 text-blue-600 hover:bg-blue-100 rounded-lg" title="Save as Word (.doc)">
+                                            <FileText className="w-3.5 h-3.5" />
+                                        </button>
                                         <button onClick={() => handleEdit(r)} className="p-1.5 text-blue-600 hover:bg-blue-100 rounded-lg" title="Edit">
                                             <Pencil className="w-3.5 h-3.5" />
                                         </button>
+                                        {r.recordType !== 'invoice' && (
+                                            <button onClick={() => handleDuplicate(r)} className="p-1.5 text-amber-600 hover:bg-amber-100 rounded-lg" title="Duplicate Quote">
+                                                <Copy className="w-3.5 h-3.5" />
+                                            </button>
+                                        )}
                                         <button onClick={() => alert('Log coming soon')} className="p-1.5 text-slate-500 hover:bg-slate-200 rounded-lg" title="Log">
                                             <Eye className="w-3.5 h-3.5" />
                                         </button>

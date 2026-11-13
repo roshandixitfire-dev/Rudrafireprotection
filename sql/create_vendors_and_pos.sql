@@ -77,3 +77,61 @@ CREATE POLICY "Public Full Access" ON public.purchase_orders FOR ALL USING (true
 
 DROP POLICY IF EXISTS "Public Full Access" ON public.purchase_order_items;
 CREATE POLICY "Public Full Access" ON public.purchase_order_items FOR ALL USING (true);
+
+-- ==================================================================================
+-- 6. Create work_orders table (Convert from Quotations or Manual Entry)
+-- ==================================================================================
+CREATE TABLE IF NOT EXISTS public.work_orders (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    wo_number TEXT UNIQUE NOT NULL,
+    wo_date DATE NOT NULL DEFAULT CURRENT_DATE,
+    ref_quotation_no TEXT,
+    quotation_id TEXT,
+    quotation_type TEXT,
+    client_name TEXT NOT NULL,
+    contact_person TEXT,
+    client_phone TEXT,
+    client_email TEXT,
+    client_gst TEXT,
+    site_name TEXT,
+    site_street TEXT,
+    site_location TEXT,
+    site_city TEXT,
+    site_state TEXT DEFAULT 'Maharashtra',
+    site_pin TEXT,
+    vendor_id BIGINT REFERENCES public.vendors(id) ON DELETE SET NULL,
+    subtotal DECIMAL(12,2) NOT NULL DEFAULT 0,
+    tax_rate DECIMAL(5,2) NOT NULL DEFAULT 18,
+    tax_total DECIMAL(12,2) NOT NULL DEFAULT 0,
+    other_total DECIMAL(12,2) NOT NULL DEFAULT 0,
+    grand_total DECIMAL(12,2) NOT NULL DEFAULT 0,
+    status TEXT DEFAULT 'Draft',
+    special_instructions TEXT,
+    raw_json JSONB,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 7. Create work_order_items table
+CREATE TABLE IF NOT EXISTS public.work_order_items (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    work_order_id UUID REFERENCES public.work_orders(id) ON DELETE CASCADE,
+    item_no TEXT,
+    description TEXT NOT NULL,
+    quantity DECIMAL(10,2) NOT NULL DEFAULT 1,
+    unit TEXT DEFAULT 'Nos',
+    unit_price DECIMAL(12,2) NOT NULL DEFAULT 0,
+    total_price DECIMAL(12,2) NOT NULL DEFAULT 0,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.work_orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.work_order_items ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public Full Access" ON public.work_orders;
+CREATE POLICY "Public Full Access" ON public.work_orders FOR ALL USING (true);
+
+DROP POLICY IF EXISTS "Public Full Access" ON public.work_order_items;
+CREATE POLICY "Public Full Access" ON public.work_order_items FOR ALL USING (true);
+

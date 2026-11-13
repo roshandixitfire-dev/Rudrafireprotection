@@ -21,7 +21,7 @@ const QuotationStickyHeader: React.FC<{ actions: React.ReactNode }> = ({ actions
                 </div>
             </div>
             
-            <div className="flex flex-wrap items-center gap-2 shrink-0 mt-2 md:mt-0">
+            <div className="flex flex-wrap items-center gap-2 shrink-0 mt-2 md:mt-0" suppressHydrationWarning>
                 {actions}
             </div>
         </div>

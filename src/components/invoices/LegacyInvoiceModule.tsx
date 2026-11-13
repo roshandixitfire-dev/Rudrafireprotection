@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { useFormDraft } from '@/hooks/useFormDraft';
 import DraftNoticeBanner from '@/components/common/DraftNoticeBanner';
+import { exportLegacyInvoiceToDoc } from '@/utils/exportDoc';
 
 const supabase = createClient();
 
@@ -379,10 +380,10 @@ const LegacyInvoicePreview: React.FC<{ data: LegacyInvoice }> = ({ data }) => {
                                     </div>
                                 </div>
 
-                                <div style={{ border: '1px solid #000', borderTop: 'none', padding: '10px 15px', height: '110px', position: 'relative' }}>
-                                    <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 50 }}>For, Rudra Fire Protection</div>
-                                    <div style={{ position: 'absolute', bottom: '25px', left: '25px', height: '38px', pointerEvents: 'none' }}>
-                                        <img src="/signature.png" alt="Signature" style={{ height: '100%', width: 'auto', mixBlendMode: 'multiply' }} />
+                                <div style={{ border: '1px solid #000', borderTop: 'none', padding: '10px 15px', minHeight: '105px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                                    <div style={{ fontSize: 10, fontWeight: 700, marginBottom: '6px' }}>For, Rudra Fire Protection</div>
+                                    <div style={{ height: '42px', display: 'flex', alignItems: 'center', margin: '4px 0' }}>
+                                        <img src="/signature.png" alt="Signature" style={{ height: '38px', width: 'auto', mixBlendMode: 'multiply', display: 'block' }} />
                                     </div>
                                     <div style={{ fontSize: 10, fontWeight: 800 }}>Authorised Signatory</div>
                                 </div>
@@ -849,6 +850,7 @@ const LegacyInvoiceModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => 
                         {dbStatus === 'saving' ? '⏳ Saving...' : dbStatus === 'saved' ? '✓ Saved!' : dbStatus === 'error' ? '✗ Error' : '💾 Save'}
                     </button>
                     <button onClick={() => window.print()} style={{ padding: '6px 14px', background: '#E3242B', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}>🖨 Print / PDF</button>
+                    <button onClick={() => exportLegacyInvoiceToDoc(data)} style={{ padding: '6px 14px', background: '#2563EB', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>📄 Save as Word (.doc)</button>
                     <span style={{ color: '#aaa', fontSize: 11, marginLeft: 'auto' }}>A4 Preview Mode — {getInvoiceLabel(data.invoiceType)}</span>
                 </div>
                 <div style={{ flex: 1, overflow: 'auto', padding: '20px 0' }}>
@@ -880,6 +882,7 @@ const LegacyInvoiceModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => 
                     <button onClick={saveToDb} disabled={dbStatus === 'saving'} style={{ padding: '7px 16px', background: dbStatus === 'saved' ? '#16a34a' : dbStatus === 'error' ? '#dc2626' : '#1a73e8', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
                         {dbStatus === 'saving' ? '⏳ Saving...' : dbStatus === 'saved' ? '✓ Saved!' : dbStatus === 'error' ? '✗ Error – Retry' : '💾 Save'}
                     </button>
+                    <button onClick={() => exportLegacyInvoiceToDoc(data)} style={{ padding: '7px 16px', background: '#2563EB', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>📄 Word (.doc)</button>
                     <button onClick={() => setShowPreview(true)} style={{ padding: '8px 18px', background: '#E3242B', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>Preview / Print →</button>
                 </div>
             </div>
@@ -1196,6 +1199,10 @@ const LegacyInvoiceModule: React.FC<{ tabs?: React.ReactNode }> = ({ tabs }) => 
                     <button onClick={() => window.print()}
                         style={{ padding: '10px 30px', background: '#E3242B', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 700, fontSize: 14 }}>
                         🖨️ Print / Download PDF
+                    </button>
+                    <button onClick={() => exportLegacyInvoiceToDoc(data)}
+                        style={{ padding: '10px 30px', background: '#2563EB', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 700, fontSize: 14 }}>
+                        📄 Save as Word (.doc)
                     </button>
                     <button onClick={() => setShowPreview(true)}
                         style={{ padding: '10px 30px', background: '#555', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 700, fontSize: 14 }}>
